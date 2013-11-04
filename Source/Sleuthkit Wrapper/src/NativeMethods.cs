@@ -193,7 +193,6 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern byte tsk_fs_dir_walk(FileSystemHandle fs, long directory_address, DirWalkFlags walk_flags, DirWalkDelegate callback, IntPtr a_ptr);
 
-
         #endregion
 
         #region meta
@@ -205,6 +204,16 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern byte tsk_fs_meta_walk(FileSystemHandle fs, long start_address, long end_address, MetadataFlags walk_flags, MetaWalkDelegate callback, IntPtr a_ptr);
 
+
+        #endregion
+
+        #region error stuff
+
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern uint tsk_error_get_errno();
+
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr tsk_error_get_errstr();
 
         #endregion
 

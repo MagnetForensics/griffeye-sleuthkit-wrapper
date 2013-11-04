@@ -239,7 +239,7 @@
         {
             // Parallel read via a for loop
             Parallel.ForEach(
-                FilePaths,
+                FilePaths, new ParallelOptions() {MaxDegreeOfParallelism = 1},
                 filePath =>
                 {
                     WrapperStopwatch.Start();
@@ -252,6 +252,12 @@
                             // Construct file stream
                             using (var stream = new FileStream(file))
                             {
+                                /*
+                                byte[] buffer = new byte[64];
+                                int bytesread = stream.Read(buffer, 0, 64);
+                                stream.Seek(0, SeekOrigin.Begin);
+                                //*/
+
                                 // Calculate md5 hash
                                 MD5 md5 = new MD5CryptoServiceProvider();
                                 byte[] hash = md5.ComputeHash(stream);

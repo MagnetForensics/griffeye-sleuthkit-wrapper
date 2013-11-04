@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace SleuthKit
@@ -224,10 +226,20 @@ namespace SleuthKit
         {
             IntPtr ptr = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
 
-            //On error, try again
+            //On error, check for EOF
             if (ptr.ToInt32() == -1)
             {
-                ptr = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);                
+                uint errorCode = NativeMethods.tsk_error_get_errno();
+                if (errorCode == 0x08000005)
+                {
+                    return 0; //EOF reached
+                }
+                else
+                {
+                    IntPtr ptrToMessage = NativeMethods.tsk_error_get_errstr();
+                    String errorMessage = Marshal.PtrToStringAnsi(ptrToMessage);
+                    throw new IOException(String.Format("{0} (0x{1,8:X8})", errorMessage, errorCode));
+                }
             }
 
             return ptr.ToInt32();

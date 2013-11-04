@@ -55,3 +55,6 @@ EXPORTS
 	tsk_fs_open_vol
 	tsk_fs_parse_inum
 	tsk_fs_path2inum
+
+	tsk_error_get_errno
+	tsk_error_get_errstr
