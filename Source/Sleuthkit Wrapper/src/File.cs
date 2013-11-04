@@ -223,6 +223,13 @@ namespace SleuthKit
         public int ReadBytes(long offset, byte[] buffer, int amt)
         {
             IntPtr ptr = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
+
+            //On error, try again
+            if (ptr.ToInt32() == -1)
+            {
+                ptr = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);                
+            }
+
             return ptr.ToInt32();
         }
 
