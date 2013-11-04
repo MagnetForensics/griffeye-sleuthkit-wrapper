@@ -222,9 +222,8 @@ namespace SleuthKit
         /// <param name="amt"></param>        /// <returns></returns>
         public int ReadBytes(long offset, byte[] buffer, int amt)
         {
-            var ptr = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
-            var br = ptr.ToInt32();
-            return br;
+            IntPtr ptr = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
+            return ptr.ToInt32();
         }
 
         /// <summary>
