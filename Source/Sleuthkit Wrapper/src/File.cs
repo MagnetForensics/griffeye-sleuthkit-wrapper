@@ -221,7 +221,8 @@ namespace SleuthKit
         /// </summary>
         /// <param name="offset"></param>
         /// <param name="buffer"></param>
-        /// <param name="amt"></param>        /// <returns></returns>
+        /// <param name="amt"></param>        
+        /// <returns></returns>
         public int ReadBytes(long offset, byte[] buffer, int amt)
         {
             IntPtr ptr = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);

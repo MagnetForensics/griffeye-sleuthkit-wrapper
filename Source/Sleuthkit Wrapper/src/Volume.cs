@@ -125,6 +125,17 @@ namespace SleuthKit
         }
 
         /// <summary>
+        /// Address of this partition
+        /// </summary>
+        public long Address
+        {
+            get 
+            { 
+                return _struct.Address
+            }
+        }
+
+        /// <summary>
         /// Opens the filesystem on this volume, if any
         /// </summary>
         /// <param name="type"></param>
