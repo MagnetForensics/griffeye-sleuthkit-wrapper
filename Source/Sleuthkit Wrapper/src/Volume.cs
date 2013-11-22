@@ -130,8 +130,8 @@ namespace SleuthKit
         public long Address
         {
             get 
-            { 
-                return _struct.Address
+            {
+                return _struct.Address;
             }
         }
 
