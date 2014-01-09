@@ -10,35 +10,51 @@
 
     using SleuthKit;
 
+    using Directory = SleuthKit.Directory;
+    using File = SleuthKit.File;
+
     /// <summary>
-    /// This is a test class for DiskImageTest and is intended
-    /// to contain all DiskImageTest Unit Tests
+    ///     This is a test class for DiskImageTest and is intended
+    ///     to contain all DiskImageTest Unit Tests
     /// </summary>
     [TestFixture]
     public class DiskImageTest
     {
         #region Static Fields
 
+        private static readonly IList<string> FilePaths = new List<string>();
+
+        private static int allFileCount;
+
         /// <summary>
-        /// The file count.
+        ///     The file count.
         /// </summary>
-        private static int fileCount;
+        private static int jpgFileCount;
 
         #endregion
 
         #region Fields
 
         /// <summary>
-        /// The disk image.
+        ///     The disk image.
         /// </summary>
         private DiskImage diskImage;
 
         #endregion
 
         #region Public Methods and Operators
+        [SetUp]
+        public void Init()
+        {
+            allFileCount = 0;
+            jpgFileCount = 0;
+
+            // empty the list 
+            FilePaths.Clear();
+        }
 
         /// <summary>
-        /// A test for GetFileSystems
+        ///     A test for GetFileSystems
         /// </summary>
         [Test]
         public void GetFileSystemsTest()
@@ -53,7 +69,7 @@
         }
 
         /// <summary>
-        /// A test for OpenFileSystem
+        ///     A test for OpenFileSystem
         /// </summary>
         [Test]
         public void OpenFileSystemTest()
@@ -67,18 +83,18 @@
                 Assert.AreEqual(0, actual.FirstBlock);
                 Assert.AreEqual(3915743, actual.LastBlock);
 
-                fileCount = 0;
-                actual.WalkDirectories(DirectoryWalkCallback, DirWalkFlags.Recurse | DirWalkFlags.Allocated);
-                Assert.AreEqual(30, fileCount);
+                jpgFileCount = 0;
+                actual.WalkDirectories(FileCount_DirectoryWalkCallback, DirWalkFlags.Recurse | DirWalkFlags.Allocated);
+                Assert.AreEqual(30, jpgFileCount);
 
-                fileCount = 0;
-                actual.WalkDirectories(DirectoryWalkCallback, DirWalkFlags.Recurse | DirWalkFlags.Unallocated);
-                Assert.AreEqual(30, fileCount);
+                jpgFileCount = 0;
+                actual.WalkDirectories(FileCount_DirectoryWalkCallback, DirWalkFlags.Recurse | DirWalkFlags.Unallocated);
+                Assert.AreEqual(30, jpgFileCount);
             }
         }
 
         /// <summary>
-        /// A test for OpenRead
+        ///     A test for OpenRead
         /// </summary>
         [Test]
         public void OpenReadTest()
@@ -90,22 +106,84 @@
             }
         }
 
+        [Test]
+        public void OpenSingleFileFromVolume()
+        {
+            int volumeAdress = 2;
+            String filepath = @"A folder/370076.jpg";
+
+            using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
+            {
+                Volume volume = volumeSystem.Volumes.SingleOrDefault(v => v.Address == volumeAdress);
+
+                Assert.NotNull(volume);
+
+                using (FileSystem fileSystem = volume.OpenFileSystem())
+                {
+                    using (File file = fileSystem.OpenFile(filepath))
+                    {
+                        Assert.NotNull(file);
+                        Assert.AreEqual(32061, file.Size);
+                    }
+                }
+            }
+        }
+
         /// <summary>
-        /// A test for OpenVolumeSystem
+        ///     A test for OpenVolumeSystem
         /// </summary>
         [Test]
-        public void OpenVolumeSystemTest()
+        public void OpenVolumeSystemAndCountFiles()
         {
             using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
             {
                 Assert.AreEqual(3, volumeSystem.PartitionCount);
                 Assert.AreEqual(1, volumeSystem.AllocatedPartitionCount);
                 Assert.AreEqual(3, volumeSystem.Volumes.Count());
+
+                int count = 0;
+                foreach (Volume volume in volumeSystem.Volumes)
+                {
+                    using (FileSystem fileSystem = volume.OpenFileSystem())
+                    {
+                        //count += CountFiles(fileSystem.OpenRootDirectory());
+                        fileSystem.WalkDirectories(
+                            FileCount_DirectoryWalkCallback,
+                            DirWalkFlags.Recurse | DirWalkFlags.Unallocated);
+                    }
+                }
+
+                Assert.AreEqual(30, jpgFileCount);
+                    //I think it should be 63 //Bala- Autopsy shows me that there are only 30 files
+                Assert.AreEqual(37, allFileCount);
+            }
+        }
+
+        [Test]
+        public void OpenVolumeSystemAndFindFiles()
+        {
+            int volumeAdress = 2;
+
+            using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
+            {
+                Volume volume = volumeSystem.Volumes.SingleOrDefault(v => v.Address == volumeAdress);
+
+                Assert.NotNull(volume);
+
+                using (FileSystem fileSystem = volume.OpenFileSystem())
+                {
+                    //count += CountFiles(fileSystem.OpenRootDirectory());
+                    fileSystem.WalkDirectories(
+                        FindFiles_DirectoryWalkCallback,
+                        DirWalkFlags.Recurse | DirWalkFlags.Unallocated);
+                }
+
+                Assert.AreEqual(37, FilePaths.Count()); //I think it should be 63 || Bala: Autopsy shows me that there are only 30 files
             }
         }
 
         /// <summary>
-        /// A test for SectorSize
+        ///     A test for SectorSize
         /// </summary>
         [Test]
         public void SectorSizeTest()
@@ -114,7 +192,7 @@
         }
 
         /// <summary>
-        /// Sets up disk image tests.
+        ///     Sets up disk image tests.
         /// </summary>
         [SetUp]
         public void SetUpDiskImageTests()
@@ -124,7 +202,7 @@
         }
 
         /// <summary>
-        /// A test for Size
+        ///     A test for Size
         /// </summary>
         [Test]
         public void SizeTest()
@@ -133,7 +211,7 @@
         }
 
         /// <summary>
-        /// Tears down disk image tests.
+        ///     Tears down disk image tests.
         /// </summary>
         [TearDown]
         public void TearDownDiskImageTests()
@@ -149,28 +227,93 @@
         #region Methods
 
         /// <summary>
-        /// Callback function that is called for each file name during directory walk. (FileSystem.WalkDirectories)
+        ///     Callback function that is called for each file name during directory walk. (FileSystem.WalkDirectories)
         /// </summary>
         /// <param name="file">
-        /// The file struct.
+        ///     The file struct.
         /// </param>
         /// <param name="directoryPath">
-        /// The directory path.
+        ///     The directory path.
         /// </param>
         /// <param name="dataPtr">
-        /// Pointer to data that is passed to the callback function each time.
+        ///     Pointer to data that is passed to the callback function each time.
         /// </param>
         /// <returns>
-        /// Value to control the directory walk.
+        ///     Value to control the directory walk.
         /// </returns>
-        private static WalkReturnEnum DirectoryWalkCallback(ref FileStruct file, string directoryPath, IntPtr dataPtr)
+        private static WalkReturnEnum FileCount_DirectoryWalkCallback(
+            ref FileStruct file,
+            string directoryPath,
+            IntPtr dataPtr)
         {
             if (file.Name.ToString().Contains("jpg"))
             {
-                fileCount++;
+                jpgFileCount++;
+            }
+            allFileCount++;
+            return WalkReturnEnum.Continue;
+        }
+
+        /// <summary>
+        ///     Callback function that is called for each file name during directory walk. (FileSystem.WalkDirectories)
+        /// </summary>
+        /// <param name="file">
+        ///     The file struct.
+        /// </param>
+        /// <param name="directoryPath">
+        ///     The directory path.
+        /// </param>
+        /// <param name="dataPtr">
+        ///     Pointer to data that is passed to the callback function each time.
+        /// </param>
+        /// <returns>
+        ///     Value to control the directory walk.
+        /// </returns>
+        private static WalkReturnEnum FindFiles_DirectoryWalkCallback(
+            ref FileStruct file,
+            string directoryPath,
+            IntPtr dataPtr)
+        {
+            FilePaths.Add(string.Format("{0}{1}", directoryPath, file.Name));
+            return WalkReturnEnum.Continue;
+        }
+
+        private int CountFiles(Directory directory)
+        {
+            int count = 0;
+
+            if (directory == null)
+            {
+                return 0;
             }
 
-            return WalkReturnEnum.Continue;
+            foreach (Directory subDirectory in directory.Directories)
+            {
+                count += this.CountFiles(subDirectory);
+            }
+
+            count += directory.Files.Count();
+
+            return count;
+        }
+
+        private IEnumerable<String> FindFiles(Directory directory)
+        {
+            if (directory != null)
+            {
+                foreach (Directory subDirectory in directory.Directories)
+                {
+                    foreach (String path in this.FindFiles(subDirectory))
+                    {
+                        yield return path;
+                    }
+                }
+
+                foreach (File file in directory.Files)
+                {
+                    yield return file.Path;
+                }
+            }
         }
 
         #endregion

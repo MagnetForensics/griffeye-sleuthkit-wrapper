@@ -110,6 +110,10 @@
                         {
                             if (fs.WalkDirectories(DirectoryWalkCallback))
                             {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine("Volume {0}:", v.Address);
+                                Console.ResetColor();
+
                                 ProcessFiles(fs);
                             }
                         }
@@ -129,7 +133,11 @@
             }
             
             di.Dispose();
-            
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("This disk image {0} multiple volumes.", hasVolumes ? "has" : "does not have");
+            Console.ResetColor();
+
             var regularHdStopWatch = new Stopwatch();
             string[] extractedfiles = Directory.GetFiles("Images", "*.*");
 
@@ -160,6 +168,7 @@
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\nTime elapsed reading with the wrapper - {0} millisec \nTime elapsed reading with the .Net classes - {1} millisec", WrapperStopwatch.ElapsedMilliseconds, regularHdStopWatch.ElapsedMilliseconds);
+            Console.ResetColor();
             Console.ReadLine();
         }
 
