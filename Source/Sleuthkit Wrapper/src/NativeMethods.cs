@@ -124,6 +124,9 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern FileHandle tsk_fs_file_open(FileSystemHandle fs, [In] IntPtr should_be_zero, [In] string utf8path);
 
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern FileHandle tsk_fs_file_open_meta(FileSystemHandle fs, [In] IntPtr should_be_zero, [In] long metadata_address);
+
         internal static FileHandle tsk_fs_file_open_x(FileSystemHandle fs, IntPtr should_be_zero, string utf8path)
         {
             byte[] data = Encoding.Unicode.GetBytes(utf8path);
