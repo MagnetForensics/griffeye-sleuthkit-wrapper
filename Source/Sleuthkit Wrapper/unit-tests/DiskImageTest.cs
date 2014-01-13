@@ -134,7 +134,7 @@
         public void OpenSingleFileAddressFromVolume()
         {
             int volumeAddress = 2;
-            long fileAddress = 523;
+            long fileAddress = 518;
 
             using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
             {
@@ -147,7 +147,7 @@
                     using (File file = fileSystem.OpenFile(fileAddress))
                     {
                         Assert.NotNull(file);
-                        Assert.AreEqual(32061, file.Size);
+                        Assert.AreEqual(38947, file.Size);
                     }
                 }
             }

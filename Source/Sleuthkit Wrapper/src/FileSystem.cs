@@ -154,13 +154,13 @@ namespace SleuthKit
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public File OpenFile(long address, Directory parent = null)
+        public File OpenFile(long address, Directory parent = null, String name = null)
         {
             File file = null;
             var fh = NativeMethods.tsk_fs_file_open_meta(this._handle, IntPtr.Zero, address);
             if (!fh.IsInvalid)
             {
-                file = new File(this, fh, parent, null);
+                file = new File(this, fh, parent, name);
             }
             else
             {
