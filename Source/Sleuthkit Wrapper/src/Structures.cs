@@ -66,7 +66,7 @@ namespace SleuthKit
             get
             {
                 FileMetadata? ret = null;
-                if (ptr_fsinfo != IntPtr.Zero)
+                if (ptr_meta != IntPtr.Zero)
                 {
                     ret = (FileMetadata)Marshal.PtrToStructure(ptr_meta, typeof(FileMetadata));
                 }
