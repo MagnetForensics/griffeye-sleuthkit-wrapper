@@ -141,6 +141,7 @@ namespace SleuthKit
         /// </summary>
         /// <remarks>TSK_FS_NAME_TYPE_FIFO </remarks>
         NamedPipe = 1,
+
         /// <summary>
         /// Character Device
         /// </summary>

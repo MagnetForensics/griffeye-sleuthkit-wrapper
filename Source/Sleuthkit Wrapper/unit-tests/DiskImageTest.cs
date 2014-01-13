@@ -109,18 +109,42 @@
         [Test]
         public void OpenSingleFileFromVolume()
         {
-            int volumeAdress = 2;
+            int volumeAddress = 2;
             String filepath = @"A folder/370076.jpg";
 
             using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
             {
-                Volume volume = volumeSystem.Volumes.SingleOrDefault(v => v.Address == volumeAdress);
+                Volume volume = volumeSystem.Volumes.SingleOrDefault(v => v.Address == volumeAddress);
 
                 Assert.NotNull(volume);
 
                 using (FileSystem fileSystem = volume.OpenFileSystem())
                 {
                     using (File file = fileSystem.OpenFile(filepath))
+                    {
+                        Assert.NotNull(file);
+                        Assert.AreEqual(32061, file.Size);
+                        Assert.AreEqual(FilesystemNameType.Regular, file.FileStruct.Name.Value.Type);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void OpenSingleFileAddressFromVolume()
+        {
+            int volumeAddress = 2;
+            long fileAddress = 523;
+
+            using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
+            {
+                Volume volume = volumeSystem.Volumes.SingleOrDefault(v => v.Address == volumeAddress);
+
+                Assert.NotNull(volume);
+
+                using (FileSystem fileSystem = volume.OpenFileSystem())
+                {
+                    using (File file = fileSystem.OpenFile(fileAddress))
                     {
                         Assert.NotNull(file);
                         Assert.AreEqual(32061, file.Size);

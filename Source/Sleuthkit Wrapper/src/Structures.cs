@@ -133,6 +133,11 @@ namespace SleuthKit
         ulong par_addr;
 
         /// <summary>
+        /// Sequence number for parent directory (NTFS only)
+        /// </summary>
+        uint par_seq;
+
+        /// <summary>
         /// File type information (directory, file, etc.)
         /// </summary>
         FilesystemNameType type;
@@ -245,6 +250,14 @@ namespace SleuthKit
                 n = ln;
             }
             return n;
+        }
+
+        public FilesystemNameType Type
+        {
+            get 
+            {
+                return type;
+            }
         }
     }
 
