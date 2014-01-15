@@ -114,6 +114,10 @@
                                 Console.WriteLine("Volume {0}:", v.Address);
                                 Console.ResetColor();
 
+                                // temporarily pause to read console output. Press any key to continue
+                                Console.WriteLine("Press any key to continue...");
+                                Console.ReadLine();
+
                                 ProcessFiles(fs);
                             }
                         }
@@ -127,6 +131,10 @@
                 {
                     if (fs.WalkDirectories(DirectoryWalkCallback))
                     {
+                        // temporarily pause to read console output. Press any key to continue
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadLine();
+
                         ProcessFiles(fs);
                     }
                 }
@@ -248,7 +256,7 @@
         {
             // Parallel read via a for loop
             Parallel.ForEach(
-                FilePaths, new ParallelOptions() {MaxDegreeOfParallelism = 1},
+                FilePaths, new ParallelOptions() {MaxDegreeOfParallelism = 8},
                 filePath =>
                 {
                     WrapperStopwatch.Start();
@@ -261,28 +269,29 @@
                             // Construct file stream
                             using (var stream = new FileStream(file))
                             {
-                                /*
-                                byte[] buffer = new byte[64];
-                                int bytesread = stream.Read(buffer, 0, 64);
-                                stream.Seek(0, SeekOrigin.Begin);
-                                //*/
-
-                                // Calculate md5 hash
-                                MD5 md5 = new MD5CryptoServiceProvider();
-                                byte[] hash = md5.ComputeHash(stream);
-                                var builder = new StringBuilder();
-
-                                foreach (byte b in hash)
+                                try
                                 {
-                                    builder.Append(b.ToString("x2"));
-                                }
+                                    // Calculate md5 hash
+                                    MD5 md5 = new MD5CryptoServiceProvider();
+                                    byte[] hash = md5.ComputeHash(stream);
+                                    var builder = new StringBuilder();
 
-                                Console.WriteLine("{0}=> {1}", filePath, builder);
+                                    foreach (byte b in hash)
+                                    {
+                                        builder.Append(b.ToString("x2"));
+                                    }
+
+                                    Console.WriteLine("{0}=> {1}", filePath, builder);
+                                }
+                                catch (Exception) 
+                                {
+                                    Console.WriteLine("{0}=> {1}", filePath, "FAIL");
+                                }
                             }
 
                             WrapperStopwatch.Stop();
 
-                            // Copy file
+                            /* Copy file
                             System.IO.FileStream fileStream = null;
                             try
                             {
@@ -307,6 +316,7 @@
                                     fileStream.Close();
                                 }
                             }
+                            //*/
                         }
                     }
                 });

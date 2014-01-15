@@ -149,8 +149,11 @@ namespace SleuthKit
         /// <returns></returns>
         public int ReadBytes(long offset, byte[] buf, int buflen)
         {
+            /*
             IntPtr br = NativeMethods.tsk_img_read(_handle, offset, buf, buflen);
             return br.ToInt32();
+            //*/
+            return NativeMethods.tsk_img_read(_handle, offset, buf, buflen);
         }
 
         /// <summary>

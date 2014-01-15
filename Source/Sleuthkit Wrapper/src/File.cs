@@ -225,10 +225,10 @@ namespace SleuthKit
         /// <returns></returns>
         public int ReadBytes(long offset, byte[] buffer, int amt)
         {
-            IntPtr ptr = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
+            int bytesRead = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
 
             //On error, check for EOF
-            if (ptr.ToInt32() == -1)
+            if (bytesRead == -1)
             {
                 uint errorCode = NativeMethods.tsk_error_get_errno();
                 if (errorCode == 0x08000005)
@@ -243,7 +243,7 @@ namespace SleuthKit
                 }
             }
 
-            return ptr.ToInt32();
+            return bytesRead;
         }
 
         /// <summary>

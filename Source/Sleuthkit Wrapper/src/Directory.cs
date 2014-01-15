@@ -100,9 +100,7 @@ namespace SleuthKit
             {
                 if (!ec.HasValue)
                 {
-                    var result = NativeMethods.tsk_fs_dir_getsize(this._handle);
-                    var ret = (int)result.ToUInt32();
-                    ec = ret;
+                    ec = (int)NativeMethods.tsk_fs_dir_getsize(this._handle);
                 }
 
                 return ec.GetValueOrDefault(0);
