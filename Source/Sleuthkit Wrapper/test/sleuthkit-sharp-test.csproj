@@ -96,20 +96,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\Lib\libewf.dll">
-      <Link>libewf.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\Lib\libtsk4.dll">
-      <Link>libtsk4.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\Lib\zlib.dll">
-      <Link>zlib.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\src\sleuthkit-sharp.csproj">
       <Project>{828a2d64-efad-496c-a369-7c8658ae4ffa}</Project>
       <Name>sleuthkit-sharp</Name>

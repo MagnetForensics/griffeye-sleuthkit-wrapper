@@ -76,18 +76,6 @@
     <None Include="resources\USB-disk-image-FAT.E01" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\Lib\libewf.dll">
-      <Link>libewf.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\Lib\libtsk4.dll">
-      <Link>libtsk4.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\Lib\zlib.dll">
-      <Link>zlib.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="nunit\nunit.framework.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
