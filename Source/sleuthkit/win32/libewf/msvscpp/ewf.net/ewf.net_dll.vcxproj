@@ -73,12 +73,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
-    <LinkKeyFile>"D:\Development\External\Sleuthkit Wrapper\Development\Dev\Lib\ncpub.snk"</LinkKeyFile>
-    <LinkDelaySign>true</LinkDelaySign>
+    <LinkKeyFile>
+    </LinkKeyFile>
+    <LinkDelaySign>
+    </LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkKeyFile>"D:\Development\External\Sleuthkit Wrapper\Development\Dev\Lib\ncpub.snk"</LinkKeyFile>
-    <LinkDelaySign>true</LinkDelaySign>
+    <LinkKeyFile>
+    </LinkKeyFile>
+    <LinkDelaySign>
+    </LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VSDebug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
