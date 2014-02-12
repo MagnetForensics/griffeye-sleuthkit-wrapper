@@ -84,7 +84,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ewf.net">
-      <HintPath>..\..\..\Lib\ewf.net.dll</HintPath>
+      <HintPath>..\..\..\Lib\x86\ewf.net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
