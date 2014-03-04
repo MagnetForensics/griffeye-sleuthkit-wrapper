@@ -809,4 +809,89 @@ namespace SleuthKit
         /// </summary>
         All = 0x07,
     }
+
+    /// <summary>
+    /// TSK_FS_ATTR_FLAG_ENUM
+    /// </summary>
+    [Flags]
+    public enum AttributeFlags
+    {
+        /// <summary>
+        /// No Flag
+        /// </summary>
+        None = 0x00,
+
+        /// <summary>
+        /// Data structure is in use
+        /// </summary>
+        InUse = 0x01,
+
+        /// <summary>
+        /// Contains non-resident data (i.e. located in blocks)
+        /// </summary>
+        NonResident = 0x02,
+
+        /// <summary>
+        /// Contains resident data (i.e. in a small buffer)
+        /// </summary>
+        Resident = 0x04,
+
+        /// <summary>
+        /// Contains encrypted data
+        /// </summary>
+        Encrypted = 0x10,
+
+        /// <summary>
+        /// Contains compressed data
+        /// </summary>
+        Compressed = 0x20,
+
+        /// <summary>
+        /// Contains sparse data
+        /// </summary>
+        Sparse = 0x40,
+
+        /// <summary>
+        /// Data was determined in file recovery mode
+        /// </summary>
+        Recovery = 0x80,
+    }
+
+    /// <summary>
+    /// TSK_FS_ATTR_TYPE_ENUM
+    /// </summary>
+    public enum AttributeType
+    {
+        NotFound = 0x00,      // 0
+        Default = 0x01,        // 1
+
+        NtfsSi = 0x10,        // 16
+        NtfsAttrlist = 0x20,  // 32
+        NtfsFName = 0x30,     // 48
+        NtfsVVer = 0x40,      // 64 (NT)
+        NtfsObjId = 0x40,     // 64 (2K)
+        NtfsSec = 0x50,       // 80
+        NtfsVName = 0x60,     // 96
+        NtfsVInfo = 0x70,     // 112
+        NtfsData = 0x80,      // 128
+        NtfsIdxRoot = 0x90,   // 144
+        NtfsIdxAlloc = 0xA0,  // 160
+        NtfsBitmap = 0xB0,    // 176
+        NtfsSymlink = 0xC0,    // 192 (NT)
+        NtfsReparse = 0xC0,   // 192 (2K)
+        NtfsEAInfo = 0xD0,    // 208
+        NtfsEA = 0xE0,        // 224
+        NtfsProp = 0xF0,      //  (NT)
+        NtfsLog = 0x100,      //  (2K)
+
+        UnixIndir = 0x1001,   //  Indirect blocks for UFS and ExtX file systems
+        UnixExtent = 0x1002,  //  Extents for Ext4 file system
+
+        // Types for HFS+ File Attributes
+        HfsDefault = 0x01,    // 1    Data fork of fs special files and misc
+        HfsData = 0x1100,     // 4352 Data fork of regular files
+        HfsRSRC = 0x1101,     // 4353 Resource fork of regular files
+        HfsExtAttr = 0x1102, // 4354 Extended Attributes, except compression records
+        HfsCompRec = 0x1103, // 4355 Compression records        
+    }
 }

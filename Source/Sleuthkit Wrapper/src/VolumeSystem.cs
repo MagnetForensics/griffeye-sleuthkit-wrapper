@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SleuthKit.Structs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace SleuthKit
     public class VolumeSystem : IDisposable
     {
         internal VolumeSystemHandle _handle;
-        internal VolumeSystemInfo _struct;
+        internal TSK_VS_INFO _struct;
 
         /// <summary>
         /// ctor
@@ -46,7 +47,7 @@ namespace SleuthKit
         /// <summary>
         /// Managed wrapper for TSK_VS_INFO.
         /// </summary>
-        public VolumeSystemInfo VolumeSystemInfo
+        public TSK_VS_INFO VolumeSystemInfo
         {
             get
             {

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace SleuthKit
 {
+    using SleuthKit.Structs;
     using System.Runtime.InteropServices;
 
     /// <summary>
@@ -17,7 +18,7 @@ namespace SleuthKit
         #region Fields
 
         internal DiskImageHandle _handle;
-        internal ImageInfo _struct;
+        internal TSK_IMG_INFO _struct;
         internal FileInfo[] files;
 
 

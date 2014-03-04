@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SleuthKit.Structs;
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -116,6 +117,9 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void tsk_fs_file_close(IntPtr ptr_fs_file);
 
+        //const TSK_FS_ATTR * tsk_fs_attrlist_get(const TSK_FS_ATTRLIST * a_fs_attrlist, TSK_FS_ATTR_TYPE_ENUM a_type)
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern AttributeHandle tsk_fs_attrlist_get(IntPtr a_fs_attrlist, AttributeType a_type);
         #endregion
 
         #region dir stuff
@@ -171,6 +175,19 @@ namespace SleuthKit
         #endregion
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILE
+    {
+        IntPtr _ptr;
+        int _cnt;
+        IntPtr _base;
+        int _flag;
+        int _file;
+        int _charbuf;
+        int _bufsiz;
+        IntPtr _tmpfname;
+    };
+
     /// <summary>
     /// safe handle to work with TSK Disk Images (TSK_IMG_INFO*)
     /// </summary>
@@ -210,9 +227,9 @@ namespace SleuthKit
         /// converts this pointer into an ImageInfo struct
         /// </summary>
         /// <returns></returns>
-        internal ImageInfo GetStruct()
+        internal TSK_IMG_INFO GetStruct()
         {
-            return ((ImageInfo)Marshal.PtrToStructure(this.handle, typeof(ImageInfo)));
+            return ((TSK_IMG_INFO)Marshal.PtrToStructure(this.handle, typeof(TSK_IMG_INFO)));
         }
 
         /// <summary>
@@ -277,12 +294,12 @@ namespace SleuthKit
         /// Converts this handle into a new VolumeSystemInfo.
         /// </summary>
         /// <returns></returns>
-        internal VolumeSystemInfo GetStruct()
+        internal TSK_VS_INFO GetStruct()
         {
             if (this.IsInvalid)
-                return new VolumeSystemInfo();
+                return new TSK_VS_INFO();
             else
-                return ((VolumeSystemInfo)Marshal.PtrToStructure(this.handle, typeof(VolumeSystemInfo)));
+                return ((TSK_VS_INFO)Marshal.PtrToStructure(this.handle, typeof(TSK_VS_INFO)));
         }
     }
 
@@ -321,12 +338,36 @@ namespace SleuthKit
             return true;
         }
 
-        internal FileSystemInfo GetStruct()
+        internal TSK_FS_INFO GetStruct()
         {
             if (this.IsInvalid)
-                return new FileSystemInfo();
+            {
+                return new TSK_FS_INFO();
+            }
             else
-                return ((FileSystemInfo)Marshal.PtrToStructure(this.handle, typeof(FileSystemInfo)));
+            {
+                return ((TSK_FS_INFO)Marshal.PtrToStructure(this.handle, typeof(TSK_FS_INFO)));
+            }
+        }
+
+        internal EXT2FS_INFO GetStructExt2()
+        {
+            return ((EXT2FS_INFO)Marshal.PtrToStructure(this.handle, typeof(EXT2FS_INFO)));            
+        }
+
+        internal FATFS_INFO GetStructFat()
+        {
+            return ((FATFS_INFO)Marshal.PtrToStructure(this.handle, typeof(FATFS_INFO)));
+        }
+
+        internal ISO_INFO GetStructIso()
+        {
+            return ((ISO_INFO)Marshal.PtrToStructure(this.handle, typeof(ISO_INFO)));
+        }
+
+        internal FFS_INFO GetStructFfs()
+        {
+            return ((FFS_INFO)Marshal.PtrToStructure(this.handle, typeof(FFS_INFO)));
         }
     }
 
@@ -365,12 +406,12 @@ namespace SleuthKit
             return true;
         }
 
-        internal FileSystemBlockInfo GetStruct()
+        internal TSK_FS_BLOCK GetStruct()
         {
             if (this.IsInvalid)
-                return new FileSystemBlockInfo();
+                return new TSK_FS_BLOCK();
             else
-                return ((FileSystemBlockInfo)Marshal.PtrToStructure(this.handle, typeof(FileSystemBlockInfo)));
+                return ((TSK_FS_BLOCK)Marshal.PtrToStructure(this.handle, typeof(TSK_FS_BLOCK)));
         }
     }
 
@@ -409,12 +450,55 @@ namespace SleuthKit
             return true;
         }
 
-        internal FileStruct GetStruct()
+        internal TSK_FS_FILE GetStruct()
         {
             if (this.IsInvalid)
-                return new FileStruct();
+                return new TSK_FS_FILE();
             else
-                return ((FileStruct)Marshal.PtrToStructure(this.handle, typeof(FileStruct)));
+                return ((TSK_FS_FILE)Marshal.PtrToStructure(this.handle, typeof(TSK_FS_FILE)));
+        }
+    }
+
+    /// <summary>
+    /// safe handle to work with TSK Attribute (TSK_FS_ATTR*)
+    /// </summary>
+    internal class AttributeHandle : SafeHandle
+    {
+        /// <summary>
+        /// ctor
+        /// </summary>
+        public AttributeHandle()
+            : base(IntPtr.Zero, true)
+        {
+        }
+
+        /// <summary>
+        /// invalid if pointer is zero
+        /// </summary>
+        public override bool IsInvalid
+        {
+            get
+            {
+                return base.handle == IntPtr.Zero;
+            }
+        }
+
+        /// <summary>
+        /// closes handle
+        /// </summary>
+        /// <returns></returns>
+        protected override bool ReleaseHandle()
+        {
+            base.SetHandleAsInvalid();
+            return true;
+        }
+
+        internal TSK_FS_ATTR GetStruct()
+        {
+            if (this.IsInvalid)
+                return new TSK_FS_ATTR();
+            else
+                return ((TSK_FS_ATTR)Marshal.PtrToStructure(this.handle, typeof(TSK_FS_ATTR)));
         }
     }
 
@@ -453,12 +537,12 @@ namespace SleuthKit
             return true;
         }
 
-        internal DirectoryStruct GetStruct()
+        internal TSK_FS_DIR GetStruct()
         {
             if (this.IsInvalid)
-                return new DirectoryStruct();
+                return new TSK_FS_DIR();
             else
-                return ((DirectoryStruct)Marshal.PtrToStructure(this.handle, typeof(DirectoryStruct)));
+                return ((TSK_FS_DIR)Marshal.PtrToStructure(this.handle, typeof(TSK_FS_DIR)));
         }
     }
 }

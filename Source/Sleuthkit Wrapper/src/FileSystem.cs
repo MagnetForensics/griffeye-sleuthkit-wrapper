@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SleuthKit.Structs;
+using System;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace SleuthKit
@@ -11,7 +13,7 @@ namespace SleuthKit
         #region Fields
         private DiskImage _image;
         internal FileSystemHandle _handle;
-        private FileSystemInfo _struct;
+        private TSK_FS_INFO _struct;
         private Volume _volume;
         #endregion
 
@@ -47,6 +49,63 @@ namespace SleuthKit
         #endregion
 
         #region Properties
+
+        public String Label
+        {
+            get 
+            {
+                switch (_struct.FilesystemType)
+                {
+                    case FileSystemType.ext2:
+                    case FileSystemType.ext3:
+                    case FileSystemType.Ext4:
+                        EXT2FS_INFO ext2Struct = _handle.GetStructExt2();
+                        return ext2Struct.fs.VolumeName;
+
+                    case FileSystemType.FAT12:
+                    case FileSystemType.FAT16:
+                        FATFS_INFO fatStruct16 = _handle.GetStructFat();
+                        return fatStruct16.sb.VolumeName16;
+
+                    case FileSystemType.FAT32:
+                        FATFS_INFO fatStruct32 = _handle.GetStructFat();
+                        return fatStruct32.sb.VolumeName32;
+
+                    //TODO: case FileSystemType.HFS: //OS X filesystem, seems tricky to read
+
+                    case FileSystemType.ISO9660:
+                        ISO_INFO isoStruct = _handle.GetStructIso();
+                        return isoStruct.pvd.VolumeName;
+
+                    case FileSystemType.NTFS: //Stored in some metadata entry
+                        File mftVol = OpenFile(0x03);
+
+                        if (mftVol.FileStruct.Metadata.HasValue)
+                        {
+                            AttributeHandle attrHandle = NativeMethods.tsk_fs_attrlist_get(
+                                mftVol.FileStruct.Metadata.Value.attrPtr, AttributeType.NtfsVName);
+                            return attrHandle.GetStruct().rdBufString;
+                        }
+                        else
+                        {
+                            return _struct.Offset.ToString();
+                        }
+
+                    //TODO: Test
+                    case FileSystemType.UFS2:
+                        FFS_INFO ffsStruct = _handle.GetStructFfs();
+                        return ffsStruct.sb.VolumeName;
+
+                    case FileSystemType.Raw:
+                    case FileSystemType.Swap:
+                    case FileSystemType.UFS1:
+                    case FileSystemType.UFS1b:
+                    case FileSystemType.Yaffs2:
+                    default:
+                        return _struct.Offset.ToString();
+                }
+            }
+        }
 
         /// <summary>
         /// 	Size of each block (in bytes) 
@@ -264,6 +323,58 @@ namespace SleuthKit
             return ret == 0;
         }
 
+        /*
+        public unsafe String GetName()
+        {
+            String fsstatOutput = String.Empty;
+
+            if (_struct.fsstat != null)
+            {
+                String tmpFileName = @"C:\Users\Josef.Eklann\AppData\Local\Temp\tmpTSK.txt"; //System.IO.Path.GetTempFileName();
+                try
+                {
+                    IntPtr structPtr = Marshal.AllocHGlobal(Marshal.SizeOf(_struct));
+                    Marshal.StructureToPtr(_struct, structPtr, false);
+
+                    FILE* filePtr = NativeMethods.fopen(tmpFileName, "w+, ccs=UNICODE"); //
+                    //int fprintfResult = NativeMethods.fprintf(filePtr, "test");
+                    int fwprintfResult = NativeMethods.fwprintf(filePtr, "test");
+                    byte result = 1;// _struct.fsstat(structPtr, filePtr);
+                    int fflushResult = NativeMethods.fflush(filePtr);
+                    int fcloseResult = NativeMethods.fclose(filePtr);
+
+                    if (result == 0)
+                    {
+                        using (System.IO.FileStream stream = new System.IO.FileStream(tmpFileName,
+                            System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read))
+                        {
+                            stream.Seek(0, System.IO.SeekOrigin.Begin);
+
+                            using (System.IO.StreamReader reader = new System.IO.StreamReader(stream))
+                            {
+                                fsstatOutput = reader.ReadToEnd();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        uint error = NativeMethods.tsk_error_get_errno();
+                        IntPtr messagePtr = NativeMethods.tsk_error_get_errstr();
+                        String errorMessage = Marshal.PtrToStringAnsi(messagePtr);
+                    }
+                }
+                catch (Exception ex) { }
+                finally
+                {
+                    System.IO.File.Delete(tmpFileName);
+                }
+            }
+            //TODO: parse output
+
+            return String.Empty;
+        }
+        //*/
+
         /// <summary>
         /// Releases resources
         /// </summary>
@@ -295,7 +406,7 @@ namespace SleuthKit
         private FileSystem _fs;
         private FileSystemBlockHandle _handle;
         private long _blockAddress;
-        private FileSystemBlockInfo _struct;
+        private TSK_FS_BLOCK _struct;
         #endregion
 
         internal FileSystemBlock(FileSystem fileSystem, FileSystemBlockHandle fsbh, long block)

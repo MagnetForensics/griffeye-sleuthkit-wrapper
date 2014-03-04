@@ -15,6 +15,7 @@
     using Directory = System.IO.Directory;
     using File = SleuthKit.File;
     using FileStream = SleuthKit.FileStream;
+    using SleuthKit.Structs;
 
     /// <summary>
     /// Test class for SleuthKit wrapper
@@ -108,10 +109,12 @@
                         hasVolumes = true;
                         using (FileSystem fs = v.OpenFileSystem())
                         {
+                            String volumeName = fs.Label;
+
                             if (fs.WalkDirectories(DirectoryWalkCallback))
                             {
                                 Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("Volume {0}:", v.Address);
+                                Console.WriteLine("Volume \"{0}\" ({1} @ {2}):", volumeName, fs.Type, v.Address);
                                 Console.ResetColor();
 
                                 // temporarily pause to read console output. Press any key to continue
@@ -129,8 +132,14 @@
             {
                 using (FileSystem fs = di.OpenFileSystem())
                 {
+                    String volumeName = fs.Label;
+
                     if (fs.WalkDirectories(DirectoryWalkCallback))
                     {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Volume \"{0}\" ({1} @ 0):", volumeName, fs.Type);
+                        Console.ResetColor();
+
                         // temporarily pause to read console output. Press any key to continue
                         Console.WriteLine("Press any key to continue...");
                         Console.ReadLine();
@@ -146,6 +155,7 @@
             Console.WriteLine("This disk image {0} multiple volumes.", hasVolumes ? "has" : "does not have");
             Console.ResetColor();
 
+            /*
             var regularHdStopWatch = new Stopwatch();
             string[] extractedfiles = Directory.GetFiles("Images", "*.*");
 
@@ -176,6 +186,7 @@
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\nTime elapsed reading with the wrapper - {0} millisec \nTime elapsed reading with the .Net classes - {1} millisec", WrapperStopwatch.ElapsedMilliseconds, regularHdStopWatch.ElapsedMilliseconds);
+            //*/
             Console.ResetColor();
             Console.ReadLine();
         }
@@ -199,7 +210,7 @@
         /// <returns>
         /// Value to control the directory walk.
         /// </returns>
-        private static WalkReturnEnum DirectoryWalkCallback(ref FileStruct file, string directoryPath, IntPtr dataPtr)
+        private static WalkReturnEnum DirectoryWalkCallback(ref TSK_FS_FILE file, string directoryPath, IntPtr dataPtr)
         {
             FilePaths.Add(string.Format("{0}{1}", directoryPath, file.Name));
             return WalkReturnEnum.Continue;
@@ -233,7 +244,7 @@
         /// Value to control the file walk.
         /// </returns>
         private static WalkReturnEnum FileContentWalkCallback(
-            ref FileStruct file,
+            ref TSK_FS_FILE file,
             long offset,
             long address,
             IntPtr buffer,

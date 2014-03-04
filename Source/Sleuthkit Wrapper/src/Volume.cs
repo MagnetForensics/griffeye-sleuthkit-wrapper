@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SleuthKit.Structs;
+using System;
 using System.Text;
 
 namespace SleuthKit
@@ -9,7 +10,7 @@ namespace SleuthKit
     public class Volume
     {
         private VolumeSystem _system;
-        private VolumeInfo _struct;
+        private TSK_VS_PART_INFO _struct;
         internal IntPtr _ptr_volinfo;
 
         /// <summary>
@@ -22,7 +23,7 @@ namespace SleuthKit
             this._system = volumeSystem;
 
             this._ptr_volinfo = ptrToVolumeInfo;
-            var v = VolumeInfo.FromIntPtr(ptrToVolumeInfo);
+            var v = TSK_VS_PART_INFO.FromIntPtr(ptrToVolumeInfo);
             if (v.HasValue)
                 this._struct = v.Value;
         }
@@ -38,7 +39,7 @@ namespace SleuthKit
             }
         }
 
-        internal VolumeInfo VolumeInfo
+        internal TSK_VS_PART_INFO VolumeInfo
         {
             get
             {

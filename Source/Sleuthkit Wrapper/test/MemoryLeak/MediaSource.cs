@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
 using System.Threading;
+using SleuthKit.Structs;
 
 namespace Test.MemoryLeak
 {
@@ -272,7 +272,7 @@ namespace Test.MemoryLeak
                 Count = 0;
             }
 
-            public WalkReturnEnum Callback(ref FileStruct file, string directoryPath, IntPtr dataPtr)
+            public WalkReturnEnum Callback(ref TSK_FS_FILE file, string directoryPath, IntPtr dataPtr)
             {
                 if (file.Metadata.HasValue && file.Name.HasValue &&
                     (file.Name.Value.Type == FilesystemNameType.Regular
@@ -355,7 +355,7 @@ namespace Test.MemoryLeak
                 this.externalCancellationToken = externalCancellationToken;
             }
 
-            public WalkReturnEnum Callback(ref FileStruct file, string directoryPath, IntPtr dataPtr)
+            public WalkReturnEnum Callback(ref TSK_FS_FILE file, string directoryPath, IntPtr dataPtr)
             {
                 if (file.Metadata.HasValue && file.Name.HasValue &&
                     (file.Name.Value.Type == FilesystemNameType.Regular

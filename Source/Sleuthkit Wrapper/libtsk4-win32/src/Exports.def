@@ -24,6 +24,7 @@ EXPORTS
 	tsk_fs_read_block
 	tsk_fs_close
 	
+	tsk_fs_attrlist_get
 	tsk_fs_block_get
 	tsk_fs_block_free
 	tsk_fs_block_walk

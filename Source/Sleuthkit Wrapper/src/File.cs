@@ -1,3 +1,4 @@
+using SleuthKit.Structs;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -106,7 +107,7 @@ namespace SleuthKit
         #region Fields
         private FileSystem _fs;
         private FileHandle _handle;
-        private FileStruct _struct;
+        private TSK_FS_FILE _struct;
         private Directory _parentDir;
         private string path;
         #endregion
@@ -180,7 +181,7 @@ namespace SleuthKit
         /// <summary>
         /// The underlying TSK_FS_FILE.
         /// </summary>
-        public FileStruct FileStruct
+        public TSK_FS_FILE FileStruct
         {
             get
             {

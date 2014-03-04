@@ -1,3 +1,4 @@
+using SleuthKit.Structs;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -12,7 +13,7 @@ namespace SleuthKit
     {
         private FileSystem _fs;
         private DirectoryHandle _handle;
-        private DirectoryStruct _struct;
+        private TSK_FS_DIR _struct;
         private int? ec;
         private Directory _parentDir;
         private string path = null;
@@ -28,7 +29,7 @@ namespace SleuthKit
             this._struct = dh.GetStruct();
             this._parentDir = parent;
             
-            var fileStruct = (FileStruct)Marshal.PtrToStructure(_struct.fs_dir, typeof(FileStruct));
+            var fileStruct = (TSK_FS_FILE)Marshal.PtrToStructure(_struct.fs_dir, typeof(TSK_FS_FILE));
 
             if (fileStruct.Metadata.HasValue)
             {
@@ -121,9 +122,9 @@ namespace SleuthKit
         /// open file
         /// </summary>
         /// <returns></returns>
-        public FileStruct GetFileStruct()
+        public TSK_FS_FILE GetFileStruct()
         {
-            var fs = (FileStruct)Marshal.PtrToStructure(this._struct.fs_dir, typeof(FileStruct));
+            var fs = (TSK_FS_FILE)Marshal.PtrToStructure(this._struct.fs_dir, typeof(TSK_FS_FILE));
             return fs;
         }
 
@@ -132,13 +133,13 @@ namespace SleuthKit
         /// <summary>
         /// Lists the entries in this directory.
         /// </summary>
-        public IEnumerable<NameStruct> EntryNames
+        public IEnumerable<TSK_FS_NAME> EntryNames
         {
             get
             {
                 for (int a = 0; a < _struct.names_used; a++)
                 {
-                    yield return _struct.ptr_list_names.ElementAt<NameStruct>(a);
+                    yield return _struct.ptr_list_names.ElementAt<TSK_FS_NAME>(a);
                 }
             }
         }
@@ -216,7 +217,7 @@ namespace SleuthKit
         /// <summary>
         /// The entries in this directory
         /// </summary>
-        public IEnumerable<FileStruct> Entries
+        public IEnumerable<TSK_FS_FILE> Entries
         {
             get
             {
