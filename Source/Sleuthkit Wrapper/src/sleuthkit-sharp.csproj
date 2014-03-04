@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Bit32</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\x86\Debug\sleuthkit-sharp.xml</DocumentationFile>
@@ -40,7 +40,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\x86\Release\sleuthkit-sharp.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
-    <DefineConstants>Bit32</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -87,7 +86,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Bit64</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DocumentationFile>bin\AnyCPU\Debug\sleuthkit-sharp.xml</DocumentationFile>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -104,7 +103,6 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DefineConstants>Bit64</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ewf.net">
@@ -161,6 +159,14 @@
     <None Include="ncpub.snk" />
     <None Include="NuSpec\SleuthkitSharp.nuspec" />
   </ItemGroup>
+
+  <PropertyGroup Condition=" '$(Platform)' == 'x64' ">
+    <DefineConstants>Bit64</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' != 'x64' ">
+    <DefineConstants>Bit32</DefineConstants>
+  </PropertyGroup>
+  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
