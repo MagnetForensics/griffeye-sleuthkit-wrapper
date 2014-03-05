@@ -104,10 +104,19 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="ewf.net">
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <Reference Include="ewf.net, Version=1.0.5156.25405, Culture=neutral, PublicKeyToken=c0e8495fa322da2d, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Lib\x64\ewf.net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Platform)' != 'x64'">
+    <Reference Include="ewf.net, Version=1.0.5156.25405, Culture=neutral, PublicKeyToken=c0e8495fa322da2d, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Lib\x86\ewf.net.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
     </Reference>
@@ -159,14 +168,12 @@
     <None Include="ncpub.snk" />
     <None Include="NuSpec\SleuthkitSharp.nuspec" />
   </ItemGroup>
-
   <PropertyGroup Condition=" '$(Platform)' == 'x64' ">
     <DefineConstants>Bit64</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' != 'x64' ">
     <DefineConstants>Bit32</DefineConstants>
   </PropertyGroup>
-  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

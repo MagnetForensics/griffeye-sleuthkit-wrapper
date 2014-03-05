@@ -323,58 +323,6 @@ namespace SleuthKit
             return ret == 0;
         }
 
-        /*
-        public unsafe String GetName()
-        {
-            String fsstatOutput = String.Empty;
-
-            if (_struct.fsstat != null)
-            {
-                String tmpFileName = @"C:\Users\Josef.Eklann\AppData\Local\Temp\tmpTSK.txt"; //System.IO.Path.GetTempFileName();
-                try
-                {
-                    IntPtr structPtr = Marshal.AllocHGlobal(Marshal.SizeOf(_struct));
-                    Marshal.StructureToPtr(_struct, structPtr, false);
-
-                    FILE* filePtr = NativeMethods.fopen(tmpFileName, "w+, ccs=UNICODE"); //
-                    //int fprintfResult = NativeMethods.fprintf(filePtr, "test");
-                    int fwprintfResult = NativeMethods.fwprintf(filePtr, "test");
-                    byte result = 1;// _struct.fsstat(structPtr, filePtr);
-                    int fflushResult = NativeMethods.fflush(filePtr);
-                    int fcloseResult = NativeMethods.fclose(filePtr);
-
-                    if (result == 0)
-                    {
-                        using (System.IO.FileStream stream = new System.IO.FileStream(tmpFileName,
-                            System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read))
-                        {
-                            stream.Seek(0, System.IO.SeekOrigin.Begin);
-
-                            using (System.IO.StreamReader reader = new System.IO.StreamReader(stream))
-                            {
-                                fsstatOutput = reader.ReadToEnd();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        uint error = NativeMethods.tsk_error_get_errno();
-                        IntPtr messagePtr = NativeMethods.tsk_error_get_errstr();
-                        String errorMessage = Marshal.PtrToStringAnsi(messagePtr);
-                    }
-                }
-                catch (Exception ex) { }
-                finally
-                {
-                    System.IO.File.Delete(tmpFileName);
-                }
-            }
-            //TODO: parse output
-
-            return String.Empty;
-        }
-        //*/
-
         /// <summary>
         /// Releases resources
         /// </summary>

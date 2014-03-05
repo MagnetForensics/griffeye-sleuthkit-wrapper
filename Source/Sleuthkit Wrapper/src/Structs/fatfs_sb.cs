@@ -11,10 +11,11 @@ namespace SleuthKit.Structs
     public struct fatfs_sb
     {
         [FieldOffset(40)] //really 43, but some shortcoming of marshlling in C# made this ugly hack nessecary
-        fatfs_vol_lab vol_lab_f16;
+                          //offset must be on an adress divisible by the width of a word (4b on 32bit, and 8b on 64bit)
+        fatfs_vol_lab_16 vol_lab_f16;
 
-        [FieldOffset(68)] //really 71, see above
-        fatfs_vol_lab vol_lab_f32;
+        [FieldOffset(64)] //really 71, see above
+        fatfs_vol_lab_32 vol_lab_f32;
 
         internal String VolumeName16
         {
@@ -34,7 +35,7 @@ namespace SleuthKit.Structs
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct fatfs_vol_lab
+    public struct fatfs_vol_lab_16
     {
         byte padding1; //ugly hack
         byte padding2; //ugly hack
@@ -46,6 +47,29 @@ namespace SleuthKit.Structs
         public String Name
         {
             get 
+            {
+                return vol_lab;
+            }
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct fatfs_vol_lab_32
+    {
+        byte padding1; //ugly hack
+        byte padding2; //ugly hack
+        byte padding3; //ugly hack
+        byte padding4; //ugly hack
+        byte padding5; //ugly hack
+        byte padding6; //ugly hack
+        byte padding7; //ugly hack
+
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 11)]
+        String vol_lab;
+
+        public String Name
+        {
+            get
             {
                 return vol_lab;
             }
