@@ -71,7 +71,24 @@ namespace SleuthKit
                         FATFS_INFO fatStruct32 = _handle.GetStructFat();
                         return fatStruct32.sb.VolumeName32;
 
-                    //TODO: case FileSystemType.HFS: //OS X filesystem, seems tricky to read
+                    case FileSystemType.HFS: //OS X filesystem, stored in some metadata entry
+                        HFS_ENTRY hfsRootEntry = new HFS_ENTRY();
+                        IntPtr entryPtr = Marshal.AllocHGlobal(Marshal.SizeOf(hfsRootEntry));
+                        Marshal.StructureToPtr(hfsRootEntry, entryPtr, false);
+                        IntPtr hfsPtr = _handle.DangerousGetHandle();
+
+                        byte result = NativeMethods.hfs_cat_file_lookup(hfsPtr, 2, entryPtr, 0);
+
+                        if (result == 0)
+                        {
+                            hfsRootEntry = ((HFS_ENTRY)Marshal.PtrToStructure(entryPtr, typeof(HFS_ENTRY)));
+                            Endianness endian = _handle.GetStruct().Endian;
+                            return hfsRootEntry.Thread.Name.GetString(endian);
+                        }
+                        else 
+                        {
+                            return _struct.Offset.ToString();
+                        }
 
                     case FileSystemType.ISO9660:
                         ISO_INFO isoStruct = _handle.GetStructIso();
@@ -91,7 +108,7 @@ namespace SleuthKit
                             return _struct.Offset.ToString();
                         }
 
-                    //TODO: Test
+                    //TODO: Get sample image and test
                     case FileSystemType.UFS2:
                         FFS_INFO ffsStruct = _handle.GetStructFfs();
                         return ffsStruct.sb.VolumeName;

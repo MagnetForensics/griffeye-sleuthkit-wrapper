@@ -120,6 +120,11 @@ namespace SleuthKit
         //const TSK_FS_ATTR * tsk_fs_attrlist_get(const TSK_FS_ATTRLIST * a_fs_attrlist, TSK_FS_ATTR_TYPE_ENUM a_type)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern AttributeHandle tsk_fs_attrlist_get(IntPtr a_fs_attrlist, AttributeType a_type);
+
+        //uint8_t hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HFS_ENTRY * entry, unsigned char follow_hard_link)
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern byte hfs_cat_file_lookup(IntPtr hfs, ulong inum, IntPtr entry, byte follow_hard_link);
+
         #endregion
 
         #region dir stuff

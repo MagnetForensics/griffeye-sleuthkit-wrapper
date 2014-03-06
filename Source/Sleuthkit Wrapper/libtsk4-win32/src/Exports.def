@@ -59,3 +59,5 @@ EXPORTS
 
 	tsk_error_get_errno
 	tsk_error_get_errstr
+
+	hfs_cat_file_lookup

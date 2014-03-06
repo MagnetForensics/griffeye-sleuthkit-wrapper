@@ -475,5 +475,13 @@ namespace SleuthKit.Structs
                 return this.ftype;
             }
         }
+
+        public Endianness Endian
+        {
+            get
+            {
+                return endian;
+            }
+        }
     }
 }
