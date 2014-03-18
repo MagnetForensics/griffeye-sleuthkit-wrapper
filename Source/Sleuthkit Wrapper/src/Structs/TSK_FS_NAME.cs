@@ -180,5 +180,13 @@ namespace SleuthKit.Structs
                 return type;
             }
         }
+
+        public NameFlags Flags
+        {
+            get
+            {
+                return flags;
+            }
+        }
     }
 }
