@@ -89,64 +89,44 @@ namespace SleuthKit.Structs
         /// Looks at the name and metadata struct, and attempts to determine if the metadata actually belongs to the name.
         /// Returns true if the Metadata appears to belong to the name (the name points to the correct data), false otherwise
         /// </summary>
-        public bool MetadataAppearsValid
+        public bool MetadataAppearsValid(bool isNtfs)
         { 
-            get
+            if (!Name.HasValue || !Metadata.HasValue)
             {
-                if (!Name.HasValue || !Metadata.HasValue)
-                {
-                    return false;
-                }
+                return false;
+            }
 
-                bool nameAllocated = (Name.Value.Flags == NameFlags.Allocated);
-                bool metadataAllocated = Metadata.Value.MetadataFlags.HasFlag(MetadataFlags.Allocated);
+            //We have to check if the metadata has a name that actually matches the found name
+            String maybeName = Name.Value.ToString();
+            ulong maybeParentAddress = Name.Value.ParentAddress;
+            uint maybeParentSequence = Name.Value.ParentSequence;
 
-                if (nameAllocated)
+            if (Metadata.Value.NameListHead.HasValue)
+            {
+                TSK_FS_META_NAME_LIST realName = Metadata.Value.NameListHead.Value;
+
+                for (;;)
                 {
-                    return metadataAllocated;
-                }
-                else
-                {
-                    if (metadataAllocated)
+                    if ((!isNtfs || 
+                        (realName.ParentAddress == maybeParentAddress &&
+                         realName.ParentSequence == maybeParentSequence)) &&
+                        realName.Name.Equals(maybeName))
                     {
-                        //This means that it points to the data of another file
-                        return false;
+                        return true;
+                    }
+
+                    if (realName.HasNext) 
+                    {
+                        realName = realName.Next;
                     }
                     else
                     {
-                        //Here we have to check if the metadata has a name that actually matches the found name
-                        String maybeName = Name.Value.ToString();
-                        ulong maybeParentAddress = Name.Value.ParentAddress;
-                        uint maybeParentSequence = Name.Value.ParentSequence;
-
-                        if (Metadata.Value.NameListHead.HasValue)
-                        {
-                            TSK_FS_META_NAME_LIST realName = Metadata.Value.NameListHead.Value;
-
-                            for (;;)
-                            {
-                                if (realName.ParentAddress == maybeParentAddress &&
-                                    realName.ParentSequence == maybeParentSequence &&
-                                    realName.Name.Equals(maybeName))
-                                {
-                                    return true;
-                                }
-
-                                if (realName.HasNext) 
-                                {
-                                    realName = realName.Next;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-
-                        return false;
+                        break;
                     }
                 }
             }
+
+            return false;
         }
     }
 }

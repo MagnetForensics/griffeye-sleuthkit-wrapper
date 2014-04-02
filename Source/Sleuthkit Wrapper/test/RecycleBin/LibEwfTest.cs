@@ -7,9 +7,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EWF;
+//using EWF;
+
 namespace Org.SleuthKit.RecycleBin
 {
+    /*
     public class LibEwfTest
     {
         private static HashSet<String> setFiles;
@@ -61,4 +63,5 @@ namespace Org.SleuthKit.RecycleBin
 
 
     }
+    //*/
 }

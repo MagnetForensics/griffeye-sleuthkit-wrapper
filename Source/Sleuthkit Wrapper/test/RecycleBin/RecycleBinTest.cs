@@ -137,7 +137,7 @@ namespace Org.SleuthKit.RecycleBin
                         file.Metadata.HasValue ? (int)file.Metadata.Value.Mode : 0,
                         file.Metadata.HasValue ? file.Metadata.Value.LinkCount : 0,
                         file.Metadata.HasValue ? (int)file.Metadata.Value.AttributeState : 0,
-                        file.MetadataAppearsValid
+                        MetadataAppearsValid(file, true)
                     );
                 sb.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},",
                         file.Name.HasValue,
@@ -242,6 +242,68 @@ namespace Org.SleuthKit.RecycleBin
             }
 
             return legalPath.ToString();
+        }
+
+        public static bool MetadataAppearsValid(TSK_FS_FILE file, bool isNtfs)
+        {
+            if (!file.Name.HasValue || !file.Metadata.HasValue)
+            {
+                return false;
+            }
+
+            bool nameAllocated = (file.Name.Value.Flags == NameFlags.Allocated);
+            bool metadataAllocated = file.Metadata.Value.MetadataFlags.HasFlag(MetadataFlags.Allocated);
+
+            if (file.Metadata.Value.Address == 361)
+            {
+                Debugger.Break();
+            }
+
+            if (nameAllocated)
+            {
+                return metadataAllocated;
+            }
+            else
+            {
+                if (metadataAllocated)
+                {
+                    //This means that it points to the data of another file
+                    return false;
+                }
+                else
+                {
+                    //Here we have to check if the metadata has a name that actually matches the found name
+                    String maybeName = file.Name.Value.ToString();
+                    ulong maybeParentAddress = isNtfs ? file.Name.Value.ParentAddress : 0;
+                    uint maybeParentSequence = isNtfs ? file.Name.Value.ParentSequence : 0;
+
+                    if (file.Metadata.Value.NameListHead.HasValue)
+                    {
+                        TSK_FS_META_NAME_LIST realName = file.Metadata.Value.NameListHead.Value;
+
+                        for (; ; )
+                        {
+                            if (realName.ParentAddress == maybeParentAddress &&
+                                realName.ParentSequence == maybeParentSequence &&
+                                realName.Name.Equals(maybeName))
+                            {
+                                return true;
+                            }
+
+                            if (realName.HasNext)
+                            {
+                                realName = realName.Next;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    return false;
+                }
+            }
         }
 
         #region Autopsy files
