@@ -254,7 +254,7 @@ namespace Org.SleuthKit.RecycleBin
             bool nameAllocated = (file.Name.Value.Flags == NameFlags.Allocated);
             bool metadataAllocated = file.Metadata.Value.MetadataFlags.HasFlag(MetadataFlags.Allocated);
 
-            if (file.Metadata.Value.Address == 361)
+            if (file.Name.ToString().Contains("visual.avi"))
             {
                 Debugger.Break();
             }
@@ -274,8 +274,7 @@ namespace Org.SleuthKit.RecycleBin
                 {
                     //Here we have to check if the metadata has a name that actually matches the found name
                     String maybeName = file.Name.Value.ToString();
-                    ulong maybeParentAddress = isNtfs ? file.Name.Value.ParentAddress : 0;
-                    uint maybeParentSequence = isNtfs ? file.Name.Value.ParentSequence : 0;
+                    ulong maybeParentAddress = file.Name.Value.ParentAddress;
 
                     if (file.Metadata.Value.NameListHead.HasValue)
                     {
@@ -283,8 +282,7 @@ namespace Org.SleuthKit.RecycleBin
 
                         for (; ; )
                         {
-                            if (realName.ParentAddress == maybeParentAddress &&
-                                realName.ParentSequence == maybeParentSequence &&
+                            if ((!isNtfs || realName.ParentAddress == maybeParentAddress) &&
                                 realName.Name.Equals(maybeName))
                             {
                                 return true;
