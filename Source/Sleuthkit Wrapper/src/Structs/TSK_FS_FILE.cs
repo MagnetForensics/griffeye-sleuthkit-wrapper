@@ -99,7 +99,6 @@ namespace SleuthKit.Structs
             //We have to check if the metadata has a name that actually matches the found name
             String maybeName = Name.Value.ToString();
             ulong maybeParentAddress = Name.Value.ParentAddress;
-            uint maybeParentSequence = Name.Value.ParentSequence;
 
             if (Metadata.Value.NameListHead.HasValue)
             {
@@ -107,9 +106,7 @@ namespace SleuthKit.Structs
 
                 for (;;)
                 {
-                    if ((!isNtfs || 
-                        (realName.ParentAddress == maybeParentAddress &&
-                         realName.ParentSequence == maybeParentSequence)) &&
+                    if ((!isNtfs || realName.ParentAddress == maybeParentAddress) &&
                         realName.Name.Equals(maybeName))
                     {
                         return true;
