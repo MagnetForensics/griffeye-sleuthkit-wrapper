@@ -353,7 +353,8 @@ namespace SleuthKit
     /// <summary>
     /// Managed version of TSK_FS_META_MODE_ENUM.  The following describe the file permissions
     /// </summary>
-    internal enum MetadataMode : int
+    [Flags]
+    public enum MetadataMode : int
     {
         /// <summary>
         /// set user id on execution 
@@ -699,12 +700,12 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_TYPE_YAFFS2, YAFFS2 file system
         /// </summary>
-        Yaffs2 = 0x00003000,     
+        Yaffs2 = 0x00004000,     
         
         /// <summary>
         /// TSK_FS_TYPE_YAFFS2_DETECT, YAFFS2 auto detection
         /// </summary>
-        Yaffs2AutoDetect = 0x00003000, 
+        Yaffs2AutoDetect = 0x00004000, 
                                                 
         /// <summary>
         /// TSK_FS_TYPE_UNSUPP, Unsupported file system

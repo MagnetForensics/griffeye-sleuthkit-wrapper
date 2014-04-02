@@ -14,7 +14,7 @@ namespace SleuthKit.Structs
     public struct TSK_FS_NAME
     {
         /// <summary>
-        /// tag, can be used to validate that we have the right kind of struct.  a magic header for the struct, essentially.
+        /// tag, can be used to validate that we have the right kind of struct. a magic header for the struct, essentially.
         /// </summary>
         StructureMagic tag;
 
@@ -94,7 +94,7 @@ namespace SleuthKit.Structs
                     Marshal.Copy(ptr_name, local, 0, local.Length);
                     if (local[ns - 1] == 0)
                     {
-                        ns--;//trim it
+                        ns--; //trim it
                     }
                     str = Encoding.UTF8.GetString(local, 0, ns);
                 }
@@ -160,17 +160,41 @@ namespace SleuthKit.Structs
         /// <returns></returns>
         public override string ToString()
         {
-            var ln = this.LongName;
-            string n = null;
-            if (ln == null)
+            return LongName != null
+                ? LongName.Trim(new char[] { '\0' })
+                : ShortName.Trim(new char[] { '\0' });
+        }
+
+        public ulong MetadataAddress
+        {
+            get
             {
-                n = this.ShortName;
+                return this.meta_addr;
             }
-            else
+        }
+
+        public uint MetadataSequence
+        {
+            get
             {
-                n = ln;
+                return this.meta_seq;
             }
-            return n;
+        }
+
+        public ulong ParentAddress
+        {
+            get
+            {
+                return this.par_addr;
+            }
+        }
+
+        public uint ParentSequence
+        {
+            get
+            {
+                return this.par_seq;
+            }
         }
 
         public FilesystemNameType Type

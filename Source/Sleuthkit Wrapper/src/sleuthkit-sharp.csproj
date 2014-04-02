@@ -168,6 +168,7 @@
     <Compile Include="VolumeSystem.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="nc.snk" />
     <None Include="ncpub.snk" />
     <None Include="NuSpec\SleuthkitSharp.nuspec" />
   </ItemGroup>

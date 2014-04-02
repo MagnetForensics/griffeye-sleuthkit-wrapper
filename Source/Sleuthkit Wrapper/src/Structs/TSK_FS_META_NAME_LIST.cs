@@ -8,7 +8,7 @@ using System.IO;
 namespace SleuthKit.Structs
 {
     [StructLayout(LayoutKind.Sequential)]
-    struct TSK_FS_META_NAME_LIST
+    public struct TSK_FS_META_NAME_LIST
     {
         /// <summary>
         /// Pointer to next name (or NULL)
@@ -30,5 +30,52 @@ namespace SleuthKit.Structs
         /// Sequence number of parent directory (NTFS only)
         /// </summary>
         uint par_seq;
+
+        public bool HasNext
+        {
+            get
+            {
+                return next != IntPtr.Zero;
+            }
+        }
+
+        public TSK_FS_META_NAME_LIST Next
+        {
+            get
+            {
+                if (next != IntPtr.Zero)
+                {
+                    return (TSK_FS_META_NAME_LIST)Marshal.PtrToStructure(next, typeof(TSK_FS_META_NAME_LIST));
+                }
+                else
+                {
+                    throw new NullReferenceException();
+                }
+            }
+        }
+
+        public ulong ParentAddress
+        {
+            get
+            {
+                return par_inode;
+            }
+        }
+
+        public uint ParentSequence
+        {
+            get
+            {
+                return par_seq;
+            }
+        }
+
+        public String Name
+        {
+            get
+            {
+                return Encoding.UTF8.GetString(name).Trim(new char[] { '\0' });
+            }
+        }
     };
 }

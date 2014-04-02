@@ -263,6 +263,22 @@ namespace SleuthKit.Structs
             }
         }
 
+        public MetadataMode Mode
+        {
+            get
+            {
+                return this.mode;
+            }
+        }
+
+        public long LinkCount
+        {
+            get
+            {
+                return this.nlink;
+            }
+        }
+
         /// <summary>
         /// File size, in bytes
         /// </summary>
@@ -319,7 +335,7 @@ namespace SleuthKit.Structs
             }
         }
 
-        public uint Seq
+        public uint Sequence
         {
             get
             {
@@ -343,6 +359,26 @@ namespace SleuthKit.Structs
             }
         }
 
+        public MetadataAttributeFlags AttributeState
+        {
+            get
+            {
+                return this.attr_state;
+            }
+        }
+
+        public TSK_FS_META_NAME_LIST? NameListHead
+        {
+            get
+            {
+                TSK_FS_META_NAME_LIST? ret = null;
+                if (name2 != IntPtr.Zero)
+                {
+                    ret = (TSK_FS_META_NAME_LIST)Marshal.PtrToStructure(name2, typeof(TSK_FS_META_NAME_LIST));
+                }
+                return ret;
+            }
+        }
         //public DateTime LastAccessed
         //{
         //    get
