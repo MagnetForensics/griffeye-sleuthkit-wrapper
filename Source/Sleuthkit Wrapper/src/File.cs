@@ -220,10 +220,12 @@ namespace SleuthKit
         /// <summary>
         /// Reads file data
         /// </summary>
-        /// <param name="offset"></param>
-        /// <param name="buffer"></param>
-        /// <param name="amt"></param>        
+        /// <param name="offset">The offset.</param>
+        /// <param name="buffer">The buffer.</param>
+        /// <param name="amt">The amt.</param>
         /// <returns></returns>
+        /// <exception cref="SleuthKit.NtfsCompressionException">If a compressed file is corrupt</exception>
+        /// <exception cref="System.IO.IOException">If the file reading files for another reason</exception>
         public int ReadBytes(long offset, byte[] buffer, int amt)
         {
             int bytesRead = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
@@ -240,7 +242,11 @@ namespace SleuthKit
                 {
                     IntPtr ptrToMessage = NativeMethods.tsk_error_get_errstr();
                     String errorMessage = Marshal.PtrToStringAnsi(ptrToMessage);
-                    throw new IOException(String.Format("{0} (0x{1,8:X8})", errorMessage, errorCode));
+                    String ioExceptionMessage = String.Format("{0} (0x{1,8:X8})", errorMessage, errorCode);
+                    if (errorMessage.Contains("ntfs_uncompress_compunit"))
+                        throw new NtfsCompressionException(String.Format("The compressed NTFS file was corrupt and could not be decompressed. Full error: {0}", ioExceptionMessage));
+                    else
+                        throw new IOException(ioExceptionMessage);
                 }
             }
 
