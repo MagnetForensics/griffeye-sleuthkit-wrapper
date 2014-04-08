@@ -254,11 +254,6 @@ namespace Org.SleuthKit.RecycleBin
             bool nameAllocated = (file.Name.Value.Flags == NameFlags.Allocated);
             bool metadataAllocated = file.Metadata.Value.MetadataFlags.HasFlag(MetadataFlags.Allocated);
 
-            if (file.Name.ToString().Contains("visual.avi"))
-            {
-                Debugger.Break();
-            }
-
             if (nameAllocated)
             {
                 return metadataAllocated;
