@@ -133,7 +133,7 @@ namespace SleuthKit.Structs
 
         //Some more attributes here, but not wrapped
 
-        public bool hasNext
+        public bool HasNext
         {
             get
             {
@@ -141,11 +141,27 @@ namespace SleuthKit.Structs
             }
         }
 
-        public TSK_FS_ATTR next
+        public TSK_FS_ATTR Next
         {
             get
             {
                 return ((TSK_FS_ATTR)Marshal.PtrToStructure(next_ptr, typeof(TSK_FS_ATTR)));
+            }
+        }
+
+        public TSK_FS_FILE File
+        {
+            get
+            {
+                return ((TSK_FS_FILE)Marshal.PtrToStructure(fs_file_ptr, typeof(TSK_FS_FILE)));
+            }
+        }
+
+        public IntPtr FilePointer
+        {
+            get
+            {
+                return fs_file_ptr;
             }
         }
 
@@ -154,6 +170,23 @@ namespace SleuthKit.Structs
             get
             {
                 return flags;
+            }
+        }
+
+        public String Name
+        {
+            get
+            {
+                if (name_size > 0)
+                {
+                    byte[] buffer = new byte[name_size];
+                    Marshal.Copy(name_ptr, buffer, 0, name_size);
+                    return Encoding.UTF8.GetString(buffer, 0, name_size).TrimEnd(new char[] { '\0' });
+                }
+                else
+                {
+                    return String.Empty;
+                }
             }
         }
 
@@ -170,6 +203,39 @@ namespace SleuthKit.Structs
             get
             {
                 return id;
+            }
+        }
+
+        public long Size
+        {
+            get
+            {
+                return size;
+            }
+        }
+
+        public IEnumerable<TSK_FS_ATTR_RUN> NonResidentBlocks
+        { 
+            get
+            {
+                if (nrd_run_ptr != IntPtr.Zero)
+                {
+                    TSK_FS_ATTR_RUN block = ((TSK_FS_ATTR_RUN)Marshal.PtrToStructure(nrd_run_ptr, typeof(TSK_FS_ATTR_RUN)));
+
+                    for (; ; )
+                    {
+                        yield return block;
+
+                        if (block.HasNext)
+                        {
+                            block = block.Next;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
             }
         }
 

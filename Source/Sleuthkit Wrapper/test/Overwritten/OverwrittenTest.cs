@@ -3,6 +3,7 @@ using SleuthKit.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,7 +28,7 @@ namespace Org.SleuthKit.Overwritten
             }
         }
 
-        private static void IterateImage(DiskImage image, DirWalkDelegate callback)
+        private static void IterateImage(DiskImage image, DirWalkPtrDelegate callback)
         {
             bool hasVolumes = false;
 
@@ -63,8 +64,10 @@ namespace Org.SleuthKit.Overwritten
             }
         }
 
-        private static WalkReturnEnum DirectoryWalkCallback(ref TSK_FS_FILE file, String directoryPath, IntPtr dataPtr)
+        private static WalkReturnEnum DirectoryWalkCallback(IntPtr filePtr, String directoryPath, IntPtr dataPtr)
         {
+            TSK_FS_FILE file = ((TSK_FS_FILE)Marshal.PtrToStructure(filePtr, typeof(TSK_FS_FILE)));
+
             if (file.Name.HasValue && file.Name.Value.ToString().Contains(searchString))
             {
                 String fullpath = directoryPath.Replace('/', '\\') + file.Name.Value;
@@ -72,8 +75,9 @@ namespace Org.SleuthKit.Overwritten
 
                 TSK_FS_NAME name = file.Name.Value;
 
-                Console.WriteLine("MetadataAppearsValid(): " + file.MetadataAppearsValid(isNtfs));
-
+                Console.WriteLine("filePtr: " + filePtr.ToInt64());
+                //Console.WriteLine("MetadataAppearsValid(): " + file.MetadataAppearsValid(isNtfs));
+                Console.WriteLine(String.Empty);
                 Console.WriteLine("Name.LongName: " + name.LongName);
                 Console.WriteLine("Name.ShortName: " + name.ShortName);
                 Console.WriteLine("Name.Type: " + name.Type);
@@ -82,7 +86,43 @@ namespace Org.SleuthKit.Overwritten
                 Console.WriteLine("Name.MetadataSequence: " + name.MetadataSequence);
                 Console.WriteLine("Name.ParentAdress: " + name.ParentAddress);
                 Console.WriteLine("Name.ParentSequence: " + name.ParentSequence);
+                Console.WriteLine(String.Empty);
 
+                if (file.Metadata.HasValue)
+                {
+                    TSK_FS_META meta = file.Metadata.Value;
+
+                    Console.WriteLine("Metadata.Address: " + meta.Address);
+                    Console.WriteLine("Metadata.AppearsValid: " + meta.AppearsValid);
+                    Console.WriteLine("Metadata.MetadataType: " + meta.MetadataType);
+                    Console.WriteLine("Metadata.MetadataFlags: " + meta.MetadataFlags);
+                    Console.WriteLine("Metadata.Mode: " + meta.Mode);
+                    Console.WriteLine("Metadata.Sequence: " + meta.Sequence);
+                    Console.WriteLine("Metadata.Size: " + meta.Size);
+                    Console.WriteLine("Metadata.LinkCount: " + meta.LinkCount);
+                    Console.WriteLine("Metadata.AttributeState: " + meta.AttributeState);
+                    Console.WriteLine(String.Empty);
+
+                    if (meta.HasAttributeList && !meta.AttributeList.IsEmpty)
+                    {
+                        Console.WriteLine("Metadata.AttributeList:");
+
+                        foreach (TSK_FS_ATTR attr in meta.AttributeList.List)
+                        {
+                            Console.WriteLine("  Attribute.Id: " + attr.Id);
+                            Console.WriteLine("  Attribute.Name: " + attr.Name);
+                            Console.WriteLine("  Attribute.FilePointer: " + attr.FilePointer.ToInt64());
+                            Console.WriteLine("  Attribute.AttributeType: " + attr.AttributeType);
+                            Console.WriteLine("  Attribute.AttributeFlags: " + attr.AttributeFlags);
+                            Console.WriteLine("  Attribute.Size: " + attr.Size);
+
+                            Console.WriteLine(String.Empty);
+                        }
+                    }
+                }
+
+                Console.WriteLine(String.Empty);
+                Console.WriteLine("--------------------------------");
                 Console.WriteLine(String.Empty);
             }
 

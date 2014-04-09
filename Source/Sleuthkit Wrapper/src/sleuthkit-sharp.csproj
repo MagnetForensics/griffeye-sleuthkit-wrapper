@@ -144,6 +144,7 @@
     <Compile Include="Structs\hfs_uni_str.cs" />
     <Compile Include="Structs\TSK_FS_ATTR.cs" />
     <Compile Include="Structs\TSK_FS_ATTRLIST.cs" />
+    <Compile Include="Structs\TSK_FS_ATTR_RUN.cs" />
     <Compile Include="Structs\TSK_FS_DIR.cs" />
     <Compile Include="Structs\ext2fs_sb.cs" />
     <Compile Include="Structs\FATFS_INFO.cs" />

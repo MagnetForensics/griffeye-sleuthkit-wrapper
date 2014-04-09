@@ -351,7 +351,15 @@ namespace SleuthKit.Structs
             }
         }
 
-        internal TSK_FS_ATTRLIST attr
+        public bool HasAttributeList
+        {
+            get
+            {
+                return attr_ptr != IntPtr.Zero;
+            }
+        }
+
+        public TSK_FS_ATTRLIST AttributeList
         {
             get
             {
@@ -367,6 +375,32 @@ namespace SleuthKit.Structs
             }
         }
 
+        public IEnumerable<TSK_FS_META_NAME_LIST> NameList
+        {
+            get
+            {
+                if (name2 != IntPtr.Zero)
+                {
+                    TSK_FS_META_NAME_LIST entry = (TSK_FS_META_NAME_LIST)Marshal.PtrToStructure(name2, typeof(TSK_FS_META_NAME_LIST));
+
+                    for (; ; )
+                    {
+                        yield return entry;
+
+                        if (entry.HasNext)
+                        {
+                            entry = entry.Next;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
         public TSK_FS_META_NAME_LIST? NameListHead
         {
             get
@@ -379,6 +413,8 @@ namespace SleuthKit.Structs
                 return ret;
             }
         }
+        //*/
+
         //public DateTime LastAccessed
         //{
         //    get

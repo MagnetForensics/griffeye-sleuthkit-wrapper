@@ -858,6 +858,14 @@ namespace SleuthKit
         Recovery = 0x80,
     }
 
+    [Flags]
+    public enum AttributeRunFlags
+    {
+        None = 0x00,       ///< No Flag
+        Filler = 0x01,     ///< Entry is a filler for a run that has not been seen yet in the processing (or has been lost)
+        Sparse = 0x02      ///< Entry is a sparse run where all data in the run is zeros        
+    }
+
     /// <summary>
     /// TSK_FS_ATTR_TYPE_ENUM
     /// </summary>

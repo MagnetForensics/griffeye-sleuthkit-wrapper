@@ -340,6 +340,12 @@ namespace SleuthKit
             return ret == 0;
         }
 
+        public bool WalkDirectories(DirWalkPtrDelegate callback, DirWalkFlags flags = DirWalkFlags.Recurse)
+        {
+            var ret = NativeMethods.tsk_fs_dir_walk_ptr(this._handle, this._struct.root_inum, flags, callback, IntPtr.Zero);
+            return ret == 0;
+        }
+
         /// <summary>
         /// Releases resources
         /// </summary>

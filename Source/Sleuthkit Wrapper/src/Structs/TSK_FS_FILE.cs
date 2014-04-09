@@ -89,6 +89,7 @@ namespace SleuthKit.Structs
         /// Looks at the name and metadata struct, and attempts to determine if the metadata actually belongs to the name.
         /// Returns true if the Metadata appears to belong to the name (the name points to the correct data), false otherwise
         /// </summary>
+        /*
         public bool MetadataAppearsValid(bool isNtfs)
         { 
             if (!Name.HasValue || !Metadata.HasValue)
@@ -127,5 +128,6 @@ namespace SleuthKit.Structs
 
             return false;
         }
+        //*/
     }
 }

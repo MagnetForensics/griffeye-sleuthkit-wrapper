@@ -137,7 +137,7 @@ namespace Org.SleuthKit.RecycleBin
                         file.Metadata.HasValue ? (int)file.Metadata.Value.Mode : 0,
                         file.Metadata.HasValue ? file.Metadata.Value.LinkCount : 0,
                         file.Metadata.HasValue ? (int)file.Metadata.Value.AttributeState : 0,
-                        MetadataAppearsValid(file, true)
+                        true//MetadataAppearsValid(file, true)
                     );
                 sb.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},",
                         file.Name.HasValue,
@@ -244,6 +244,7 @@ namespace Org.SleuthKit.RecycleBin
             return legalPath.ToString();
         }
 
+        /*
         public static bool MetadataAppearsValid(TSK_FS_FILE file, bool isNtfs)
         {
             if (!file.Name.HasValue || !file.Metadata.HasValue)
@@ -298,7 +299,7 @@ namespace Org.SleuthKit.RecycleBin
                 }
             }
         }
-
+        //*/
         #region Autopsy files
 
         #region Compressed test

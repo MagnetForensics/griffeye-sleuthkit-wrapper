@@ -37,6 +37,9 @@ namespace SleuthKit
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate WalkReturnEnum DirWalkDelegate(ref TSK_FS_FILE file, string path, IntPtr some_ptr);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate WalkReturnEnum DirWalkPtrDelegate(IntPtr filePtr, string path, IntPtr some_ptr);
+
     /// <summary>
     /// Called for each metdata entry during a metadata walk
     /// typedef TSK_WALK_RET_ENUM(* TSK_FS_META_WALK_CB)(TSK_FS_FILE *a_fs_file, void *a_ptr)
