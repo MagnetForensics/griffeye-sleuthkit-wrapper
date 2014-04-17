@@ -198,7 +198,7 @@ namespace SleuthKit.Structs
         /// Name of file stored in metadata (FAT and NTFS Only)
         /// </summary>
 #if Bit32
-        [FieldOffset(204)]
+        [FieldOffset(208)]
 #elif Bit64
         [FieldOffset(224)]
 #endif

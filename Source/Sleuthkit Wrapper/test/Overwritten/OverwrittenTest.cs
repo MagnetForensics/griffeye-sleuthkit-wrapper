@@ -12,7 +12,6 @@ namespace Org.SleuthKit.Overwritten
     public class OverwrittenTest
     {
         private static String searchString;
-        private static bool isNtfs;
 
         public static void Main(String[] args)
         {
@@ -48,7 +47,15 @@ namespace Org.SleuthKit.Overwritten
                     {
                         using (FileSystem filesystem = volume.OpenFileSystem())
                         {
-                            isNtfs = filesystem.Type == FileSystemType.NTFS;
+                            if (filesystem.Type == FileSystemType.HFS)
+                            {
+                                HFS_INFO info = filesystem.debugHfs();
+
+                                List<TSK_FS_ATTR> attr = info.CatalogAttributes.ToList();
+
+                                Console.WriteLine(attr.Count);
+                            }
+
                             filesystem.WalkDirectories(callback);
                         }
                     }
@@ -58,7 +65,6 @@ namespace Org.SleuthKit.Overwritten
             {
                 using (FileSystem filesystem = image.OpenFileSystem())
                 {
-                    isNtfs = filesystem.Type == FileSystemType.NTFS;
                     filesystem.WalkDirectories(callback);
                 }
             }
@@ -115,6 +121,30 @@ namespace Org.SleuthKit.Overwritten
                             Console.WriteLine("  Attribute.AttributeType: " + attr.AttributeType);
                             Console.WriteLine("  Attribute.AttributeFlags: " + attr.AttributeFlags);
                             Console.WriteLine("  Attribute.Size: " + attr.Size);
+
+                            if (attr.AttributeFlags.HasFlag(AttributeFlags.NonResident))
+                            {
+                                Console.WriteLine("  Attribute.NonResidentBlocks:");
+                                foreach (TSK_FS_ATTR_RUN run in attr.NonResidentBlocks)
+                                { 
+                                    Console.WriteLine(String.Format("    Address: {0}, Length: {1}, Offset: {2}, Flags: {3}", 
+                                        run.Address, run.Length, run.Offset, run.Flags));
+                                }
+                            }
+
+                            Console.WriteLine(String.Empty);
+                        }
+                    }
+
+                    if (meta.NameList.Any())
+                    {
+                        Console.WriteLine("Metadata.NameList:");
+
+                        foreach (TSK_FS_META_NAME_LIST nameEntry in meta.NameList)
+                        {
+                            Console.WriteLine("  Name.Name: " + nameEntry.Name);
+                            Console.WriteLine("  Name.ParentAddress: " + nameEntry.ParentAddress);
+                            Console.WriteLine("  Name.ParentSequence: " + nameEntry.ParentSequence);
 
                             Console.WriteLine(String.Empty);
                         }

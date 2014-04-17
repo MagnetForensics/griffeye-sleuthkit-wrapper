@@ -378,6 +378,11 @@ namespace SleuthKit
         {
             return ((FFS_INFO)Marshal.PtrToStructure(this.handle, typeof(FFS_INFO)));
         }
+
+        internal HFS_INFO GetStructHfs()
+        {
+            return ((HFS_INFO)Marshal.PtrToStructure(this.handle, typeof(HFS_INFO)));
+        }
     }
 
     /// <summary>
