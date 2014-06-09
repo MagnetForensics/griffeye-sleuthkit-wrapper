@@ -85,7 +85,7 @@ namespace SleuthKit
                             Endianness endian = _handle.GetStruct().Endian;
                             return hfsRootEntry.Thread.Name.GetString(endian);
                         }
-                        else 
+                        else
                         {
                             return _struct.Offset.ToString();
                         }
@@ -101,7 +101,8 @@ namespace SleuthKit
                         {
                             AttributeHandle attrHandle = NativeMethods.tsk_fs_attrlist_get(
                                 mftVol.FileStruct.Metadata.Value.attrPtr, AttributeType.NtfsVName);
-                            return attrHandle.GetStruct().rdBufString;
+
+                            return attrHandle.GetStruct().rdBufString ?? _struct.Offset.ToString();
                         }
                         else
                         {
