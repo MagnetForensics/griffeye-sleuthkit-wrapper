@@ -168,6 +168,7 @@
     <Compile Include="Structs\TSK_VS_INFO.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Volume.cs" />
+    <Compile Include="VolumeInformation.cs" />
     <Compile Include="VolumeSystem.cs" />
   </ItemGroup>
   <ItemGroup>
