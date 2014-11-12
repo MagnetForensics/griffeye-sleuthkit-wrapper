@@ -1,0 +1,11 @@
+Lib/
+Source/Sleuthkit Wrapper/libtsk4-win32/Release/
+Source/Sleuthkit Wrapper/src/bin/
+Source/Sleuthkit Wrapper/src/obj/
+Source/Sleuthkit Wrapper/test/bin/
+Source/Sleuthkit Wrapper/test/obj/
+Source/Sleuthkit Wrapper/unit-tests/obj/
+*.suo
+Source/sleuthkit/win32/libewf/msvscpp/ewf.net/Release/
+*.sdf
+*.opensdf

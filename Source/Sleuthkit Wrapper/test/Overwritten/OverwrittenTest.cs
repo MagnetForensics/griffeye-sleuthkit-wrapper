@@ -47,15 +47,6 @@ namespace Org.SleuthKit.Overwritten
                     {
                         using (FileSystem filesystem = volume.OpenFileSystem())
                         {
-                            if (filesystem.Type == FileSystemType.HFS)
-                            {
-                                HFS_INFO info = filesystem.debugHfs();
-
-                                List<TSK_FS_ATTR> attr = info.CatalogAttributes.ToList();
-
-                                Console.WriteLine(attr.Count);
-                            }
-
                             filesystem.WalkDirectories(callback);
                         }
                     }
