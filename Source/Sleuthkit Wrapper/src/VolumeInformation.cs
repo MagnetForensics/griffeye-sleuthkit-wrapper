@@ -15,10 +15,5 @@ namespace SleuthKit
         public long Offset { get; set; }
         public long SectorLength { get; set; }
         public long SectorOffset { get; set; }
-
-        public VolumeInformation() 
-        { 
-        
-        }
     }
 }
