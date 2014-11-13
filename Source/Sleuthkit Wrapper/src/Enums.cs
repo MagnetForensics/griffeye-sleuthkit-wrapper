@@ -601,6 +601,7 @@ namespace SleuthKit
     /// <summary>
     /// Managed version of TSK_FS_TYPE_ENUM
     /// </summary>
+    [Flags]
     public enum FileSystemType : uint
     {
         /// <summary>
@@ -611,10 +612,6 @@ namespace SleuthKit
         /// TSK_FS_TYPE_NTFS, NTFS file system
         /// </summary>
         NTFS = 0x00000001,
-        /// <summary>
-        /// TSK_FS_TYPE_NTFS_DETECT, NTFS auto detection
-        /// </summary>
-        NTFSAutodetect = 0x00000001,
         /// <summary>
         /// TSK_FS_TYPE_FAT12, FAT12 file system
         /// </summary>
@@ -630,6 +627,7 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_TYPE_FAT_DETECT, FAT auto detection
         /// </summary>
+        [Description("Autodetect FAT")]
         FATAutodetect = 0x0000000e,
         /// <summary>
         /// TSK_FS_TYPE_FFS1, UFS1 (FreeBSD, OpenBSD, BSDI ...)
@@ -646,6 +644,7 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_TYPE_FFS_DETECT, UFS auto detection
         /// </summary>
+        [Description("Autodetect UFS")]
         UFSAutodetect = 0x00000070,
         /// <summary>
         /// TSK_FS_TYPE_EXT2, Ext2 file system
@@ -658,55 +657,35 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_TYPE_EXT_DETECT, ExtX auto detection
         /// </summary>
+        [Description("Autodetect ext")]
         extAutodetect = 0x00002180,
         /// <summary>
         /// TSK_FS_TYPE_SWAP, SWAP file system
         /// </summary>
         Swap = 0x00000200,
         /// <summary>
-        /// SWAP auto detection
-        /// </summary>
-        TSK_FS_TYPE_SWAP_DETECT = 0x00000200,
-        /// <summary>
         /// TSK_FS_TYPE_RAW, RAW file system
         /// </summary>
         Raw = 0x00000400,
-        /// <summary>
-        /// TSK_FS_TYPE_RAW_DETECT, RAW auto detection
-        /// </summary>
-        RawAutodetect = 0x00000400,
         /// <summary>
         /// TSK_FS_TYPE_ISO9660, ISO9660 file system
         /// </summary>
         ISO9660 = 0x00000800,
         /// <summary>
-        /// TSK_FS_TYPE_ISO9660_DETECT, ISO9660 auto detection
-        /// </summary>
-        ISO9660Autodetect = 0x00000800,
-        /// <summary>
         /// TSK_FS_TYPE_HFS, HFS file system
         /// </summary>
         HFS = 0x00001000,
-        /// <summary>
-        /// TSK_FS_TYPE_HFS_DETECT, HFS auto detection
-        /// </summary>
-        HFSAutodetect = 0x00001000,
 
         /// <summary>
         /// TSK_FS_TYPE_EXT4, Ext4 file system
         /// </summary>
-        Ext4 = 0x00002000,  
+        ext4 = 0x00002000,  
          
         /// <summary>
         /// TSK_FS_TYPE_YAFFS2, YAFFS2 file system
         /// </summary>
         Yaffs2 = 0x00004000,     
-        
-        /// <summary>
-        /// TSK_FS_TYPE_YAFFS2_DETECT, YAFFS2 auto detection
-        /// </summary>
-        Yaffs2AutoDetect = 0x00004000, 
-                                                
+                                                        
         /// <summary>
         /// TSK_FS_TYPE_UNSUPP, Unsupported file system
         /// </summary>
