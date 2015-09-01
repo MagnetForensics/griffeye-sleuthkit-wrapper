@@ -12,6 +12,7 @@
 
     using Directory = SleuthKit.Directory;
     using File = SleuthKit.File;
+    using SleuthKit.Structs;
 
     /// <summary>
     ///     This is a test class for DiskImageTest and is intended
@@ -266,7 +267,7 @@
         ///     Value to control the directory walk.
         /// </returns>
         private static WalkReturnEnum FileCount_DirectoryWalkCallback(
-            ref FileStruct file,
+            ref TSK_FS_FILE file,
             string directoryPath,
             IntPtr dataPtr)
         {
@@ -294,7 +295,7 @@
         ///     Value to control the directory walk.
         /// </returns>
         private static WalkReturnEnum FindFiles_DirectoryWalkCallback(
-            ref FileStruct file,
+            ref TSK_FS_FILE file,
             string directoryPath,
             IntPtr dataPtr)
         {
