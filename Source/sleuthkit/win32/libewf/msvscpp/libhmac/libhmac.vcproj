@@ -56,7 +56,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libhmac.lib"
+				OutputFile="$(OutDir)\$(ProjectName).lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -121,7 +121,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libhmac.lib"
+				OutputFile="$(OutDir)\$(ProjectName).lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -163,7 +163,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libhmac\libhmac_sha224.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libhmac\libhmac_sha256.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libhmac\libhmac_sha512.c"
 				>
 			</File>
 			<File
@@ -205,7 +213,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libhmac\libhmac_sha224.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libhmac\libhmac_sha256.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libhmac\libhmac_sha512.h"
 				>
 			</File>
 			<File

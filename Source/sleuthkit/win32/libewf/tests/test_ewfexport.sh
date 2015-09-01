@@ -2,7 +2,7 @@
 #
 # ewfexport testing script
 #
-# Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -24,7 +24,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input";
+INPUT="input_old";
 TMP="tmp";
 
 LS="ls";

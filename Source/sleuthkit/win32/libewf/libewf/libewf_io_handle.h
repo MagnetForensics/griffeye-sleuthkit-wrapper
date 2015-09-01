@@ -1,7 +1,7 @@
 /*
  * IO handle functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -39,10 +39,6 @@ struct libewf_io_handle
 	 */
 	int access_flags;
 
-	/* The current (storage media) offset
-	 */
-	off64_t current_offset;
-
 	/* The segment file type
 	 */
 	uint8_t segment_file_type;
@@ -75,6 +71,14 @@ struct libewf_io_handle
 	 */
 	uint8_t is_encrypted;
 
+	/* The size of an individual chunk
+	 */
+	size32_t chunk_size;
+
+	/* A value to indicate if the chunk data should be zeroed on error
+	 */
+	uint8_t zero_on_error;
+
 	/* The header codepage
 	 */
 	int header_codepage;
@@ -90,6 +94,10 @@ int libewf_io_handle_initialize(
 
 int libewf_io_handle_free(
      libewf_io_handle_t **io_handle,
+     libcerror_error_t **error );
+
+int libewf_io_handle_clear(
+     libewf_io_handle_t *io_handle,
      libcerror_error_t **error );
 
 int libewf_io_handle_clone(

@@ -1,7 +1,7 @@
 /*
  * The cache functions
  *
- * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -67,7 +67,7 @@ int libfcache_cache_clone(
      libcerror_error_t **error );
 
 LIBFCACHE_EXTERN \
-int libfcache_cache_clear(
+int libfcache_cache_empty(
      libfcache_cache_t *cache,
      libcerror_error_t **error );
 

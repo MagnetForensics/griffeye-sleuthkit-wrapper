@@ -27,7 +27,7 @@
     <ClCompile Include="..\..\libsmraw\libsmraw_information_file.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libsmraw\libsmraw_legacy.c">
+    <ClCompile Include="..\..\libsmraw\libsmraw_io_handle.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libsmraw\libsmraw_metadata.c">
@@ -62,7 +62,7 @@
     <ClInclude Include="..\..\libsmraw\libsmraw_information_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libsmraw\libsmraw_legacy.h">
+    <ClInclude Include="..\..\libsmraw\libsmraw_io_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libsmraw\libsmraw_libbfio.h">
@@ -80,13 +80,13 @@
     <ClInclude Include="..\..\libsmraw\libsmraw_libcstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libsmraw\libsmraw_libcthreads.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libsmraw\libsmraw_libfdata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\libsmraw\libsmraw_libfvalue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libsmraw\libsmraw_libfcache.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libsmraw\libsmraw_libmfdata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libsmraw\libsmraw_libuna.h">

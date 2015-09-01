@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
@@ -12,19 +13,19 @@ AM_CPPFLAGS = \
 	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBFCACHE_CPPFLAGS@ \
+	@LIBFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
-	@LIBMFDATA_CPPFLAGS@ \
 	@ZLIB_CPPFLAGS@ \
 	@BZIP2_CPPFLAGS@ \
 	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBHMAC_CPPFLAGS@ \
-	@LIBCAES_CPPFLAGS@
+	@LIBCAES_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@
 
 lib_LTLIBRARIES = libewf.la
 
 libewf_la_SOURCES = \
 	ewf_data.h \
-	ewf_definitions.h \
 	ewf_digest.h \
 	ewf_error.h \
 	ewf_file_header.h \
@@ -40,6 +41,7 @@ libewf_la_SOURCES = \
 	libewf_case_data.c libewf_case_data.h \
 	libewf_checksum.c libewf_checksum.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
+	libewf_chunk_group.c libewf_chunk_group.h \
 	libewf_chunk_table.c libewf_chunk_table.h \
 	libewf_codepage.h \
 	libewf_compression.c libewf_compression.h \
@@ -68,7 +70,7 @@ libewf_la_SOURCES = \
 	libewf_libcstring.h \
 	libewf_libhmac.h \
 	libewf_libfcache.h \
-	libewf_libmfdata.h \
+	libewf_libfdata.h \
 	libewf_libfvalue.h \
 	libewf_libuna.h \
 	libewf_media_values.c libewf_media_values.h \
@@ -79,7 +81,6 @@ libewf_la_SOURCES = \
 	libewf_section.c libewf_section.h \
 	libewf_sector_range.c libewf_sector_range.h \
 	libewf_segment_file.c libewf_segment_file.h \
-	libewf_segment_file_handle.c libewf_segment_file_handle.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_single_files.c libewf_single_files.h \
 	libewf_single_file_entry.c libewf_single_file_entry.h \
@@ -92,6 +93,7 @@ libewf_la_SOURCES = \
 libewf_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
@@ -101,14 +103,15 @@ libewf_la_LIBADD = \
 	@LIBCPATH_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBFCACHE_LIBADD@ \
+	@LIBFDATA_LIBADD@ \
 	@LIBFVALUE_LIBADD@ \
-	@LIBMFDATA_LIBADD@ \
 	@ZLIB_LIBADD@ \
 	@BZIP2_LIBADD@ \
 	@LIBHMAC_LIBADD@ \
 	@LIBCAES_LIBADD@ \
 	@LIBCRYPTO_LIBADD@ \
-	@LIBDL_LIBADD@
+	@LIBDL_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 libewf_la_LDFLAGS = -no-undefined -version-info 3:0:1
 

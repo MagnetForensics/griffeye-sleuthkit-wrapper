@@ -1,7 +1,7 @@
 /*
  * The internal libuna header
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -32,7 +32,6 @@
 #include <libuna_base32_stream.h>
 #include <libuna_base64_stream.h>
 #include <libuna_byte_stream.h>
-#include <libuna_error.h>
 #include <libuna_unicode_character.h>
 #include <libuna_url_stream.h>
 #include <libuna_utf16_stream.h>

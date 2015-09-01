@@ -1,7 +1,7 @@
 /*
  * Metadata functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -36,10 +36,7 @@
 #include "libewf_libfvalue.h"
 #include "libewf_metadata.h"
 #include "libewf_sector_range.h"
-#include "libewf_segment_file_handle.h"
 #include "libewf_types.h"
-
-#include "ewf_definitions.h"
 
 /* Retrieves the number of sectors per chunk
  * Returns 1 if successful or -1 on error
@@ -1357,24 +1354,22 @@ int libewf_handle_set_format(
 	 || ( format == LIBEWF_FORMAT_ENCASE7 ) )
 	{
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
-		internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
 	}
 	else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
 	{
-		internal_handle->write_io_handle->unrestrict_offset_table    = 1;
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
-		internal_handle->write_io_handle->maximum_chunks_per_section = INT32_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES;
 	}
 	else if( format == LIBEWF_FORMAT_EWFX )
 	{
-		internal_handle->write_io_handle->unrestrict_offset_table    = 1;
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
-		internal_handle->write_io_handle->maximum_chunks_per_section = INT32_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES;
 	}
 	else
 	{
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
-		internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_TABLE_ENTRIES;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES_EWF;
 	}
 	return( 1 );
 }
@@ -2132,18 +2127,18 @@ int libewf_handle_set_read_zero_chunk_on_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle->read_io_handle->zero_on_error = zero_on_error;
+	internal_handle->io_handle->zero_on_error = zero_on_error;
 
 	return( 1 );
 }
@@ -2302,6 +2297,7 @@ int libewf_handle_get_acquiry_error(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_acquiry_error";
+	intptr_t *value                           = NULL;
 
 	if( handle == NULL )
 	{
@@ -2316,11 +2312,12 @@ int libewf_handle_get_acquiry_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libcdata_range_list_get_range(
+	if( libcdata_range_list_get_range_by_index(
 	     internal_handle->acquiry_errors,
 	     (int) index,
 	     start_sector,
 	     number_of_sectors,
+	     &value,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2361,17 +2358,20 @@ int libewf_handle_append_acquiry_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libcdata_range_list_append_range(
+	if( libcdata_range_list_insert_range(
 	     internal_handle->acquiry_errors,
 	     start_sector,
 	     number_of_sectors,
+	     NULL,
+	     NULL,
+	     NULL,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append acquiry error.",
+		 "%s: unable to insert acquiry error in range list.",
 		 function );
 
 		return( -1 );
@@ -2389,7 +2389,6 @@ int libewf_handle_get_number_of_checksum_errors(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_checksum_errors";
-	int number_of_elements                    = 0;
 
 	if( handle == NULL )
 	{
@@ -2404,55 +2403,38 @@ int libewf_handle_get_number_of_checksum_errors(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->chunk_table == NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
-		 function );
+		if( number_of_errors == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of errors.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		*number_of_errors = 0;
 	}
-	if( number_of_errors == NULL )
+	else
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of errors.",
-		 function );
+		if( libewf_chunk_table_get_number_of_checksum_errors(
+		     internal_handle->chunk_table,
+		     number_of_errors,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of checksum errors.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	if( libcdata_range_list_get_number_of_elements(
-	     internal_handle->read_io_handle->checksum_errors,
-	     &number_of_elements,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from checksum errors range list.",
-		 function );
-
-		return( -1 );
-	}
-	if( number_of_elements < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of elements value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	*number_of_errors = (uint32_t) number_of_elements;
-
 	return( 1 );
 }
 
@@ -2461,7 +2443,7 @@ int libewf_handle_get_number_of_checksum_errors(
  */
 int libewf_handle_get_checksum_error(
      libewf_handle_t *handle,
-     uint32_t index,
+     uint32_t error_index,
      uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error )
@@ -2482,20 +2464,20 @@ int libewf_handle_get_checksum_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->chunk_table == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid error index value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( libcdata_range_list_get_range(
-	     internal_handle->read_io_handle->checksum_errors,
-	     (int) index,
+	if( libewf_chunk_table_get_checksum_error(
+	     internal_handle->chunk_table,
+	     error_index,
 	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
@@ -2506,14 +2488,14 @@ int libewf_handle_get_checksum_error(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve checksum error: %" PRIu32 ".",
 		 function,
-		 index );
+		 error_index );
 
 		return( -1 );
 	}
 	return( 1 );
 }
 
-/* Append a checksum error
+/* Appends a checksum error
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_append_checksum_error(
@@ -2538,19 +2520,8 @@ int libewf_handle_append_checksum_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libcdata_range_list_append_range(
-	     internal_handle->read_io_handle->checksum_errors,
+	if( libewf_chunk_table_append_checksum_error(
+	     internal_handle->chunk_table,
 	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
@@ -3432,6 +3403,7 @@ int libewf_handle_get_utf8_header_value_size(
 	static char *function                     = "libewf_handle_get_utf8_header_value_size";
 	size_t date_time_string_size              = 64;
 	size_t header_value_data_size             = 0;
+	size_t string_index                       = 0;
 	int encoding                              = 0;
 	int result                                = 0;
 
@@ -3577,8 +3549,16 @@ int libewf_handle_get_utf8_header_value_size(
 
 			return( -1 );
 		}
-		*utf8_string_size = 1 + libcstring_narrow_string_length(
-		                         (char *) date_time_string );
+		for( string_index = 0;
+		     string_index < date_time_string_size;
+		     string_index++ )
+		{
+			if( date_time_string[ string_index ] == 0 )
+			{
+				break;
+			}
+		}
+		*utf8_string_size = 1 + string_index;
 	}
 	else
 	{
@@ -3959,6 +3939,7 @@ int libewf_handle_get_utf16_header_value_size(
 	static char *function                     = "libewf_handle_get_utf8_header_value_size";
 	size_t date_time_string_size              = 64;
 	size_t header_value_data_size             = 0;
+	size_t string_index                       = 0;
 	int encoding                              = 0;
 	int result                                = 0;
 
@@ -4104,8 +4085,16 @@ int libewf_handle_get_utf16_header_value_size(
 
 			return( -1 );
 		}
-		*utf16_string_size = 1 + libcstring_narrow_string_length(
-					  (char *) date_time_string );
+		for( string_index = 0;
+		     string_index < date_time_string_size;
+		     string_index++ )
+		{
+			if( date_time_string[ string_index ] == 0 )
+			{
+				break;
+			}
+		}
+		*utf16_string_size = 1 + string_index;
 	}
 	else
 	{

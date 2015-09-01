@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\libcdata\libcdata_btree.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libcdata\libcdata_error.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\libcdata\libcdata_list.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -28,6 +31,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libcdata\libcdata_range_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libcdata\libcdata_range_list_value.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libcdata\libcdata_support.c">
@@ -47,6 +53,9 @@
     <ClInclude Include="..\..\libcdata\libcdata_definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libcdata\libcdata_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\libcdata\libcdata_extern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -56,6 +65,9 @@
     <ClInclude Include="..\..\libcdata\libcdata_libcstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libcdata\libcdata_libcthreads.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\libcdata\libcdata_list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcdata\libcdata_range_list.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libcdata\libcdata_range_list_value.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcdata\libcdata_support.h">

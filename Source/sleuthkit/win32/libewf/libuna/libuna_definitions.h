@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,11 +35,11 @@
 #else
 #include <byte_stream.h>
 
-#define LIBUNA_VERSION						20130105
+#define LIBUNA_VERSION						@VERSION@
 
 /* The libuna version string
  */
-#define LIBUNA_VERSION_STRING					"20130105"
+#define LIBUNA_VERSION_STRING					"@VERSION@"
 
 /* The endian definitions
  */

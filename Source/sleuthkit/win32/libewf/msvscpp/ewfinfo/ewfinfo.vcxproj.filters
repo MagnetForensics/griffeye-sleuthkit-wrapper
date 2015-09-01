@@ -53,7 +53,28 @@
     <ClInclude Include="..\..\ewftools\ewfoutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\ewftools\ewftools_libcerror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ewftools\ewftools_libclocale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ewftools\ewftools_libcnotify.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ewftools\ewftools_libcsplit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ewftools\ewftools_libcstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ewftools\ewftools_libcsystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\ewftools\ewftools_libewf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ewftools\ewftools_libfvalue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ewftools\ewftools_libhmac.h">

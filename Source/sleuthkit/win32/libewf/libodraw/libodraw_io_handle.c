@@ -1,7 +1,7 @@
 /*
  * Input/Output (IO) handle functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -40,8 +40,8 @@
 static uint8_t libodraw_sector_synchronisation_data[ 12 ] = \
 	{ 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00 };
 
-/* Initialize an IO handle
- * Make sure the value io_handle is pointing to is set to NULL
+/* Creates an IO handle
+ * Make sure the value io_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libodraw_io_handle_initialize(
@@ -143,6 +143,46 @@ int libodraw_io_handle_free(
 
 		*io_handle = NULL;
 	}
+	return( 1 );
+}
+
+/* Clears the IO handle
+ * Returns 1 if successful or -1 on error
+ */
+int libodraw_io_handle_clear(
+     libodraw_io_handle_t *io_handle,
+     libcerror_error_t **error )
+{
+	static char *function = "libodraw_io_handle_clear";
+
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     io_handle,
+	     0,
+	     sizeof( libodraw_io_handle_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	io_handle->bytes_per_sector = 2048;
+	io_handle->ascii_codepage   = LIBODRAW_CODEPAGE_WINDOWS_1252;
+
 	return( 1 );
 }
 
@@ -304,9 +344,10 @@ ssize_t libodraw_io_handle_copy_sector_data_to_buffer(
 				 sector_data[ sector_data_offset + 2 ],
 				 sector_lba );
 
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) || defined( HAVE_VERBOSE_OUTPUT )
 				sector_mode = sector_data[ sector_data_offset + 3 ] & 0x03;
-
+#endif
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(

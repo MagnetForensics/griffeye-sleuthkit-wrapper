@@ -1,13 +1,13 @@
-if HAVE_LOCAL_LIBUNA
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@
 
-noinst_LTLIBRARIES = libuna.la
+lib_LTLIBRARIES = libuna.la
 
 libuna_la_SOURCES = \
+	libuna.c \
 	libuna_base16_stream.c libuna_base16_stream.h \
 	libuna_base32_stream.c libuna_base32_stream.h \
 	libuna_base64_stream.c libuna_base64_stream.h \
@@ -58,12 +58,24 @@ libuna_la_SOURCES = \
 	libuna_utf7_stream.c libuna_utf7_stream.h \
 	libuna_utf8_stream.c libuna_utf8_stream.h \
 	libuna_utf8_string.c libuna_utf8_string.h
-endif
+
+libuna_la_LIBADD  = \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
+
+libuna_la_LDFLAGS = -no-undefined -version-info 1:0:0
+
+EXTRA_DIST = \
+	libuna_definitions.h.in \
+	libuna.rc \
+	libuna.rc.in
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
+	/bin/rm -f libuna_definitions.h
+	/bin/rm -f libuna.rc
 	/bin/rm -f Makefile
 
 splint:

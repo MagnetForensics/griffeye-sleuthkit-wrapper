@@ -1,7 +1,7 @@
 /*
  * Handle functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,7 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libodraw_array_type.h"
 #include "libodraw_codepage.h"
 #include "libodraw_cue_parser.h"
 #include "libodraw_data_file.h"
@@ -33,9 +32,11 @@
 #include "libodraw_io_handle.h"
 #include "libodraw_handle.h"
 #include "libodraw_libbfio.h"
+#include "libodraw_libcdata.h"
 #include "libodraw_libcerror.h"
 #include "libodraw_libclocale.h"
 #include "libodraw_libcnotify.h"
+#include "libodraw_libcpath.h"
 #include "libodraw_libcstring.h"
 #include "libodraw_libuna.h"
 #include "libodraw_sector_range.h"
@@ -48,8 +49,8 @@ extern int cue_parser_parse_buffer(
             size_t buffer_size,
             libcerror_error_t **error );
 
-/* Initializes a handle
- * Make sure the value handle is pointing to is set to NULL
+/* Creates a handle
+ * Make sure the value handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libodraw_handle_initialize(
@@ -112,7 +113,7 @@ int libodraw_handle_initialize(
 
 		return( -1 );
 	}
-	if( libodraw_array_initialize(
+	if( libcdata_array_initialize(
 	     &( internal_handle->data_file_descriptors_array ),
 	     0,
 	     error ) != 1 )
@@ -126,7 +127,7 @@ int libodraw_handle_initialize(
 
 		goto on_error;
 	}
-	if( libodraw_array_initialize(
+	if( libcdata_array_initialize(
 	     &( internal_handle->sessions_array ),
 	     0,
 	     error ) != 1 )
@@ -140,7 +141,7 @@ int libodraw_handle_initialize(
 
 		goto on_error;
 	}
-	if( libodraw_array_initialize(
+	if( libcdata_array_initialize(
 	     &( internal_handle->run_outs_array ),
 	     0,
 	     error ) != 1 )
@@ -154,7 +155,7 @@ int libodraw_handle_initialize(
 
 		goto on_error;
 	}
-	if( libodraw_array_initialize(
+	if( libcdata_array_initialize(
 	     &( internal_handle->lead_outs_array ),
 	     0,
 	     error ) != 1 )
@@ -168,7 +169,7 @@ int libodraw_handle_initialize(
 
 		goto on_error;
 	}
-	if( libodraw_array_initialize(
+	if( libcdata_array_initialize(
 	     &( internal_handle->tracks_array ),
 	     0,
 	     error ) != 1 )
@@ -206,35 +207,35 @@ on_error:
 	{
 		if( internal_handle->tracks_array != NULL )
 		{
-			libodraw_array_free(
+			libcdata_array_free(
 			 &( internal_handle->tracks_array ),
 			 NULL,
 			 NULL );
 		}
 		if( internal_handle->lead_outs_array != NULL )
 		{
-			libodraw_array_free(
+			libcdata_array_free(
 			 &( internal_handle->lead_outs_array ),
 			 NULL,
 			 NULL );
 		}
 		if( internal_handle->run_outs_array != NULL )
 		{
-			libodraw_array_free(
+			libcdata_array_free(
 			 &( internal_handle->run_outs_array ),
 			 NULL,
 			 NULL );
 		}
 		if( internal_handle->sessions_array != NULL )
 		{
-			libodraw_array_free(
+			libcdata_array_free(
 			 &( internal_handle->sessions_array ),
 			 NULL,
 			 NULL );
 		}
 		if( internal_handle->data_file_descriptors_array != NULL )
 		{
-			libodraw_array_free(
+			libcdata_array_free(
 			 &( internal_handle->data_file_descriptors_array ),
 			 NULL,
 			 NULL );
@@ -290,7 +291,7 @@ int libodraw_handle_free(
 		}
 		*handle = NULL;
 
-		if( libodraw_array_free(
+		if( libcdata_array_free(
 		     &( internal_handle->data_file_descriptors_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_data_file_descriptor_free,
 		     error ) != 1 )
@@ -304,7 +305,7 @@ int libodraw_handle_free(
 
 			result = -1;
 		}
-		if( libodraw_array_free(
+		if( libcdata_array_free(
 		     &( internal_handle->sessions_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 		     error ) != 1 )
@@ -318,7 +319,7 @@ int libodraw_handle_free(
 
 			result = -1;
 		}
-		if( libodraw_array_free(
+		if( libcdata_array_free(
 		     &( internal_handle->run_outs_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 		     error ) != 1 )
@@ -332,7 +333,7 @@ int libodraw_handle_free(
 
 			result = -1;
 		}
-		if( libodraw_array_free(
+		if( libcdata_array_free(
 		     &( internal_handle->lead_outs_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 		     error ) != 1 )
@@ -346,7 +347,7 @@ int libodraw_handle_free(
 
 			result = -1;
 		}
-		if( libodraw_array_free(
+		if( libcdata_array_free(
 		     &( internal_handle->tracks_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_track_value_free,
 		     error ) != 1 )
@@ -413,7 +414,7 @@ int libodraw_handle_signal_abort(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -434,10 +435,10 @@ int libodraw_handle_open(
 {
 	libbfio_handle_t *file_io_handle            = NULL;
 	libodraw_internal_handle_t *internal_handle = NULL;
+	char *basename_end                          = NULL;
 	static char *function                       = "libodraw_handle_open";
 	size_t basename_length                      = 0;
 	size_t filename_length                      = 0;
-	char *basename_end                          = NULL;
 
 	if( handle == NULL )
 	{
@@ -491,7 +492,7 @@ int libodraw_handle_open(
 
 	basename_end = libcstring_narrow_string_search_character_reverse(
 	                filename,
-	                LIBODRAW_PATH_SEPARATOR,
+	                (int) LIBCPATH_SEPARATOR,
 	                filename_length + 1 );
 
 	if( basename_end != NULL )
@@ -535,12 +536,12 @@ int libodraw_handle_open(
 	     1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set track offsets read in file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track offsets read in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -551,12 +552,12 @@ int libodraw_handle_open(
 	     filename_length + 1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set filename in file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -603,10 +604,10 @@ int libodraw_handle_open_wide(
 {
 	libbfio_handle_t *file_io_handle            = NULL;
 	libodraw_internal_handle_t *internal_handle = NULL;
+	wchar_t *basename_end                       = NULL;
 	static char *function                       = "libodraw_handle_open_wide";
 	size_t basename_length                      = 0;
 	size_t filename_length                      = 0;
-	wchar_t *basename_end                       = NULL;
 
 	if( handle == NULL )
 	{
@@ -661,7 +662,7 @@ int libodraw_handle_open_wide(
 /* TODO does this work for UTF-16 ? */
 	basename_end = libcstring_wide_string_search_character_reverse(
 	                filename,
-	                (wint_t) LIBODRAW_PATH_SEPARATOR,
+	                (wint_t) LIBCPATH_SEPARATOR,
 	                filename_length + 1 );
 
 	if( basename_end != NULL )
@@ -705,12 +706,12 @@ int libodraw_handle_open_wide(
 	     1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set track offsets read in file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track offsets read in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -722,12 +723,12 @@ int libodraw_handle_open_wide(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set filename in file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -761,7 +762,7 @@ on_error:
 	return( -1 );
 }
 
-#endif
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Opens a handle using a Basic File IO (bfio) handle of a table of contents (TOC) file
  * Returns 1 if successful or -1 on error
@@ -776,6 +777,7 @@ int libodraw_handle_open_file_io_handle(
 	static char *function                       = "libodraw_handle_open_file_io_handle";
 	int bfio_access_flags                       = 0;
 	int file_io_handle_is_open                  = 0;
+	int file_io_handle_opened_in_library        = 0;
 
 	if( handle == NULL )
 	{
@@ -796,7 +798,7 @@ int libodraw_handle_open_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid internal handle - file IO handle already set.",
+		 "%s: invalid handle - file IO handle already set.",
 		 function );
 
 		return( -1 );
@@ -839,11 +841,8 @@ int libodraw_handle_open_file_io_handle(
 	{
 		bfio_access_flags = LIBBFIO_ACCESS_FLAG_READ;
 	}
-	internal_handle->access_flags       = access_flags;
-	internal_handle->toc_file_io_handle = file_io_handle;
-
 	file_io_handle_is_open = libbfio_handle_is_open(
-	                          internal_handle->toc_file_io_handle,
+	                          file_io_handle,
 	                          error );
 
 	if( file_io_handle_is_open == -1 )
@@ -860,7 +859,7 @@ int libodraw_handle_open_file_io_handle(
 	else if( file_io_handle_is_open == 0 )
 	{
 		if( libbfio_handle_open(
-		     internal_handle->toc_file_io_handle,
+		     file_io_handle,
 		     bfio_access_flags,
 		     error ) != 1 )
 		{
@@ -873,9 +872,11 @@ int libodraw_handle_open_file_io_handle(
 
 			return( -1 );
 		}
+		file_io_handle_opened_in_library = 1;
 	}
 	if( libodraw_handle_open_read(
 	     internal_handle,
+	     file_io_handle,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -887,7 +888,20 @@ int libodraw_handle_open_file_io_handle(
 
 		return( -1 );
 	}
+	internal_handle->access_flags                         = access_flags;
+	internal_handle->toc_file_io_handle                   = file_io_handle;
+	internal_handle->toc_file_io_handle_opened_in_library = file_io_handle_opened_in_library;
+
 	return( 1 );
+
+on_error:
+	if( file_io_handle_opened_in_library != 0 )
+	{
+		libbfio_handle_close(
+		 file_io_handle,
+		 error );
+	}
+	return( -1 );
 }
 
 /* Opens the data files
@@ -934,7 +948,7 @@ int libodraw_handle_open_data_files(
 
 		return( -1 );
 	}
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->data_file_descriptors_array,
 	     &number_of_data_file_descriptors,
 	     error ) != 1 )
@@ -952,7 +966,7 @@ int libodraw_handle_open_data_files(
 	     data_file_descriptor_index < number_of_data_file_descriptors;
 	     data_file_descriptor_index++ )
 	{
-		if( libodraw_array_get_entry_by_index(
+		if( libcdata_array_get_entry_by_index(
 		     internal_handle->data_file_descriptors_array,
 		     data_file_descriptor_index,
 		     (intptr_t **) &data_file_descriptor,
@@ -998,15 +1012,14 @@ int libodraw_handle_open_data_files(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 			data_file_name_start = libcstring_wide_string_search_character_reverse(
 			                        data_file_descriptor->name,
-			                        (wint_t) LIBODRAW_PATH_SEPARATOR,
+			                        (wint_t) LIBCPATH_SEPARATOR,
 			                        data_file_descriptor->name_size );
 #else
 			data_file_name_start = libcstring_narrow_string_search_character_reverse(
 			                        data_file_descriptor->name,
-			                        (int) LIBODRAW_PATH_SEPARATOR,
+			                        (int) LIBCPATH_SEPARATOR,
 		        	                data_file_descriptor->name_size );
 #endif
-
 		}
 		if( data_file_name_start != NULL )
 		{
@@ -1025,65 +1038,35 @@ int libodraw_handle_open_data_files(
 		if( ( data_file_descriptor->name_set == 0 )
 		 && ( internal_handle->basename != NULL ) )
 		{
-			data_file_location_size = internal_handle->basename_size + data_file_name_size - 1;
-
-			data_file_location = libcstring_system_string_allocate(
-			                      data_file_location_size );
-
-			if( data_file_location == NULL )
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			if( libcpath_path_join_wide(
+			     &data_file_location,
+			     &data_file_location_size,
+			     internal_handle->basename,
+			     internal_handle->basename_size - 1,
+			     data_file_name_start,
+			     data_file_name_size - 1,
+			     error ) != 1 )
+#else
+			if( libcpath_path_join(
+			     &data_file_location,
+			     &data_file_location_size,
+			     internal_handle->basename,
+			     internal_handle->basename_size - 1,
+			     data_file_name_start,
+			     data_file_name_size - 1,
+			     error ) != 1 )
+#endif
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 				 "%s: unable to create data file location.",
 				 function );
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			if( libcstring_wide_string_copy(
-			     data_file_location,
-			     internal_handle->basename,
-			     internal_handle->basename_size - 1 ) == NULL )
-#else
-			if( libcstring_narrow_string_copy(
-			     data_file_location,
-			     internal_handle->basename,
-			     internal_handle->basename_size - 1 ) == NULL )
-#endif
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy basename to data file location.",
-				 function );
-
-				goto on_error;
-			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			if( libcstring_wide_string_copy(
-			     &( data_file_location[ internal_handle->basename_size - 1 ] ),
-			     data_file_name_start,
-			     data_file_name_size - 1 ) == NULL )
-#else
-			if( libcstring_narrow_string_copy(
-			     &( data_file_location[ internal_handle->basename_size - 1 ] ),
-			     data_file_name_start,
-			     data_file_name_size - 1 ) == NULL )
-#endif
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy data file name to data file location.",
-				 function );
-
-				goto on_error;
-			}
-			data_file_location[ data_file_location_size - 1 ] = 0;
 		}
 		else
 		{
@@ -1128,14 +1111,14 @@ int libodraw_handle_open_data_files(
 	     internal_handle,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set media values.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set media values.",
+		 function );
 
-                return( -1 );
+		goto on_error;
 	}
 	return( 1 );
 
@@ -1209,6 +1192,19 @@ int libodraw_handle_open_data_files_file_io_pool(
 	}
 	internal_handle->data_file_io_pool = file_io_pool;
 
+	if( libodraw_handle_set_media_values(
+	     internal_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set media values.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 
@@ -1230,7 +1226,7 @@ int libodraw_handle_open_data_file(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1276,14 +1272,14 @@ int libodraw_handle_open_data_file(
 	     1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set track offsets read in file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track offsets read in file IO handle.",
+		 function );
 
-                goto on_error;
+		goto on_error;
 	}
 #endif
 	if( libbfio_file_set_name(
@@ -1293,14 +1289,14 @@ int libodraw_handle_open_data_file(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set filename in file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file IO handle.",
+		 function );
 
-                goto on_error;
+		goto on_error;
 	}
 	if( libodraw_handle_open_data_file_io_handle(
 	     internal_handle,
@@ -1350,7 +1346,7 @@ int libodraw_handle_open_data_file_wide(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1388,7 +1384,7 @@ int libodraw_handle_open_data_file_wide(
 		 "%s: unable to create file IO handle.",
 		 function );
 
-                goto on_error;
+		goto on_error;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libbfio_handle_set_track_offsets_read(
@@ -1396,14 +1392,14 @@ int libodraw_handle_open_data_file_wide(
 	     1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set track offsets read in file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track offsets read in file IO handle.",
+		 function );
 
-                goto on_error;
+		goto on_error;
 	}
 #endif
 	if( libbfio_file_set_name_wide(
@@ -1413,14 +1409,14 @@ int libodraw_handle_open_data_file_wide(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set filename in file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file IO handle.",
+		 function );
 
-                goto on_error;
+		goto on_error;
 	}
 	if( libodraw_handle_open_data_file_io_handle(
 	     internal_handle,
@@ -1450,7 +1446,7 @@ on_error:
 	return( -1 );
 }
 
-#endif
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Opens a data file using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
@@ -1471,7 +1467,7 @@ int libodraw_handle_open_data_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1523,7 +1519,7 @@ int libodraw_handle_open_data_file_io_handle(
 	}
 	if( internal_handle->data_file_io_pool == NULL )
 	{
-		if( libodraw_array_get_number_of_entries(
+		if( libcdata_array_get_number_of_entries(
 		     internal_handle->data_file_descriptors_array,
 		     &number_of_data_file_descriptors,
 		     error ) != 1 )
@@ -1563,14 +1559,14 @@ int libodraw_handle_open_data_file_io_handle(
 	     bfio_access_flags,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_IO,
-                 LIBCERROR_IO_ERROR_OPEN_FAILED,
-                 "%s: unable to open file IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file IO handle.",
+		 function );
 
-                return( -1 );
+		return( -1 );
 	}
 	/* This function currently does not allow the file_io_handle to be set more than once
 	 */
@@ -1629,10 +1625,10 @@ int libodraw_handle_close(
 
 		return( -1 );
 	}
-	if( internal_handle->toc_file_io_handle_created_in_library != 0 )
-	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
+	if( libcnotify_verbose != 0 )
+	{
+		if( internal_handle->toc_file_io_handle_created_in_library != 0 )
 		{
 			if( libodraw_debug_print_read_offsets(
 			     internal_handle->toc_file_io_handle,
@@ -1648,7 +1644,10 @@ int libodraw_handle_close(
 				result = -1;
 			}
 		}
+	}
 #endif
+	if( internal_handle->toc_file_io_handle_opened_in_library != 0 )
+	{
 		if( libbfio_handle_close(
 		     internal_handle->toc_file_io_handle,
 		     error ) != 0 )
@@ -1662,6 +1661,10 @@ int libodraw_handle_close(
 
 			result = -1;
 		}
+		internal_handle->toc_file_io_handle_opened_in_library = 0;
+	}
+	if( internal_handle->toc_file_io_handle_created_in_library != 0 )
+	{
 		if( libbfio_handle_free(
 		     &( internal_handle->toc_file_io_handle ),
 		     error ) != 1 )
@@ -1675,9 +1678,9 @@ int libodraw_handle_close(
 
 			result = -1;
 		}
+		internal_handle->toc_file_io_handle_created_in_library = 0;
 	}
-	internal_handle->toc_file_io_handle                    = NULL;
-	internal_handle->toc_file_io_handle_created_in_library = 0;
+	internal_handle->toc_file_io_handle = NULL;
 
 	if( internal_handle->data_file_io_pool != 0 )
 	{
@@ -1710,13 +1713,32 @@ int libodraw_handle_close(
 				result = -1;
 			}
 		}
+		internal_handle->data_file_io_pool_created_in_library = 0;
 	}
-	internal_handle->data_file_io_pool                    = NULL;
-	internal_handle->data_file_io_pool_created_in_library = 0;
+	internal_handle->data_file_io_pool = NULL;
 
-	if( libodraw_array_resize(
+	internal_handle->current_offset    = 0;
+	internal_handle->current_run_out   = 0;
+	internal_handle->current_lead_out  = 0;
+	internal_handle->current_track     = 0;
+	internal_handle->media_size        = 0;
+	internal_handle->number_of_sectors = 0;
+
+	if( libodraw_io_handle_clear(
+	     internal_handle->io_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to clear IO handle.",
+		 function );
+
+		result = -1;
+	}
+	if( libcdata_array_empty(
 	     internal_handle->data_file_descriptors_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_data_file_descriptor_free,
 	     error ) != 1 )
 	{
@@ -1729,9 +1751,8 @@ int libodraw_handle_close(
 
 		result = -1;
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->sessions_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 	     error ) != 1 )
 	{
@@ -1744,9 +1765,8 @@ int libodraw_handle_close(
 
 		result = -1;
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->run_outs_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 	     error ) != 1 )
 	{
@@ -1759,9 +1779,8 @@ int libodraw_handle_close(
 
 		result = -1;
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->lead_outs_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 	     error ) != 1 )
 	{
@@ -1774,9 +1793,8 @@ int libodraw_handle_close(
 
 		result = -1;
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->tracks_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_track_value_free,
 	     error ) != 1 )
 	{
@@ -1789,6 +1807,14 @@ int libodraw_handle_close(
 
 		result = -1;
 	}
+	if( internal_handle->basename != NULL )
+	{
+		memory_free(
+		 internal_handle->basename );
+
+		internal_handle->basename      = NULL;
+		internal_handle->basename_size = 0;
+	}
 	return( result );
 }
 
@@ -1797,6 +1823,7 @@ int libodraw_handle_close(
  */
 int libodraw_handle_open_read(
      libodraw_internal_handle_t *internal_handle,
+     libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
 	uint8_t *buffer       = NULL;
@@ -1812,7 +1839,7 @@ int libodraw_handle_open_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1823,14 +1850,13 @@ int libodraw_handle_open_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->data_file_descriptors_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_track_value_free,
 	     error ) != 1 )
 	{
@@ -1843,9 +1869,8 @@ int libodraw_handle_open_read(
 
 		return( -1 );
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->sessions_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 	     error ) != 1 )
 	{
@@ -1858,9 +1883,8 @@ int libodraw_handle_open_read(
 
 		return( -1 );
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->run_outs_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 	     error ) != 1 )
 	{
@@ -1873,9 +1897,8 @@ int libodraw_handle_open_read(
 
 		return( -1 );
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->lead_outs_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_sector_range_free,
 	     error ) != 1 )
 	{
@@ -1888,9 +1911,8 @@ int libodraw_handle_open_read(
 
 		return( -1 );
 	}
-	if( libodraw_array_resize(
+	if( libcdata_array_empty(
 	     internal_handle->tracks_array,
-	     0,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libodraw_track_value_free,
 	     error ) != 1 )
 	{
@@ -1915,7 +1937,7 @@ int libodraw_handle_open_read(
 	}
 #endif
 	if( libbfio_handle_get_size(
-	     internal_handle->toc_file_io_handle,
+	     file_io_handle,
 	     &file_size,
 	     error ) != 1 )
 	{
@@ -1948,7 +1970,7 @@ int libodraw_handle_open_read(
 	}
 #endif
 	if( libbfio_handle_seek_offset(
-	     internal_handle->toc_file_io_handle,
+	     file_io_handle,
 	     0,
 	     SEEK_SET,
 	     error ) == -1 )
@@ -1981,7 +2003,7 @@ int libodraw_handle_open_read(
 		return( -1 );
 	}
 	read_count = libbfio_handle_read_buffer(
-	              internal_handle->toc_file_io_handle,
+	              file_io_handle,
 	              buffer,
 	              (size_t) file_size,
 	              error );
@@ -2081,7 +2103,7 @@ ssize_t libodraw_handle_read_buffer(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2092,23 +2114,23 @@ ssize_t libodraw_handle_read_buffer(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid internal handle - invalid IO handle - current offset value out of bounds.",
+		 "%s: invalid handle - invalid IO handle - current offset value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->run_outs_array,
 	     &number_of_run_outs,
 	     error ) != 1 )
@@ -2122,7 +2144,7 @@ ssize_t libodraw_handle_read_buffer(
 
 		return( -1 );
 	}
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->lead_outs_array,
 	     &number_of_lead_outs,
 	     error ) != 1 )
@@ -2136,11 +2158,11 @@ ssize_t libodraw_handle_read_buffer(
 
 		return( -1 );
 	}
-	if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_size )
+	if( (size64_t) internal_handle->current_offset >= internal_handle->media_size )
 	{
 		return( 0 );
 	}
-	current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+	current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 	if( current_sector > (uint64_t) UINT32_MAX )
 	{
@@ -2157,9 +2179,9 @@ ssize_t libodraw_handle_read_buffer(
 	{
 		in_known_range = 0;
 
-		if( libodraw_array_get_entry_by_index(
+		if( libcdata_array_get_entry_by_index(
 		     internal_handle->tracks_array,
-		     internal_handle->io_handle->current_track,
+		     internal_handle->current_track,
 		     (intptr_t **) &track_value,
 		     error ) != 1 )
 		{
@@ -2169,7 +2191,7 @@ ssize_t libodraw_handle_read_buffer(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve track value: %d from array.",
 			 function,
-			 internal_handle->io_handle->current_track );
+			 internal_handle->current_track );
 
 			return( -1 );
 		}
@@ -2181,7 +2203,7 @@ ssize_t libodraw_handle_read_buffer(
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing track value: %d.",
 			 function,
-			 internal_handle->io_handle->current_track );
+			 internal_handle->current_track );
 
 			return( -1 );
 		}
@@ -2205,15 +2227,15 @@ ssize_t libodraw_handle_read_buffer(
 				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read buffer from track: %d.",
 				 function,
-				 internal_handle->io_handle->current_track );
+				 internal_handle->current_track );
 
 				return( -1 );
 			}
 			buffer_offset += read_count;
 
-			internal_handle->io_handle->current_offset += (off64_t) read_count;
+			internal_handle->current_offset += (off64_t) read_count;
 
-			current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+			current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 			if( current_sector > (uint64_t) UINT32_MAX )
 			{
@@ -2228,22 +2250,22 @@ ssize_t libodraw_handle_read_buffer(
 			}
 			if( current_sector >= track_value->end_sector )
 			{
-				internal_handle->io_handle->current_track += 1;
+				internal_handle->current_track += 1;
 			}
 		}
 		if( buffer_offset >= buffer_size )
 		{
 			break;
 		}
-		if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_size )
+		if( (size64_t) internal_handle->current_offset >= internal_handle->media_size )
 		{
 			break;
 		}
-		if( internal_handle->io_handle->current_run_out < number_of_run_outs )
+		if( internal_handle->current_run_out < number_of_run_outs )
 		{
-			if( libodraw_array_get_entry_by_index(
+			if( libcdata_array_get_entry_by_index(
 			     internal_handle->run_outs_array,
-			     internal_handle->io_handle->current_run_out,
+			     internal_handle->current_run_out,
 			     (intptr_t **) &sector_range,
 			     error ) != 1 )
 			{
@@ -2253,7 +2275,7 @@ ssize_t libodraw_handle_read_buffer(
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve run-out sector range: %d from array.",
 				 function,
-				 internal_handle->io_handle->current_run_out );
+				 internal_handle->current_run_out );
 
 				return( -1 );
 			}
@@ -2265,7 +2287,7 @@ ssize_t libodraw_handle_read_buffer(
 				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing run-out sector range: %d.",
 				 function,
-				 internal_handle->io_handle->current_run_out );
+				 internal_handle->current_run_out );
 
 				return( -1 );
 			}
@@ -2289,15 +2311,15 @@ ssize_t libodraw_handle_read_buffer(
 					 LIBCERROR_IO_ERROR_READ_FAILED,
 					 "%s: unable to read buffer from run-out: %d.",
 					 function,
-					 internal_handle->io_handle->current_run_out );
+					 internal_handle->current_run_out );
 
 					return( -1 );
 				}
 				buffer_offset += read_count;
 
-				internal_handle->io_handle->current_offset += (off64_t) read_count;
+				internal_handle->current_offset += (off64_t) read_count;
 
-				current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+				current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 				if( current_sector > (uint64_t) UINT32_MAX )
 				{
@@ -2312,23 +2334,23 @@ ssize_t libodraw_handle_read_buffer(
 				}
 				if( current_sector >= sector_range->end_sector )
 				{
-					internal_handle->io_handle->current_run_out += 1;
+					internal_handle->current_run_out += 1;
 				}
 			}
 			if( buffer_offset >= buffer_size )
 			{
 				break;
 			}
-			if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_size )
+			if( (size64_t) internal_handle->current_offset >= internal_handle->media_size )
 			{
 				break;
 			}
 		}
-		if( internal_handle->io_handle->current_lead_out < number_of_lead_outs )
+		if( internal_handle->current_lead_out < number_of_lead_outs )
 		{
-			if( libodraw_array_get_entry_by_index(
+			if( libcdata_array_get_entry_by_index(
 			     internal_handle->lead_outs_array,
-			     internal_handle->io_handle->current_lead_out,
+			     internal_handle->current_lead_out,
 			     (intptr_t **) &sector_range,
 			     error ) != 1 )
 			{
@@ -2338,7 +2360,7 @@ ssize_t libodraw_handle_read_buffer(
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve lead-out sector range: %d from array.",
 				 function,
-				 internal_handle->io_handle->current_lead_out );
+				 internal_handle->current_lead_out );
 
 				return( -1 );
 			}
@@ -2350,7 +2372,7 @@ ssize_t libodraw_handle_read_buffer(
 				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing lead-out sector range: %d.",
 				 function,
-				 internal_handle->io_handle->current_lead_out );
+				 internal_handle->current_lead_out );
 
 				return( -1 );
 			}
@@ -2374,15 +2396,15 @@ ssize_t libodraw_handle_read_buffer(
 					 LIBCERROR_IO_ERROR_READ_FAILED,
 					 "%s: unable to read buffer from lead-out: %d.",
 					 function,
-					 internal_handle->io_handle->current_lead_out );
+					 internal_handle->current_lead_out );
 
 					return( -1 );
 				}
 				buffer_offset += read_count;
 
-				internal_handle->io_handle->current_offset += (off64_t) read_count;
+				internal_handle->current_offset += (off64_t) read_count;
 
-				current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+				current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 				if( current_sector > (uint64_t) UINT32_MAX )
 				{
@@ -2397,14 +2419,14 @@ ssize_t libodraw_handle_read_buffer(
 				}
 				if( current_sector >= sector_range->end_sector )
 				{
-					internal_handle->io_handle->current_lead_out += 1;
+					internal_handle->current_lead_out += 1;
 				}
 			}
 			if( buffer_offset >= buffer_size )
 			{
 				break;
 			}
-			if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_size )
+			if( (size64_t) internal_handle->current_offset >= internal_handle->media_size )
 			{
 				break;
 			}
@@ -2430,9 +2452,9 @@ ssize_t libodraw_handle_read_buffer(
 			}
 			buffer_offset += read_count;
 
-			internal_handle->io_handle->current_offset += (off64_t) read_count;
+			internal_handle->current_offset += (off64_t) read_count;
 
-			current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+			current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 			if( current_sector > (uint64_t) UINT32_MAX )
 			{
@@ -2447,13 +2469,13 @@ ssize_t libodraw_handle_read_buffer(
 			}
 			if( current_sector >= track_value->end_sector )
 			{
-				internal_handle->io_handle->current_track += 1;
+				internal_handle->current_track += 1;
 			}
 			if( buffer_offset >= buffer_size )
 			{
 				break;
 			}
-			if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_size )
+			if( (size64_t) internal_handle->current_offset >= internal_handle->media_size )
 			{
 				break;
 			}
@@ -2497,7 +2519,7 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -2508,7 +2530,7 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2519,14 +2541,14 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
 	}
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->run_outs_array,
-	     internal_handle->io_handle->current_run_out,
+	     internal_handle->current_run_out,
 	     (intptr_t **) &sector_range,
 	     error ) != 1 )
 	{
@@ -2536,7 +2558,7 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve run-out sector range: %d from array.",
 		 function,
-		 internal_handle->io_handle->current_run_out );
+		 internal_handle->current_run_out );
 
 		goto on_error;
 	}
@@ -2548,11 +2570,11 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing run-out sector range: %d.",
 		 function,
-		 internal_handle->io_handle->current_run_out );
+		 internal_handle->current_run_out );
 
 		goto on_error;
 	}
-	current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+	current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 	if( current_sector > (uint64_t) UINT32_MAX )
 	{
@@ -2584,16 +2606,16 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 		libcnotify_printf(
 		 "%s: reading data from run-out: %d at sector(s): %" PRIu64 " - %" PRIu64 "\n",
 		 function,
-		 internal_handle->io_handle->current_run_out,
+		 internal_handle->current_run_out,
 		 sector_range->start_sector,
 		 sector_range->end_sector );
 	}
 #endif
 	/* Retrieves the track that corresponds to the run-out
 	 */
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->tracks_array,
-	     internal_handle->io_handle->current_track - 1,
+	     internal_handle->current_track - 1,
 	     (intptr_t **) &track_value,
 	     error ) != 1 )
 	{
@@ -2603,7 +2625,7 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve track value: %d from array.",
 		 function,
-		 internal_handle->io_handle->current_track - 1 );
+		 internal_handle->current_track - 1 );
 
 		goto on_error;
 	}
@@ -2615,7 +2637,7 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing track value: %d.",
 		 function,
-		 internal_handle->io_handle->current_track - 1 );
+		 internal_handle->current_track - 1 );
 
 		goto on_error;
 	}
@@ -2630,7 +2652,7 @@ ssize_t libodraw_handle_read_buffer_from_run_out(
 
 		goto on_error;
 	}
-	current_sector_offset = internal_handle->io_handle->current_offset
+	current_sector_offset = internal_handle->current_offset
 	                      - (off64_t) ( current_sector * internal_handle->io_handle->bytes_per_sector );
 
 	if( ( current_sector_offset < 0 )
@@ -2858,7 +2880,7 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -2869,7 +2891,7 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2880,14 +2902,14 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
 	}
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->lead_outs_array,
-	     internal_handle->io_handle->current_lead_out,
+	     internal_handle->current_lead_out,
 	     (intptr_t **) &sector_range,
 	     error ) != 1 )
 	{
@@ -2897,7 +2919,7 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve lead-out sector range: %d from array.",
 		 function,
-		 internal_handle->io_handle->current_lead_out );
+		 internal_handle->current_lead_out );
 
 		goto on_error;
 	}
@@ -2909,11 +2931,11 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing lead-out sector range: %d.",
 		 function,
-		 internal_handle->io_handle->current_lead_out );
+		 internal_handle->current_lead_out );
 
 		goto on_error;
 	}
-	current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+	current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 	if( current_sector > (uint64_t) UINT32_MAX )
 	{
@@ -2945,16 +2967,16 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 		libcnotify_printf(
 		 "%s: reading data from lead-out: %d at sector(s): %" PRIu64 " - %" PRIu64 "\n",
 		 function,
-		 internal_handle->io_handle->current_lead_out,
+		 internal_handle->current_lead_out,
 		 sector_range->start_sector,
 		 sector_range->end_sector );
 	}
 #endif
 	/* Retrieves the track that corresponds to the lead-out
 	 */
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->tracks_array,
-	     internal_handle->io_handle->current_track - 1,
+	     internal_handle->current_track - 1,
 	     (intptr_t **) &track_value,
 	     error ) != 1 )
 	{
@@ -2964,7 +2986,7 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve track value: %d from array.",
 		 function,
-		 internal_handle->io_handle->current_track - 1 );
+		 internal_handle->current_track - 1 );
 
 		goto on_error;
 	}
@@ -2976,7 +2998,7 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing track value: %d.",
 		 function,
-		 internal_handle->io_handle->current_track - 1 );
+		 internal_handle->current_track - 1 );
 
 		goto on_error;
 	}
@@ -2991,7 +3013,7 @@ ssize_t libodraw_handle_read_buffer_from_lead_out(
 
 		goto on_error;
 	}
-	current_sector_offset = internal_handle->io_handle->current_offset
+	current_sector_offset = internal_handle->current_offset
 	                      - (off64_t) ( current_sector * internal_handle->io_handle->bytes_per_sector );
 
 	if( ( current_sector_offset < 0 )
@@ -3217,7 +3239,7 @@ ssize_t libodraw_handle_read_buffer_from_unspecified_sector(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -3228,7 +3250,7 @@ ssize_t libodraw_handle_read_buffer_from_unspecified_sector(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -3239,12 +3261,12 @@ ssize_t libodraw_handle_read_buffer_from_unspecified_sector(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
 	}
-	current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+	current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 	if( current_sector > (uint64_t) UINT32_MAX )
 	{
@@ -3267,9 +3289,9 @@ ssize_t libodraw_handle_read_buffer_from_unspecified_sector(
 #endif
 	/* Retrieves the track that corresponds to the unspecified range
 	 */
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->tracks_array,
-	     internal_handle->io_handle->current_track - 1,
+	     internal_handle->current_track - 1,
 	     (intptr_t **) &track_value,
 	     error ) != 1 )
 	{
@@ -3279,7 +3301,7 @@ ssize_t libodraw_handle_read_buffer_from_unspecified_sector(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve track value: %d from array.",
 		 function,
-		 internal_handle->io_handle->current_track - 1 );
+		 internal_handle->current_track - 1 );
 
 		goto on_error;
 	}
@@ -3291,11 +3313,11 @@ ssize_t libodraw_handle_read_buffer_from_unspecified_sector(
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing track value: %d.",
 		 function,
-		 internal_handle->io_handle->current_track - 1 );
+		 internal_handle->current_track - 1 );
 
 		goto on_error;
 	}
-	current_sector_offset = internal_handle->io_handle->current_offset
+	current_sector_offset = internal_handle->current_offset
 	                      - (off64_t) ( current_sector * internal_handle->io_handle->bytes_per_sector );
 
 	if( ( current_sector_offset < 0 )
@@ -3509,7 +3531,7 @@ ssize_t libodraw_handle_read_buffer_from_track(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -3520,7 +3542,7 @@ ssize_t libodraw_handle_read_buffer_from_track(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -3531,14 +3553,14 @@ ssize_t libodraw_handle_read_buffer_from_track(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
 	}
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->tracks_array,
-	     internal_handle->io_handle->current_track,
+	     internal_handle->current_track,
 	     (intptr_t **) &track_value,
 	     error ) != 1 )
 	{
@@ -3548,7 +3570,7 @@ ssize_t libodraw_handle_read_buffer_from_track(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve track value: %d from array.",
 		 function,
-		 internal_handle->io_handle->current_track );
+		 internal_handle->current_track );
 
 		goto on_error;
 	}
@@ -3560,11 +3582,11 @@ ssize_t libodraw_handle_read_buffer_from_track(
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing track value: %d.",
 		 function,
-		 internal_handle->io_handle->current_track );
+		 internal_handle->current_track );
 
 		goto on_error;
 	}
-	current_sector = (uint64_t) ( internal_handle->io_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
+	current_sector = (uint64_t) ( internal_handle->current_offset / internal_handle->io_handle->bytes_per_sector );
 
 	if( current_sector > (uint64_t) UINT32_MAX )
 	{
@@ -3596,12 +3618,12 @@ ssize_t libodraw_handle_read_buffer_from_track(
 		libcnotify_printf(
 		 "%s: reading data from track: %d at sector(s): %" PRIu64 " - %" PRIu64 "\n",
 		 function,
-		 internal_handle->io_handle->current_track,
+		 internal_handle->current_track,
 		 track_value->start_sector,
 		 track_value->end_sector );
 	}
 #endif
-	current_sector_offset = internal_handle->io_handle->current_offset
+	current_sector_offset = internal_handle->current_offset
 	                      - (off64_t) ( current_sector * internal_handle->io_handle->bytes_per_sector );
 
 	if( ( current_sector_offset < 0 )
@@ -3761,6 +3783,54 @@ on_error:
 /* Reads (media) data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
+ssize_t libodraw_handle_read_buffer_at_offset(
+         libodraw_handle_t *handle,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error )
+{
+	static char *function = "libodraw_handle_read_buffer_at_offset";
+	ssize_t read_count    = 0;
+
+	if( libodraw_handle_seek_offset(
+	     handle,
+	     offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libodraw_handle_read_buffer(
+	              handle,
+	              buffer,
+	              buffer_size,
+	              error );
+
+	if( read_count <= -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read buffer.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+
+/* Reads (media) data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ */
 ssize_t libodraw_handle_read_random(
          libodraw_handle_t *handle,
          void *buffer,
@@ -3842,14 +3912,14 @@ ssize_t libodraw_handle_write_buffer(
 /* Writes (media) data at a specific offset,
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
-ssize_t libodraw_handle_write_random(
+ssize_t libodraw_handle_write_buffer_at_offset(
          libodraw_handle_t *handle,
          const void *buffer,
          size_t buffer_size,
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libodraw_handle_write_random";
+	static char *function = "libodraw_handle_write_buffer_at_offset";
 	ssize_t write_count   = 0;
 
 	if( libodraw_handle_seek_offset(
@@ -3887,7 +3957,7 @@ ssize_t libodraw_handle_write_random(
 	return( write_count );
 }
 
-#endif
+#endif /* TODO_WRITE_SUPPORT */
 
 /* Seeks a certain offset
  * Returns the offset or -1 on error
@@ -3929,7 +3999,7 @@ off64_t libodraw_handle_seek_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -3949,7 +4019,7 @@ off64_t libodraw_handle_seek_offset(
 	}
 	if( whence == SEEK_CUR )
 	{
-		offset += internal_handle->io_handle->current_offset;
+		offset += internal_handle->current_offset;
 	}
 	else if( whence == SEEK_END )
 	{
@@ -4025,7 +4095,7 @@ off64_t libodraw_handle_seek_offset(
 	}
 	else
 	{
-		if( libodraw_array_get_number_of_entries(
+		if( libcdata_array_get_number_of_entries(
 		     internal_handle->run_outs_array,
 		     &current_run_out,
 		     error ) != 1 )
@@ -4039,7 +4109,7 @@ off64_t libodraw_handle_seek_offset(
 
 			return( -1 );
 		}
-		if( libodraw_array_get_number_of_entries(
+		if( libcdata_array_get_number_of_entries(
 		     internal_handle->lead_outs_array,
 		     &current_lead_out,
 		     error ) != 1 )
@@ -4053,7 +4123,7 @@ off64_t libodraw_handle_seek_offset(
 
 			return( -1 );
 		}
-		if( libodraw_array_get_number_of_entries(
+		if( libcdata_array_get_number_of_entries(
 		     internal_handle->tracks_array,
 		     &current_track,
 		     error ) != 1 )
@@ -4068,10 +4138,10 @@ off64_t libodraw_handle_seek_offset(
 			return( -1 );
 		}
 	}
-	internal_handle->io_handle->current_offset   = offset;
-	internal_handle->io_handle->current_run_out  = current_run_out;
-	internal_handle->io_handle->current_lead_out = current_lead_out;
-	internal_handle->io_handle->current_track    = current_track;
+	internal_handle->current_offset   = offset;
+	internal_handle->current_run_out  = current_run_out;
+	internal_handle->current_lead_out = current_lead_out;
+	internal_handle->current_track    = current_track;
 
 	return( offset );
 }
@@ -4098,7 +4168,7 @@ int libodraw_handle_get_run_out_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -4109,7 +4179,7 @@ int libodraw_handle_get_run_out_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -4120,7 +4190,7 @@ int libodraw_handle_get_run_out_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -4158,7 +4228,7 @@ int libodraw_handle_get_run_out_at_offset(
 
 		return( -1 );
 	}
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->run_outs_array,
 	     &number_of_run_outs,
 	     error ) != 1 )
@@ -4189,7 +4259,7 @@ int libodraw_handle_get_run_out_at_offset(
 	     *run_out_index < number_of_run_outs;
 	     *run_out_index += 1 )
 	{
-		if( libodraw_array_get_entry_by_index(
+		if( libcdata_array_get_entry_by_index(
 		     internal_handle->run_outs_array,
 		     *run_out_index,
 		     (intptr_t **) run_out_sector_range,
@@ -4257,7 +4327,7 @@ int libodraw_handle_get_lead_out_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -4268,7 +4338,7 @@ int libodraw_handle_get_lead_out_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -4279,7 +4349,7 @@ int libodraw_handle_get_lead_out_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -4317,7 +4387,7 @@ int libodraw_handle_get_lead_out_at_offset(
 
 		return( -1 );
 	}
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->lead_outs_array,
 	     &number_of_lead_outs,
 	     error ) != 1 )
@@ -4348,7 +4418,7 @@ int libodraw_handle_get_lead_out_at_offset(
 	     *lead_out_index < number_of_lead_outs;
 	     *lead_out_index += 1 )
 	{
-		if( libodraw_array_get_entry_by_index(
+		if( libcdata_array_get_entry_by_index(
 		     internal_handle->lead_outs_array,
 		     *lead_out_index,
 		     (intptr_t **) lead_out_sector_range,
@@ -4416,7 +4486,7 @@ int libodraw_handle_get_track_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -4427,7 +4497,7 @@ int libodraw_handle_get_track_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -4438,7 +4508,7 @@ int libodraw_handle_get_track_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -4476,7 +4546,7 @@ int libodraw_handle_get_track_at_offset(
 
 		return( -1 );
 	}
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->tracks_array,
 	     &number_of_tracks,
 	     error ) != 1 )
@@ -4507,7 +4577,7 @@ int libodraw_handle_get_track_at_offset(
 	     *track_index < number_of_tracks;
 	     *track_index += 1 )
 	{
-		if( libodraw_array_get_entry_by_index(
+		if( libcdata_array_get_entry_by_index(
 		     internal_handle->tracks_array,
 		     *track_index,
 		     (intptr_t **) track_value,
@@ -4583,7 +4653,7 @@ int libodraw_handle_get_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -4599,7 +4669,7 @@ int libodraw_handle_get_offset(
 
 		return( -1 );
 	}
-	*offset = internal_handle->io_handle->current_offset;
+	*offset = internal_handle->current_offset;
 
 	return( 1 );
 }
@@ -4624,7 +4694,7 @@ int libodraw_handle_get_basename_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -4723,7 +4793,7 @@ int libodraw_handle_get_basename(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -4904,7 +4974,7 @@ int libodraw_handle_set_basename(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -5085,6 +5155,7 @@ int libodraw_handle_set_basename(
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 /* Retrieves the size of the basename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -5105,7 +5176,7 @@ int libodraw_handle_get_basename_size_wide(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -5203,7 +5274,7 @@ int libodraw_handle_get_basename_wide(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -5382,7 +5453,7 @@ int libodraw_handle_set_basename_wide(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -5558,6 +5629,7 @@ int libodraw_handle_set_basename_wide(
 #endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
 	return( 1 );
 }
+
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Sets the maximum number of (concurrent) open file handles
@@ -5628,7 +5700,7 @@ int libodraw_handle_set_media_values(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -5639,7 +5711,7 @@ int libodraw_handle_set_media_values(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -5650,7 +5722,7 @@ int libodraw_handle_set_media_values(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - invalid IO handle - missing bytes per sector.",
+		 "%s: invalid handle - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -5696,7 +5768,7 @@ int libodraw_handle_set_media_values(
 
 		return( -1 );
 	}
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->tracks_array,
 	     &number_of_tracks,
 	     error ) != 1 )
@@ -5721,7 +5793,7 @@ int libodraw_handle_set_media_values(
 
 		return( -1 );
 	}
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->tracks_array,
 	     number_of_tracks - 1,
 	     (intptr_t **) &track_value,
@@ -5763,7 +5835,7 @@ int libodraw_handle_set_media_values(
 	}
 	if( internal_handle->media_size == 0 )
 	{
-		/* TODO currently assumes that last track start sector is always relative to the start of the media */
+/* TODO currently assumes that last track start sector is always relative to the start of the media */
 		if( number_of_file_io_handles > 1 )
 		{
 			internal_handle->media_size = track_value->start_sector * track_value->bytes_per_sector;
@@ -5808,7 +5880,7 @@ int libodraw_handle_set_media_values(
 			return( -1 );
 		}
 	}
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->sessions_array,
 	     &number_of_sessions,
 	     error ) != 1 )
@@ -5824,7 +5896,7 @@ int libodraw_handle_set_media_values(
 	}
 	if( number_of_sessions > 0 )
 	{
-		if( libodraw_array_get_entry_by_index(
+		if( libcdata_array_get_entry_by_index(
 		     internal_handle->sessions_array,
 		     number_of_sessions - 1,
 		     (intptr_t **) &sector_range,
@@ -5854,7 +5926,7 @@ int libodraw_handle_set_media_values(
 		}
 		if( sector_range->number_of_sectors == 0 )
 		{
-			/* TODO currently assumes that last session is not followed by a lead-out */
+/* TODO currently assumes that last session is not followed by a lead-out */
 			number_of_sectors = internal_handle->number_of_sectors - sector_range->start_sector;
 
 			if( number_of_sectors > (uint64_t) UINT32_MAX )
@@ -5918,7 +5990,7 @@ int libodraw_handle_get_ascii_codepage(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -5969,7 +6041,7 @@ int libodraw_handle_set_ascii_codepage(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -5978,11 +6050,14 @@ int libodraw_handle_set_ascii_codepage(
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_874 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_932 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_936 )
+	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_949 )
+	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_950 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1250 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1251 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1252 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1253 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1254 )
+	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1255 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1256 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1257 )
 	 && ( ascii_codepage != LIBODRAW_CODEPAGE_WINDOWS_1258 ) )
@@ -6025,7 +6100,7 @@ int libodraw_handle_get_number_of_data_files(
 	}
 	internal_handle = (libodraw_internal_handle_t *) handle;
 
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->data_file_descriptors_array,
 	     number_of_data_files,
 	     error ) != 1 )
@@ -6068,7 +6143,7 @@ int libodraw_handle_get_data_file(
 	}
 	internal_handle = (libodraw_internal_handle_t *) handle;
 
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->data_file_descriptors_array,
 	     index,
 	     (intptr_t **) &data_file_descriptor,
@@ -6187,7 +6262,7 @@ int libodraw_handle_append_data_file(
 	}
 	data_file_descriptor->type = type;
 
-	if( libodraw_array_append_entry(
+	if( libcdata_array_append_entry(
 	     internal_handle->data_file_descriptors_array,
 	     &entry_index,
 	     (intptr_t *) data_file_descriptor,
@@ -6301,7 +6376,7 @@ int libodraw_handle_append_data_file_wide(
 	}
 	data_file_descriptor->type = type;
 
-	if( libodraw_array_append_entry(
+	if( libcdata_array_append_entry(
 	     internal_handle->data_file_descriptors_array,
 	     &entry_index,
 	     (intptr_t *) data_file_descriptor,
@@ -6328,5 +6403,5 @@ on_error:
 	return( -1 );
 }
 
-#endif
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 

@@ -1,20 +1,20 @@
-if HAVE_LOCAL_LIBSMDEV
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
-	@LIBCSPLIT_CPPFLAGS@ \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBCFILE_CPPFLAGS@ \
-	@LIBCPATH_CPPFLAGS@
+	@PTHREAD_CPPFLAGS@
 
-noinst_LTLIBRARIES = libsmdev.la
+lib_LTLIBRARIES = libsmdev.la
 
 libsmdev_la_SOURCES = \
+	libsmdev.c \
 	libsmdev_ata.c libsmdev_ata.h \
 	libsmdev_codepage.h \
 	libsmdev_debug.c libsmdev_debug.h \
@@ -44,19 +44,27 @@ libsmdev_la_SOURCES = \
 libsmdev_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
-	@LIBCSPLIT_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
-	@LIBCPATH_LIBADD@
-endif
+	@PTHREAD_LIBADD@
+
+libsmdev_la_LDFLAGS = -no-undefined -version-info 1:0:0
+
+EXTRA_DIST = \
+	libsmdev_definitions.h.in \
+        libsmdev.rc \
+        libsmdev.rc.in
 
 MAINTAINERCLEANFILES = \
-	Makefile.in
+        Makefile.in
 
 distclean: clean
+	/bin/rm -f libsmdev_definitions.h
+	/bin/rm -f libsmdev.rc
 	/bin/rm -f Makefile
 
 splint:

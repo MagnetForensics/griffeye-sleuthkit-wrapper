@@ -1,7 +1,7 @@
 /*
  * Filename functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -27,8 +27,6 @@
 #include "libewf_filename.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcstring.h"
-
-#include "ewf_definitions.h"
 
 /* Sets the extension for a certain segment file
  * Using the format specific naming schema

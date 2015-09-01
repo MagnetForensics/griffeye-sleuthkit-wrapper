@@ -1,4 +1,4 @@
-.Dd March 30, 2013
+.Dd January 19, 2014
 .Dt ewfrecover
 .Os libewf
 .Sh NAME
@@ -10,7 +10,7 @@
 .Op Fl l Ar log_filename
 .Op Fl p Ar process_buffer_size
 .Op Fl t Ar target
-.Op Fl hquvV
+.Op Fl hquvVx
 .Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfrecover
@@ -42,6 +42,8 @@ the target file to recover to (default is recover)
 verbose output to stderr
 .It Fl V
 print version
+.It Fl x
+use the chunk data instead of the buffered read and write functions.
 .El
 .Sh ENVIRONMENT
 None
@@ -77,13 +79,13 @@ EWF file(s) are not corrupted.
 Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
 .Sh BUGS
 Please report bugs of any kind to <joachim.metz@gmail.com> or on the project website:
-http://code.google.com/p/libewf/
+https://github.com/libyal/libewf/
 .Sh AUTHOR
 .Pp
 These man pages were written by Joachim Metz.
 .Sh COPYRIGHT
 .Pp
-Copyright 2006-2013, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>.
 .Pp
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO

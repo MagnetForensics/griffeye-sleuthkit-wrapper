@@ -1,34 +1,120 @@
 TODO
-* ewftools: allow to set date and time
-* add libewf_sector_range_clone function
-* libmfdata/libfdata merge
-  - reimplement chunk table using layered approach
+* throttle the size of the sections list?
+* ewfacquire allow to set the the maximum number of table entries?
+
+Tests:
+* finish migrating tests to test_runner
+  - move test_read_chunk to test runner
+  - move test_read_delta to test runner
+  - move test_ewfexport to test runner
+  - done ewfverify, ewfverify_logical, ewfinfo, glob, seek
+* split test_read_delta in test_read_delta and test_read_delta_chunk
+* add tests for Python-bindings (pyewf)
+* implement read/write chunk test
+  - allow to set maximum delta file size default 4 GiB?
+* ewftools: test with -x
+* ewfexport: export of split RAW
+* ewfinfo: DFXML output
+* write resume from volume/disk section - basically re-image
+
+Clean up:
+* remove random and other deprecated functions
+  - libewf
+  - pyewf
+  - ewf.net
+
+* libewf:
+  - add unpacked_data_size to chunk data?
+  - empty caches on close
+
+* check if empty block check or equiv is always done (except for no compression).
+* user header and header2 time difference to calculate the timezone
+
+* ewftools:
+  - if one option available just print and continue
+  - if set by command lien just print and continue
+  - port multi threaded ewfacquirestream
+  - add multi threading support
+  - allow to set date and time
+* ewfacquire:
+  - print status info without confirmation in unattended mode
+* ewfexport:
+  - if EWF file is empty still write an emtpy file
+
+* fix last_chunk_data_offset calculation for table2
+  in combination with libewf_chunk_group_correct_v1
+* chunk data
+  - related calculation into chunk data
+  - change API to have chunk type
+* libewf_chunk_data_check_for_empty_block
+  - use memcmp instead?
+  - write a test at configure time to determine which approach is faster
+  - same for adler32 ?
+
+  - sections list on write: cache section descriptors instead of free-ing them?
+
+  - add delta segment files cache ? caching happens based on element index
+    but will cause a cache miss - 2 separate caches more efficient ?
+
+  - split segment file and delta segment file to separate code files?
+    - yes, no need for chunk groups in delta segment files
+
+  - segment files cache on write set to 1 ?
+
+  - create a single chunk groups cache ? instead per segment file ?
+
+  - check if chunks groups list is filled in on demand scenario
+
+  - only use backup range (table2) during initial phase?
+    - nope also necessary during reread
+
+  - use mapped offset to determine first chunk index (+/-)
+    - what about base offset ?
+    - make mapped offsets absolute ?
+
+  - refactor chunk table to:
+    - optimize use of libewf_chunk_table_chunk_exists_for_offset and
+      successive calls to fdata types
+    - refactor libewf_chunk_table_get_chunk_data_by_offset chunk data part
+      back to read IO handle ?
+
+  - handle: replace chunk_index calcuations by current_chunk_index tracking ?
+  - libewf_filename_create: change to accept ( segment_number - 1 )
+  - libewf_write_io_handle_initialize_resume: re-map mapped offset ranges ?
+
+  - write_io_handle->number_of_table_entries still needed ?
+
+  - add write support to the various fdata lists ?
+
+  - add delta chunks range list to libewf_chunk_table_chunk_exists_for_offset ?
+  - add delta chunks range list to libewf_chunk_table_set_chunk_data_by_offset ?
+    and refactor it to have a generic solution if range list is not set fall back
+
 * pyewf
   - change header and hash values into sequence objects
-  - setup.py: non Windows support
-* ewftools: rename argv_filenames to source_filenames (see libvmdk)
+
 * add bzip2 compression support
-* complete work on ewfmount dokan support
-* update codegear files - libcdata
+* add function to retrieve:
+  - compression values
 
 * add support for set identifier change ?
 * check alignment of:
   section_data_read CHS cylinders, SMART logs start sector
 
 * check behavior of ewfacquire resume and specified offset
-* msvscpp
-  - add bzip2 support
-* codegear
-  - add checks to disable compiler warnings
-  - add bzip2 support
 
 * complete ewfrecover
   - max segment size
   - try to read the chunks by calculating the checksums and see where they align
 
 * corruption scenarios
+  - libewf_segment_file_read deal with corrupted segment file header ?
   - add strict chunk data flag handling
   - document how libewf deals with corruption scenarios
+  - valid table and table2 with different information
+    (for now use table if number of entries is not 0)
+  - tainted table and table2
+  - tainted table or table2 (use the one that is not tainted)
 
 * implement new chunk IO functions where chunk is an object
 
@@ -75,6 +161,7 @@ TODO
 * Ex01 write support
   - pattern fill chunk support (set chunk table entry, test)
   - enable secion data integrity hash support
+  - add support for write resume
 
 * Lx01 write support
   - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
@@ -327,12 +414,10 @@ Tools:
   - improve and remove "This could take a while." ?
 * libsystem path implement GetVolumeInformation
 
-Tests
-* implement read/write chunk test
-  - allow to set maximum delta file size default 4 GiB?
-* ewfexport: export of split RAW
-* implement pyewf tests
-* write resume from volume/disk section - basically re-image
+Performance:
+* map full RAW storage media data into memory?
+  - libsigsegv?
+  - mmap?
 
 Deployment:
 * spec file
@@ -345,8 +430,6 @@ Deployment:
   - figure out a way to warn about the compiler used
   - add VC_EXTRALEAN to msvscpp config
 * integrating libewf.rc into mingw dll ?
-* macosx PackageMaker files
-  - add pyewf
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -367,6 +450,168 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20150126
+* fix in ewf.net
+
+20150107
+* 2015 update
+
+20141229
+* updated dpkg files
+* updated dependencies
+* updated .gitignore
+
+20141226
+* changes for updated dependencies
+
+20141225
+* worked on Python 3 support
+
+20141210
+* fix in spec file for zlib-static
+
+20141204
+* small changes in progress status output
+* moved chunk groups cache into handle
+* moved libewf_chunk_table_chunk_exists_for_offset out of write-only code path
+
+20141201
+* code clean up
+* removed unrestrict_offset_table, added maximum of 128 M to size of offset table
+* removed ewf_definitions.h
+
+20141129
+* code clean up
+
+20141102
+* bug fixes
+* ewf.net added FileEntry::GetType
+
+20141030
+* bug fix in Python-bindings
+* changes for updated dependencies
+
+20141021
+* changes for deployment
+
+20141012
+* bug fixes
+
+20141007
+* updated dependencies and corresponding changes
+* worked on autogen.sh and synclibs.sh scripts
+
+20141002
+* removed README.macosx
+* changes for project site move
+
+20140801
+* bug fix in Python-bindings
+
+20140608
+* worked on tests
+* updated msvscpp files
+* bug fix for utf16 header functions
+
+20140602
+* bug fix in ewfmount regarding logical files date and time values
+* fix for Lx01 files, device information section needs to be read before the
+  sector table section to determine the chunk size
+
+20140601
+* updated dependencies
+* deprecated random functions
+* worked on Python bindings
+* worked on tests
+* worked on EWF2 refactor
+
+20140424
+* fixes to build static library with mingw and cygwin
+
+20140406
+* bug fixes in m4 files
+* worked on Python bindings
+
+20140216
+* bug fix in recent process status changes
+
+20140201
+* updated libcdatetime
+
+20140126
+* fixed multi file caching bug in libfdata
+
+20140119
+* 2014 update
+* updated dependencies
+* added libcdatetime
+* bug fix in writing original ewf format, due to EWF2 refactor
+
+20131230
+* small updates
+
+20131222
+* moved low-level function support from compile time to run time
+* worked on experimental features
+
+20131211
+* worked on Python bindings
+
+20131210
+* updated dependencies
+* worked on Python bindings
+* fix in DFXML output for size values
+* removed codegear project files
+* worked on ewfmount
+
+20130901
+* updated dependencies
+* worked on Python bindings
+* worked on tests
+
+20130831
+* updated dependencies
+* replaced libcmulti by libcthreads
+
+20130411
+* changes for libmfdata and libfdata merge
+
+20130410
+* changes for libmfdata and libfdata merge
+
+20130409
+* changes for libmfdata and libfdata merge
+
+20130408
+* changes for libmfdata and libfdata merge
+
+20130407
+* changes for libmfdata and libfdata merge
+
+20130406
+* changes for libmfdata and libfdata merge
+
+20130405
+* changes for libmfdata and libfdata merge
+
+20130404
+* fixes for local library Makefiles
+* changes for libmfdata and libfdata merge
+* textual changes
+* updated dependencies
+* remove libewf_segment_file_handle
+
+20130403
+* changes for libmfdata and libfdata merge
+  - replaced libmfdata_file_list_t (delta) segment files list by libfdata_list_t
+  - replaced libcdata_list_t section list by libfdata_list_t sections list
+* bug fixes for delta segment file handling
+
+20130402
+* changes to zlib.m4 for adler32 detection
+* moved README.mingw to wiki
+* changes for libmfdata and libfdata merge
 
 20130331
 * updated codegear files
@@ -404,7 +649,7 @@ Closed:
 
 20130119
 * 2013 update
-* updated pyewf
+* updated Python bindings
 * added pyewf/setup.py with thanks to Michael Cohen
 
 20130105

@@ -2,7 +2,7 @@
 #
 # Expert Witness Compression Format (EWF) library read/write testing script
 #
-# Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -24,7 +24,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input";
+INPUT="input_old";
 TMP="tmp";
 
 AWK="awk";
@@ -140,6 +140,7 @@ test_read_write_delta()
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
 		echo " (FAIL)";
+		echo "Delta segment file size: ${FILESIZE}, expected: ${CALCULATED}";
 	else
 		echo " (PASS)";
 	fi

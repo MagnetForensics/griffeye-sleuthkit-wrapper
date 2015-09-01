@@ -1,7 +1,7 @@
 /*
  * Meta data functions
  *
- * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -95,95 +95,6 @@ DISK_GEOMETRY_EX, *PDISK_GEOMETRY_EX;
 
 #endif /* !defined( IOCTL_DISK_GET_DRIVE_GEOMETRY_EX ) */
 
-#if !defined( IOCTL_STORAGE_QUERY_PROPERTY )
-#define IOCTL_STORAGE_QUERY_PROPERTY \
-	CTL_CODE( IOCTL_STORAGE_BASE, 0x0500, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-typedef enum _STORAGE_PROPERTY_ID
-{
-	StorageDeviceProperty = 0,
-	StorageAdapterProperty,
-	StorageDeviceIdProperty,
-	StorageDeviceUniqueIdProperty,
-	StorageDeviceWriteCacheProperty,
-	StorageMiniportProperty,
-	StorageAccessAlignmentProperty,
-	StorageDeviceSeekPenaltyProperty,
-	StorageDeviceTrimProperty,
-	StorageDeviceWriteAggregationProperty
-}
-STORAGE_PROPERTY_ID, *PSTORAGE_PROPERTY_ID;
-
-typedef enum _STORAGE_QUERY_TYPE
-{
-	PropertyStandardQuery = 0,
-	PropertyExistsQuery,
-	PropertyMaskQuery,
-	PropertyQueryMaxDefined
-}
-STORAGE_QUERY_TYPE, *PSTORAGE_QUERY_TYPE;
-
-#if defined( _MSC_VER ) || defined( __BORLANDC__ )
-#define HAVE_WINIOCTL_H_STORAGE_BUS_TYPE
-#endif
-
-#if !defined( HAVE_WINIOCTL_H_STORAGE_BUS_TYPE )
-
-typedef enum _STORAGE_BUS_TYPE
-{
-	BusTypeUnknown		= 0x00,
-	BusTypeScsi		= 0x01,
-	BusTypeAtapi		= 0x02,
-	BusTypeAta		= 0x03,
-	BusType1394		= 0x04,
-	BusTypeSsa		= 0x05,
-	BusTypeFibre		= 0x06,
-	BusTypeUsb		= 0x07,
-	BusTypeRAID		= 0x08,
-	BusTypeiSCSI		= 0x09,
-	BusTypeSas		= 0x0a,
-	BusTypeSata		= 0x0b,
-	BusTypeMaxReserved	= 0x7f
-}
-STORAGE_BUS_TYPE, *PSTORAGE_BUS_TYPE;
-
-#endif /* !defined( HAVE_WINIOCTL_H_STORAGE_BUS_TYPE ) */
-
-typedef struct _STORAGE_PROPERTY_QUERY
-{
-	STORAGE_PROPERTY_ID PropertyId;
-	STORAGE_QUERY_TYPE QueryType;
-	UCHAR AdditionalParameters[ 1 ];
-}
-STORAGE_PROPERTY_QUERY, *PSTORAGE_PROPERTY_QUERY;
-
-typedef struct _STORAGE_DEVICE_DESCRIPTOR
-{
-	ULONG Version;
-	ULONG Size;
-	UCHAR DeviceType;
-	UCHAR DeviceTypeModifier;
-	BOOLEAN RemovableMedia;
-	BOOLEAN CommandQueueing;
-	ULONG VendorIdOffset;
-	ULONG ProductIdOffset;
-	ULONG ProductRevisionOffset;
-	ULONG SerialNumberOffset;
-	STORAGE_BUS_TYPE BusType;
-	ULONG RawPropertiesLength;
-	UCHAR RawDeviceProperties[ 1 ];
-}
-STORAGE_DEVICE_DESCRIPTOR, *PSTORAGE_DEVICE_DESCRIPTOR;
-
-typedef struct _STORAGE_DESCRIPTOR_HEADER
-{
-	ULONG Version;
-	ULONG Size;
-}
-STORAGE_DESCRIPTOR_HEADER, *PSTORAGE_DESCRIPTOR_HEADER;
-
-#endif /* !defined( IOCTL_STORAGE_QUERY_PROPERTY ) */
-
 #endif /* defined( WINAPI ) */
 
 /* Retrieves the media size
@@ -274,6 +185,9 @@ int libsmdev_handle_get_bytes_per_sector(
 
 #if defined( WINAPI )
 	uint32_t error_code                         = 0;
+
+#elif !defined( BLKSSZGET ) && defined( DIOCGSECTORSIZE )
+	u_int safe_bytes_per_sector                 = 0;
 #endif
 
 	if( handle == NULL )
@@ -432,7 +346,69 @@ int libsmdev_handle_get_bytes_per_sector(
 		{
 			internal_handle->bytes_per_sector_set = 1;
 		}
-#elif defined( DKIOCGETBLOCKCOUNT )
+#elif defined( DIOCGSECTORSIZE )
+		read_count = libcfile_file_io_control_read(
+		              internal_handle->device_file,
+		              DIOCGSECTORSIZE,
+		              NULL,
+		              0,
+		              (uint8_t *) &safe_bytes_per_sector,
+		              sizeof( u_int ),
+		              error );
+
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_IOCTL_FAILED,
+			 "%s: unable to query device for: DIOCGSECTORSIZE.",
+			 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		}
+		else if( safe_bytes_per_sector > (u_int) UINT32_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid bytes per sector value out of bounds.",
+			 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+
+		}
+		else
+		{
+			internal_handle->bytes_per_sector     = (uint32_t) safe_bytes_per_sector;
+			internal_handle->bytes_per_sector_set = 1;
+		}
+#elif defined( DKIOCGETBLOCKSIZE )
 		read_count = libcfile_file_io_control_read(
 		              internal_handle->device_file,
 		              DKIOCGETBLOCKSIZE,
@@ -1376,6 +1352,7 @@ int libsmdev_handle_get_error(
 {
 	libsmdev_internal_handle_t *internal_handle = NULL;
 	static char *function                       = "libsmdev_handle_get_error";
+	intptr_t *value                             = NULL;
 
 	if( handle == NULL )
 	{
@@ -1390,11 +1367,12 @@ int libsmdev_handle_get_error(
 	}
 	internal_handle = (libsmdev_internal_handle_t *) handle;
 
-	if( libcdata_range_list_get_range(
+	if( libcdata_range_list_get_range_by_index(
 	     internal_handle->errors_range_list,
 	     index,
 	     (uint64_t *) offset,
 	     (uint64_t *) size,
+	     &value,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

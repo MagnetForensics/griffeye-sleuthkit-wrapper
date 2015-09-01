@@ -1,0 +1,137 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl
+END
+DokanSSHFSControl.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.cpp
+END
+DokanSSHFSControl.aps
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.aps
+END
+dlldata.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/dlldata.c
+END
+DokanSSHFSControl.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.h
+END
+DokanSSHFSControl_i.c
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl_i.c
+END
+DokanSSHFSControl.rgs
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.rgs
+END
+DokanSSHFSControl.sln
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.sln
+END
+DokanSSHFSControl.def
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.def
+END
+DokanSSHFSControl_p.c
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl_p.c
+END
+DokanSSHFSControlps.def
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControlps.def
+END
+DokanSSHFSControl.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.vcproj
+END
+DokanSSHFSControl.rc
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.rc
+END
+SSHFSControl.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/SSHFSControl.cpp
+END
+DokanSSHFSControl.suo
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.suo
+END
+DokanSSHFSControlPS.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControlPS.vcproj
+END
+stdafx.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/stdafx.cpp
+END
+DokanSSHFSControl.idl
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/DokanSSHFSControl.idl
+END
+ReadMe.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/ReadMe.txt
+END
+resource.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/resource.h
+END
+SSHFSControl.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/SSHFSControl.h
+END
+stdafx.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/stdafx.h
+END
+SSHFSControl.rgs
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/60/trunk/dokan_sshfs/DokanSSHFSControl/SSHFSControl.rgs
+END

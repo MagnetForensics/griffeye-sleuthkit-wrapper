@@ -1,7 +1,7 @@
 /*
  * The internal type definitions
  *
- * Copyright (c) 2011-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2011-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,10 +34,12 @@
 /* The following type definitions hide internal data structures
  */
 #if defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI )
-typedef struct libcaes_context {}	libcaes_context_t;
+typedef struct libcaes_context {}		libcaes_context_t;
+typedef struct libcaes_tweaked_context {}	libcaes_tweaked_context_t;
 
 #else
 typedef intptr_t libcaes_context_t;
+typedef intptr_t libcaes_tweaked_context_t;
 
 #endif
 

@@ -1,7 +1,7 @@
 /*
  * Metadata functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -22,8 +22,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "libodraw_array_type.h"
 #include "libodraw_handle.h"
+#include "libodraw_libcdata.h"
 #include "libodraw_libcerror.h"
 #include "libodraw_sector_range.h"
 #include "libodraw_track_value.h"
@@ -99,7 +99,7 @@ int libodraw_handle_get_bytes_per_sector(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -150,7 +150,7 @@ int libodraw_handle_set_bytes_per_sector(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal handle - missing IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -236,7 +236,7 @@ int libodraw_handle_get_number_of_sessions(
 	}
 	internal_handle = (libodraw_internal_handle_t *) handle;
 
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->sessions_array,
 	     number_of_sessions,
 	     error ) != 1 )
@@ -280,7 +280,7 @@ int libodraw_handle_get_session(
 	}
 	internal_handle = (libodraw_internal_handle_t *) handle;
 
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->sessions_array,
 	     index,
 	     (intptr_t **) &sector_range,
@@ -369,7 +369,7 @@ int libodraw_handle_append_session(
 
 		goto on_error;
 	}
-	if( libodraw_array_append_entry(
+	if( libcdata_array_append_entry(
 	     internal_handle->sessions_array,
 	     &entry_index,
 	     (intptr_t *) sector_range,
@@ -420,7 +420,7 @@ int libodraw_handle_get_number_of_lead_outs(
 	}
 	internal_handle = (libodraw_internal_handle_t *) handle;
 
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->lead_outs_array,
 	     number_of_lead_outs,
 	     error ) != 1 )
@@ -464,7 +464,7 @@ int libodraw_handle_get_lead_out(
 	}
 	internal_handle = (libodraw_internal_handle_t *) handle;
 
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->lead_outs_array,
 	     index,
 	     (intptr_t **) &sector_range,
@@ -553,7 +553,7 @@ int libodraw_handle_append_lead_out(
 
 		goto on_error;
 	}
-	if( libodraw_array_append_entry(
+	if( libcdata_array_append_entry(
 	     internal_handle->lead_outs_array,
 	     &entry_index,
 	     (intptr_t *) sector_range,
@@ -604,7 +604,7 @@ int libodraw_handle_get_number_of_tracks(
 	}
 	internal_handle = (libodraw_internal_handle_t *) handle;
 
-	if( libodraw_array_get_number_of_entries(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->tracks_array,
 	     number_of_tracks,
 	     error ) != 1 )
@@ -651,7 +651,7 @@ int libodraw_handle_get_track(
 	}
 	internal_handle = (libodraw_internal_handle_t *) handle;
 
-	if( libodraw_array_get_entry_by_index(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->tracks_array,
 	     index,
 	     (intptr_t **) &track_value,
@@ -749,7 +749,7 @@ int libodraw_handle_append_track(
 
 		goto on_error;
 	}
-	if( libodraw_array_append_entry(
+	if( libcdata_array_append_entry(
 	     internal_handle->tracks_array,
 	     &entry_index,
 	     (intptr_t *) track_value,

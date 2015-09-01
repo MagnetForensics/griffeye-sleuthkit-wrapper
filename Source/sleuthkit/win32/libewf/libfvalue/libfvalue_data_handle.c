@@ -1,7 +1,7 @@
 /*
  * Data handle functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,10 +31,18 @@
 #include "libfvalue_value_entry.h"
 
 /* Creates a data handle
+ * Make sure the value data_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_data_handle_initialize(
      libfvalue_data_handle_t **data_handle,
+     int (*read_value_entries)(
+            libfvalue_data_handle_t *data_handle,
+            const uint8_t *data,
+            size_t data_size,
+            int encoding,
+            uint32_t data_flags,
+            libcerror_error_t **error ),
      libcerror_error_t **error )
 {
 	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
@@ -90,6 +98,8 @@ int libfvalue_data_handle_initialize(
 
 		goto on_error;
 	}
+	internal_data_handle->read_value_entries = read_value_entries;
+
 	*data_handle = (libfvalue_data_handle_t *) internal_data_handle;
 
 	return( 1 );
@@ -103,7 +113,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the data handle
+/* Frees a data handle
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_data_handle_free(
@@ -204,6 +214,7 @@ int libfvalue_data_handle_clone(
 	
 	if( libfvalue_data_handle_initialize(
 	     destination_data_handle,
+	     internal_source_data_handle->read_value_entries,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -369,7 +380,18 @@ int libfvalue_data_handle_set_data(
 		return( -1 );
 	}
 	internal_data_handle = (libfvalue_internal_data_handle_t *) data_handle;
-	
+
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( flags & ~( LIBFVALUE_VALUE_DATA_FLAG_MANAGED | LIBFVALUE_VALUE_DATA_FLAG_CLONE_BY_REFERENCE ) ) != 0 )
 	{
 		libcerror_error_set(
@@ -458,6 +480,75 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the data flags
+ * Returns 1 if successful or -1 on error
+ */
+int libfvalue_data_handle_get_data_flags(
+     libfvalue_data_handle_t *data_handle,
+     uint32_t *data_flags,
+     libcerror_error_t **error )
+{
+	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
+	static char *function                                  = "libfvalue_data_handle_get_data_flags";
+
+	if( data_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_data_handle = (libfvalue_internal_data_handle_t *) data_handle;
+	
+	if( data_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data flags.",
+		 function );
+
+		return( -1 );
+	}
+	*data_flags = internal_data_handle->data_flags;
+
+	return( 1 );
+}
+
+/* Sets the data flags
+ * Returns 1 if successful or -1 on error
+ */
+int libfvalue_data_handle_set_data_flags(
+     libfvalue_data_handle_t *data_handle,
+     uint32_t data_flags,
+     libcerror_error_t **error )
+{
+	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
+	static char *function                                  = "libfvalue_data_handle_set_data_flags";
+
+	if( data_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_data_handle = (libfvalue_internal_data_handle_t *) data_handle;
+
+	internal_data_handle->data_flags = data_flags;
+
+	return( 1 );
+}
+
 /* Retrieves the number of value entries
  * Returns if successful or -1 on error
  */
@@ -527,14 +618,467 @@ int libfvalue_data_handle_get_number_of_value_entries(
 int libfvalue_data_handle_get_value_entry(
      libfvalue_data_handle_t *data_handle,
      int value_entry_index,
+     size_t *value_entry_offset,
+     size_t *value_entry_size,
+     libcerror_error_t **error )
+{
+	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
+	libfvalue_value_entry_t *value_entry                   = NULL;
+	static char *function                                  = "libfvalue_data_handle_get_value_entry";
+
+	if( data_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_data_handle = (libfvalue_internal_data_handle_t *) data_handle;
+
+	if( internal_data_handle->data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid data handle - missing data.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value entry offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value entry size.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_data_handle->value_entries == NULL )
+	{
+		*value_entry_offset = 0;
+		*value_entry_size   = internal_data_handle->data_size;
+	}
+	else
+	{
+		if( libcdata_array_get_entry_by_index(
+		     internal_data_handle->value_entries,
+		     value_entry_index,
+		     (intptr_t **) &value_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry: %d from values entries array.",
+			 function,
+			 value_entry_index );
+
+			return( -1 );
+		}
+		if( value_entry == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing value entry: %d.",
+			 function,
+			 value_entry_index );
+
+			return( -1 );
+		}
+		*value_entry_offset = value_entry->offset;
+		*value_entry_size   = value_entry->size;
+	}
+	return( 1 );
+}
+
+/* Sets a specific value entry
+ * Returns if successful or -1 on error
+ */
+int libfvalue_data_handle_set_value_entry(
+     libfvalue_data_handle_t *data_handle,
+     int value_entry_index,
+     size_t value_entry_offset,
+     size_t value_entry_size,
+     libcerror_error_t **error )
+{
+	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
+	libfvalue_value_entry_t *value_entry                   = NULL;
+	static char *function                                  = "libfvalue_data_handle_set_value_entry_data";
+
+	if( data_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_data_handle = (libfvalue_internal_data_handle_t *) data_handle;
+
+	if( internal_data_handle->data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid data handle - missing data.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_index != 0 )	
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid value entry index value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_offset > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid value entry offset value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid value entry size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_offset > internal_data_handle->data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid value entry offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( value_entry_size > internal_data_handle->data_size )
+	 || ( ( value_entry_offset + value_entry_size ) > internal_data_handle->data_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid value entry size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_data_handle->value_entries == NULL )
+	{
+		if( value_entry_index != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid value index value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( value_entry_offset != 0 )
+		 || ( value_entry_size != internal_data_handle->data_size ) )
+		{
+			if( libfvalue_value_entry_initialize(
+			     &value_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create value entry.",
+				 function );
+
+				return( -1 );
+			}
+			value_entry->offset = value_entry_offset;
+			value_entry->size   = value_entry_size;
+
+			if( libcdata_array_initialize(
+			     &( internal_data_handle->value_entries ),
+			     1,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create value entries array.",
+				 function );
+
+				libfvalue_value_entry_free(
+				 &value_entry,
+				 NULL );
+
+				return( -1 );
+			}
+			if( libcdata_array_set_entry_by_index(
+			     internal_data_handle->value_entries,
+			     0,
+			     (intptr_t *) value_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set entry: 0 in values entries array.",
+				 function );
+
+				libfvalue_value_entry_free(
+				 &value_entry,
+				 NULL );
+
+				libcdata_array_free(
+				 &( internal_data_handle->value_entries ),
+				 NULL,
+				 NULL );
+
+				return( -1 );
+			}
+			value_entry = NULL;
+		}
+	}
+	else
+	{
+		if( libcdata_array_get_entry_by_index(
+		     internal_data_handle->value_entries,
+		     value_entry_index,
+		     (intptr_t **) &value_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry: %d from values entries array.",
+			 function,
+			 value_entry_index );
+
+			return( -1 );
+		}
+		if( value_entry == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing value entry.",
+			 function );
+
+			return( -1 );
+		}
+		value_entry->offset = value_entry_offset;
+		value_entry->size   = value_entry_size;
+	}
+	return( 1 );
+}
+
+/* Appends a value entry
+ * Returns if successful or -1 on error
+ */
+int libfvalue_data_handle_append_value_entry(
+     libfvalue_data_handle_t *data_handle,
+     int *value_entry_index,
+     size_t value_entry_offset,
+     size_t value_entry_size,
+     libcerror_error_t **error )
+{
+	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
+	libfvalue_value_entry_t *value_entry                   = NULL;
+	static char *function                                  = "libfvalue_data_handle_append_value_entry";
+
+	if( data_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_data_handle = (libfvalue_internal_data_handle_t *) data_handle;
+
+	if( value_entry_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value entry index.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_offset > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid value entry offset value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid value entry size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_offset > internal_data_handle->data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid value entry offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( value_entry_size > internal_data_handle->data_size )
+	 || ( ( value_entry_offset + value_entry_size ) > internal_data_handle->data_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid value entry size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_data_handle->value_entries == NULL )
+	{
+		if( libcdata_array_initialize(
+		     &( internal_data_handle->value_entries ),
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create value entries array.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libfvalue_value_entry_initialize(
+	     &value_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create value entry.",
+		 function );
+
+		goto on_error;
+	}
+	value_entry->offset = value_entry_offset;
+	value_entry->size   = value_entry_size;
+
+	if( libcdata_array_append_entry(
+	     internal_data_handle->value_entries,
+	     value_entry_index,
+	     (intptr_t *) value_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append entry to values entries array.",
+		 function );
+
+		goto on_error;
+	}
+	value_entry = NULL;
+
+	return( 1 );
+
+on_error:
+	if( value_entry != NULL )
+	{
+		libfvalue_value_entry_free(
+		 &value_entry,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Retrieves the data of a specific value entry
+ * Returns if successful or -1 on error
+ */
+int libfvalue_data_handle_get_value_entry_data(
+     libfvalue_data_handle_t *data_handle,
+     int value_entry_index,
      uint8_t **value_entry_data,
      size_t *value_entry_data_size,
      int *encoding,
      libcerror_error_t **error )
 {
 	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
-	libfvalue_value_entry_t *value_entry                   = NULL;
-	static char *function                                  = "libfvalue_data_handle_get_value_entry";
+	static char *function                                  = "libfvalue_data_handle_get_value_entry_data";
+	size_t value_entry_offset                              = 0;
+	size_t value_entry_size                                = 0;
 
 	if( data_handle == NULL )
 	{
@@ -593,94 +1137,66 @@ int libfvalue_data_handle_get_value_entry(
 
 		return( -1 );
 	}
-	if( internal_data_handle->value_entries == NULL )
+	if( libfvalue_data_handle_get_value_entry(
+	     data_handle,
+	     value_entry_index,
+	     &value_entry_offset,
+	     &value_entry_size,
+	     error ) != 1 )
 	{
-		if( value_entry_index != 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid value index value out of bounds.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value entry: %d.",
+		 function,
+		 value_entry_index );
 
-			return( -1 );
-		}
-		*value_entry_data      = internal_data_handle->data;
-		*value_entry_data_size = internal_data_handle->data_size;
+		return( -1 );
+	}
+	if( value_entry_offset > internal_data_handle->data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: value entry: %d offset out of bounds.",
+		 function,
+		 value_entry_index );
+
+		return( -1 );
+	}
+	if( ( value_entry_size > internal_data_handle->data_size )
+	 || ( ( value_entry_offset + value_entry_size ) > internal_data_handle->data_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: value entry: %d size out of bounds.",
+		 function,
+		 value_entry_index );
+
+		return( -1 );
+	}
+	if( value_entry_size == 0 )
+	{
+		*value_entry_data = NULL;
 	}
 	else
 	{
-		if( libcdata_array_get_entry_by_index(
-		     internal_data_handle->value_entries,
-		     value_entry_index,
-		     (intptr_t **) &value_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve entry: %d from values entries array.",
-			 function,
-			 value_entry_index );
-
-			return( -1 );
-		}
-		if( value_entry == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing value entry.",
-			 function );
-
-			return( -1 );
-		}
-		if( value_entry->offset > internal_data_handle->data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: value entry offset: %d out of bounds.",
-			 function,
-			 value_entry_index );
-
-			return( -1 );
-		}
-		if( ( value_entry->offset + value_entry->size ) > internal_data_handle->data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: value entry size: %d out of bounds.",
-			 function,
-			 value_entry_index );
-
-			return( -1 );
-		}
-		if( value_entry->size != 0 )
-		{
-			*value_entry_data = &( ( internal_data_handle->data )[ value_entry->offset ] );
-		}
-		else
-		{
-			*value_entry_data = NULL;
-		}
-		*value_entry_data_size = value_entry->size;
+		*value_entry_data = &( ( internal_data_handle->data )[ value_entry_offset ] );
 	}
-	*encoding = internal_data_handle->encoding;
+	*value_entry_data_size = value_entry_size;
+	*encoding              = internal_data_handle->encoding;
 
 	return( 1 );
 }
 
-/* Sets a specific value entry
+/* Sets the data of a specific value entry
  * Returns if successful or -1 on error
  */
-int libfvalue_data_handle_set_value_entry(
+int libfvalue_data_handle_set_value_entry_data(
      libfvalue_data_handle_t *data_handle,
      int value_entry_index,
      const uint8_t *value_entry_data,
@@ -689,8 +1205,9 @@ int libfvalue_data_handle_set_value_entry(
      libcerror_error_t **error )
 {
 	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
-	libfvalue_value_entry_t *value_entry                   = NULL;
-	static char *function                                  = "libfvalue_data_handle_set_value_entry";
+	static char *function                                  = "libfvalue_data_handle_set_value_entry_data";
+	size_t value_entry_offset                              = 0;
+	size_t value_entry_size                                = 0;
 
 	if( data_handle == NULL )
 	{
@@ -760,137 +1277,83 @@ int libfvalue_data_handle_set_value_entry(
 
 		return( -1 );
 	}
-	if( internal_data_handle->value_entries == NULL )
+	if( libfvalue_data_handle_get_value_entry(
+	     data_handle,
+	     value_entry_index,
+	     &value_entry_offset,
+	     &value_entry_size,
+	     error ) != 1 )
 	{
-		if( value_entry_index != 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid value index value out of bounds.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value entry: %d.",
+		 function,
+		 value_entry_index );
 
-			return( -1 );
-		}
-		if( value_entry_data_size != internal_data_handle->data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid value entry data size value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		if( internal_data_handle->data_size > 0 )
-		{
-			if( memory_copy(
-			     internal_data_handle->data,
-			     value_entry_data,
-			     internal_data_handle->data_size ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy value entry data.",
-				 function );
-
-				return( -1 );
-			}
-		}
+		return( -1 );
 	}
-	else
+	if( value_entry_offset > internal_data_handle->data_size )
 	{
-		if( libcdata_array_get_entry_by_index(
-		     internal_data_handle->value_entries,
-		     value_entry_index,
-		     (intptr_t **) &value_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve entry: %d from values entries array.",
-			 function,
-			 value_entry_index );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: value entry: %d offset out of bounds.",
+		 function,
+		 value_entry_index );
 
-			return( -1 );
-		}
-		if( value_entry == NULL )
+		return( -1 );
+	}
+	if( ( value_entry_size > internal_data_handle->data_size )
+	 || ( ( value_entry_offset + value_entry_size ) > internal_data_handle->data_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: value entry: %d size out of bounds.",
+		 function,
+		 value_entry_index );
+
+		return( -1 );
+	}
+	if( value_entry_data_size != value_entry_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid value entry data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_entry_size > 0 )
+	{
+		if( memory_copy(
+		     &( ( internal_data_handle->data )[ value_entry_offset ] ),
+		     value_entry_data,
+		     value_entry_size ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing value entry.",
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy value entry data.",
 			 function );
 
 			return( -1 );
-		}
-		if( value_entry->offset > internal_data_handle->data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: value entry offset: %d out of bounds.",
-			 function,
-			 value_entry_index );
-
-			return( -1 );
-		}
-		if( ( value_entry->offset + value_entry->size ) > internal_data_handle->data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: value entry size: %d out of bounds.",
-			 function,
-			 value_entry_index );
-
-			return( -1 );
-		}
-		if( value_entry->size != internal_data_handle->data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid value entry data size value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		if( value_entry->size > 0 )
-		{
-			if( memory_copy(
-			     &( ( internal_data_handle->data )[ value_entry->offset ] ),
-			     value_entry_data,
-			     value_entry->size ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy value entry data.",
-				 function );
-
-				return( -1 );
-			}
 		}
 	}
 	return( 1 );
 }
 
-/* Appends a value entry
+/* Appends the data of a value entry
  * Returns if successful or -1 on error
  */
-int libfvalue_data_handle_append_value_entry(
+int libfvalue_data_handle_append_value_entry_data(
      libfvalue_data_handle_t *data_handle,
      int *value_entry_index,
      const uint8_t *value_entry_data,
@@ -901,7 +1364,7 @@ int libfvalue_data_handle_append_value_entry(
 	libfvalue_internal_data_handle_t *internal_data_handle = NULL;
 	libfvalue_value_entry_t *value_entry                   = NULL;
 	void *reallocation                                     = NULL;
-	static char *function                                  = "libfvalue_data_handle_append_value_entry";
+	static char *function                                  = "libfvalue_data_handle_append_value_entry_data";
 
 	if( data_handle == NULL )
 	{

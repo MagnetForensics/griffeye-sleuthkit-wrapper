@@ -30,9 +30,6 @@
     <ClCompile Include="..\..\libbfio\libbfio_handle.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libbfio\libbfio_legacy.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libbfio\libbfio_memory_range.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -68,9 +65,6 @@
     <ClInclude Include="..\..\libbfio\libbfio_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libbfio\libbfio_legacy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libbfio\libbfio_libcdata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -87,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libbfio\libbfio_libcstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libbfio\libbfio_libcthreads.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libbfio\libbfio_libuna.h">

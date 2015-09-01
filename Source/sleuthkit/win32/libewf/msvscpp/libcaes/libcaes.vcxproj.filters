@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\libcaes\libcaes_support.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libcaes\libcaes_tweaked_context.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libcaes\libcaes_context.h">
@@ -50,7 +53,16 @@
     <ClInclude Include="..\..\libcaes\libcaes_key.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libcaes\libcaes_libcerror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libcaes\libcaes_libcstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\libcaes\libcaes_support.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libcaes\libcaes_tweaked_context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcaes\libcaes_types.h">

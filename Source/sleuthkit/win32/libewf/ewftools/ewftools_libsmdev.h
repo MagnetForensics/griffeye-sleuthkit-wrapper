@@ -1,7 +1,7 @@
 /*
  * The internal libsmdev header
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,7 +31,7 @@
 #include <libsmdev_support.h>
 #include <libsmdev_types.h>
 
-#elif defined( HAVE_LIBSMDEV_H )
+#else
 #include <libsmdev.h>
 
 #endif

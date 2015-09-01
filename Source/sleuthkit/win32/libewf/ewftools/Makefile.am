@@ -3,7 +3,9 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
+	@LIBCDATETIME_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
 	@LIBCSPLIT_CPPFLAGS@ \
@@ -12,15 +14,16 @@ AM_CPPFLAGS = \
 	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBFCACHE_CPPFLAGS@ \
+	@LIBFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
-	@LIBMFDATA_CPPFLAGS@ \
-	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBHMAC_CPPFLAGS@ \
 	@LIBODRAW_CPPFLAGS@ \
 	@LIBSMDEV_CPPFLAGS@ \
 	@LIBSMRAW_CPPFLAGS@ \
 	@LIBCSYSTEM_CPPFLAGS@ \
+	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
 AM_LDFLAGS = @STATIC_LDFLAGS@
@@ -43,6 +46,8 @@ ewfacquire_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
@@ -50,7 +55,9 @@ ewfacquire_SOURCES = \
 	ewftools_libcsplit.h \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
+	ewftools_libcthreads.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -73,12 +80,15 @@ ewfacquire_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@
+	@LIBINTL@ \
+	@PTHREAD_LIBADD@
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -87,6 +97,8 @@ ewfacquirestream_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
@@ -95,6 +107,7 @@ ewfacquirestream_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -114,6 +127,7 @@ ewfacquirestream_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -132,6 +146,7 @@ ewfdebug_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -154,6 +169,8 @@ ewfexport_SOURCES = \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \
 	ewftools_libclocale.h \
@@ -163,6 +180,7 @@ ewfexport_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -183,6 +201,7 @@ ewfexport_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -203,6 +222,7 @@ ewfinfo_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -235,6 +255,7 @@ ewfmount_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -262,6 +283,8 @@ ewfrecover_SOURCES = \
 	ewfrecover.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \
 	ewftools_libclocale.h \
@@ -270,6 +293,7 @@ ewfrecover_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -290,6 +314,7 @@ ewfrecover_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -303,12 +328,15 @@ ewfverify_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -327,6 +355,7 @@ ewfverify_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \

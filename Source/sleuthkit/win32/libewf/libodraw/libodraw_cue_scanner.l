@@ -7,7 +7,7 @@
 /*
  * CUE scanner functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -374,17 +374,18 @@ int cue_scanner_wrap(
 }
 
 void cue_scanner_error(
+      void *parser_state,
       const char *error_string )
 {
 	if( cue_scanner_suppress_error == 0 )
 	{
 	        fprintf(
         	 stderr,
-	         "%s at token: %s (offset: %" PRIzd " size: %d)\n",
+	         "%s at token: %s (offset: %" PRIzd " size: %" PRIzd ")\n",
         	 error_string,
 	         cue_scanner_text,
 	         cue_scanner_buffer_offset - (size_t) cue_scanner_leng,
-	         cue_scanner_leng );
+	         (size_t) cue_scanner_leng );
 	}
 }
 

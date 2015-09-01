@@ -1,7 +1,7 @@
 /*
  * Filename functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -42,8 +42,8 @@ int libsmraw_filename_create(
      size_t *filename_size,
      libcstring_system_character_t *basename,
      size_t basename_size,
-     int total_number_of_segments,
-     int current_file_io_pool_entry,
+     int number_of_segments,
+     int segment_index,
      libcerror_error_t **error )
 {
 	static char *function    = "libsmraw_filename_create";
@@ -105,34 +105,34 @@ int libsmraw_filename_create(
 
 		return( -1 );
 	}
-	if( ( total_number_of_segments < 0 )
-	 || ( total_number_of_segments >= 1000 ) )
+	if( ( number_of_segments < 0 )
+	 || ( number_of_segments >= 1000 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid maximum pool entry value out of bounds.",
+		 "%s: invalid number of segments value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( total_number_of_segments > 0 )
+	if( number_of_segments > 0 )
 	{
-		if( ( current_file_io_pool_entry < 0 )
-		 || ( current_file_io_pool_entry > total_number_of_segments ) )
+		if( ( segment_index < 0 )
+		 || ( segment_index > number_of_segments ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid current pool entry value out of bounds.",
+			 "%s: invalid segment index value out of bounds.",
 			 function );
 
 			return( -1 );
 		}
 	}
-	if( total_number_of_segments == 1 )
+	if( number_of_segments == 1 )
 	{
 		additional_length = 4;
 	}
@@ -188,22 +188,22 @@ int libsmraw_filename_create(
 	}
 	filename_index += 4;
 
-	if( total_number_of_segments != 1 )
+	if( number_of_segments != 1 )
 	{
 		( *filename )[ filename_index++ ] = (libcstring_system_character_t) '.';
 
 		( *filename )[ filename_index++ ] = (libcstring_system_character_t) '0'
-		                                  + (libcstring_system_character_t) ( current_file_io_pool_entry / 100 );
+		                                  + (libcstring_system_character_t) ( segment_index / 100 );
 
-		current_file_io_pool_entry %= 100;
-
-		( *filename )[ filename_index++ ] = (libcstring_system_character_t) '0'
-		                                  + (libcstring_system_character_t) ( current_file_io_pool_entry / 10 );
-
-		current_file_io_pool_entry %= 10;
+		segment_index %= 100;
 
 		( *filename )[ filename_index++ ] = (libcstring_system_character_t) '0'
-		                                  + (libcstring_system_character_t) current_file_io_pool_entry;
+		                                  + (libcstring_system_character_t) ( segment_index / 10 );
+
+		segment_index %= 10;
+
+		( *filename )[ filename_index++ ] = (libcstring_system_character_t) '0'
+		                                  + (libcstring_system_character_t) segment_index;
 	}
 	( *filename )[ filename_index ] = 0;
 

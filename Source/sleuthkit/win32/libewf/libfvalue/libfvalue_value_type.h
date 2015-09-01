@@ -1,7 +1,7 @@
 /*
  * Value type functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -45,52 +45,8 @@ LIBFVALUE_EXTERN \
 int libfvalue_value_type_initialize_with_data_handle(
      libfvalue_value_t **value,
      int type,
-     intptr_t *data_handle,
-     int (*free_data_handle)(
-           intptr_t **data_handle,
-           libcerror_error_t **error ),
-     int (*clone_data_handle)(
-           intptr_t **destination_data_handle,
-           intptr_t *source_data_handle,
-           libcerror_error_t **error ),
-     int (*get_data)(
-           intptr_t *data_handle,
-           uint8_t **data,
-           size_t *data_size,
-           int *encoding,
-           libcerror_error_t **error ),
-     int (*set_data)(
-           intptr_t *data_handle,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           uint8_t flags,
-           libcerror_error_t **error ),
-     int (*get_number_of_value_entries)(
-           intptr_t *data_handle,
-           int *number_of_value_entries,
-           libcerror_error_t **error ),
-     int (*get_value_entry)(
-           intptr_t *data_handle,
-           int value_entry_index,
-           uint8_t **data,
-           size_t *data_size,
-           int *encoding,
-           libcerror_error_t **error ),
-     int (*set_value_entry)(
-           intptr_t *data_handle,
-           int value_entry_index,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           libcerror_error_t **error ),
-     int (*append_value_entry)(
-           intptr_t *data_handle,
-           int *value_entry_index,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           libcerror_error_t **error ),
+     libfvalue_data_handle_t *data_handle,
+     uint8_t flags,
      libcerror_error_t **error );
 
 ssize_t libfvalue_value_type_get_string_size(

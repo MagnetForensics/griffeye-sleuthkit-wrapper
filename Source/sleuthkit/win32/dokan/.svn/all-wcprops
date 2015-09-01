@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 23
+/svn/!svn/ver/185/trunk
+END
+license.mit.txt
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/32/trunk/license.mit.txt
+END
+license.lgpl.txt
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/32/trunk/license.lgpl.txt
+END
+dirs
+K 25
+svn:wc:ra_dav:version-url
+V 27
+/svn/!svn/ver/31/trunk/dirs
+END
+license.gpl.txt
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/32/trunk/license.gpl.txt
+END

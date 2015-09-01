@@ -1,7 +1,7 @@
 /*
  * Section reading/writing functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,7 +31,6 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
-#include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_single_files.h"
 
@@ -333,6 +332,7 @@ ssize_t libewf_section_table_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
+         uint8_t segment_file_type,
          uint8_t **section_data,
          size_t *section_data_size,
          uint64_t *first_chunk_index,
@@ -349,6 +349,7 @@ ssize_t libewf_section_table_write(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
+         uint8_t segment_file_type,
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
@@ -360,7 +361,6 @@ ssize_t libewf_section_table_write(
          size_t table_entries_data_size,
          uint32_t number_of_entries,
          size64_t chunks_data_size,
-         uint8_t segment_file_type,
          libcerror_error_t **error );
 
 ssize_t libewf_section_volume_e01_read(
@@ -405,16 +405,13 @@ ssize_t libewf_section_delta_chunk_read_header(
          uint32_t *chunk_data_size,
          libcerror_error_t **error );
 
-ssize_t libewf_section_delta_chunk_write(
+ssize_t libewf_section_delta_chunk_write_header(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
          uint32_t chunk_index,
-         uint8_t *chunk_buffer,
          uint32_t chunk_data_size,
-         uint8_t *checksum_buffer,
-         int8_t chunk_io_flags,
          libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -1,7 +1,7 @@
 /*
  * Python object definition of the file entries sequence and iterator
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #endif
 
-#include "pyewf.h"
 #include "pyewf_file_entries.h"
 #include "pyewf_file_entry.h"
 #include "pyewf_libcerror.h"
@@ -57,10 +56,8 @@ PySequenceMethods pyewf_file_entries_sequence_methods = {
 };
 
 PyTypeObject pyewf_file_entries_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyewf._file_entries",
 	/* tp_basicsize */
@@ -97,7 +94,7 @@ PyTypeObject pyewf_file_entries_type_object = {
 	0,
 	/* tp_as_buffer */
 	0,
-        /* tp_flags */
+	/* tp_flags */
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER,
 	/* tp_doc */
 	"internal pyewf file entries sequence and iterator object",
@@ -249,7 +246,7 @@ int pyewf_file_entries_init(
 	pyewf_file_entries->file_entry_object           = NULL;
 	pyewf_file_entries->get_sub_file_entry_by_index = NULL;
 	pyewf_file_entries->sub_file_entry_index        = 0;
-	pyewf_file_entries->number_of_sub_file_entries = 0;
+	pyewf_file_entries->number_of_sub_file_entries  = 0;
 
 	return( 0 );
 }
@@ -259,7 +256,8 @@ int pyewf_file_entries_init(
 void pyewf_file_entries_free(
       pyewf_file_entries_t *pyewf_file_entries )
 {
-	static char *function = "pyewf_file_entries_free";
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyewf_file_entries_free";
 
 	if( pyewf_file_entries == NULL )
 	{
@@ -270,20 +268,23 @@ void pyewf_file_entries_free(
 
 		return;
 	}
-	if( pyewf_file_entries->ob_type == NULL )
+	ob_type = Py_TYPE(
+	           pyewf_file_entries );
+
+	if( ob_type == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries - missing ob_type.",
+		 "%s: missing ob_type.",
 		 function );
 
 		return;
 	}
-	if( pyewf_file_entries->ob_type->tp_free == NULL )
+	if( ob_type->tp_free == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries - invalid ob_type - missing tp_free.",
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
@@ -293,7 +294,7 @@ void pyewf_file_entries_free(
 		Py_DecRef(
 		 (PyObject *) pyewf_file_entries->file_entry_object );
 	}
-	pyewf_file_entries->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyewf_file_entries );
 }
 

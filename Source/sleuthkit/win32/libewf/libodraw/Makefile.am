@@ -1,12 +1,12 @@
 AM_LFLAGS = -Cf
-AM_YFLAGS = -d -v
+AM_YFLAGS = -d -v -l -p cue_scanner_
 
-if HAVE_LOCAL_LIBODRAW
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
@@ -14,14 +14,15 @@ AM_CPPFLAGS = \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBCFILE_CPPFLAGS@ \
 	@LIBCPATH_CPPFLAGS@ \
-	@LIBBFIO_CPPFLAGS@
+	@LIBBFIO_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@
 
 BUILT_SOURCES = libodraw_cue_parser.h
 
-noinst_LTLIBRARIES = libodraw.la
+lib_LTLIBRARIES = libodraw.la
 
 libodraw_la_SOURCES = \
-	libodraw_array_type.c libodraw_array_type.h \
+	libodraw.c \
 	libodraw_codepage.h \
 	libodraw_cue_parser.y \
 	libodraw_cue_scanner.l \
@@ -35,9 +36,11 @@ libodraw_la_SOURCES = \
 	libodraw_io_handle.c libodraw_io_handle.h \
 	libodraw_metadata.c libodraw_metadata.h \
 	libodraw_libbfio.h \
+	libodraw_libcdata.h \
 	libodraw_libcerror.h \
 	libodraw_libclocale.h \
 	libodraw_libcnotify.h \
+	libodraw_libcpath.h \
 	libodraw_libcstring.h \
 	libodraw_libuna.h \
 	libodraw_notify.c libodraw_notify.h \
@@ -50,6 +53,7 @@ libodraw_la_SOURCES = \
 libodraw_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
@@ -57,17 +61,24 @@ libodraw_la_LIBADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
-	@LIBBFIO_LIBADD@
-endif
+	@LIBBFIO_LIBADD@ \
+	@PTHREAD_LIBADD@
+
+libodraw_la_LDFLAGS = -no-undefined -version-info 1:0:0
 
 EXTRA_DIST = \
+	libodraw_definitions.h.in \
 	libodraw_cue_parser.c libodraw_cue_parser.h \
-	libodraw_cue_scanner.c
+	libodraw_cue_scanner.c \
+	libodraw.rc \
+	libodraw.rc.in
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
+	/bin/rm -f libodraw_definitions.h
+	/bin/rm -f libodraw.rc
 	/bin/rm -f libodraw_cue_parser.c
 	/bin/rm -f libodraw_cue_parser.h
 	/bin/rm -f libodraw_cue_parser.output

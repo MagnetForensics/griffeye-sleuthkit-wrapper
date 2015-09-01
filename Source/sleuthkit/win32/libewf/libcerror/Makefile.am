@@ -1,12 +1,12 @@
-if HAVE_LOCAL_LIBCERROR
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@
 
-noinst_LTLIBRARIES = libcerror.la
+lib_LTLIBRARIES = libcerror.la
 
 libcerror_la_SOURCES = \
+	libcerror.c \
 	libcerror_definitions.h \
 	libcerror_extern.h \
 	libcerror_error.c libcerror_error.h \
@@ -15,12 +15,23 @@ libcerror_la_SOURCES = \
 	libcerror_system.c libcerror_system.h \
 	libcerror_types.h \
 	libcerror_unused.h
-endif
+
+libcerror_la_LIBADD = \
+	@LIBCSTRING_LIBADD@
+
+libcerror_la_LDFLAGS = -no-undefined -version-info 1:0:0
+
+EXTRA_DIST = \
+	libcerror_definitions.h.in \
+	libcerror.rc \
+	libcerror.rc.in
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
+	/bin/rm -f libcerror_definitions.h
+	/bin/rm -f libcerror.rc
 	/bin/rm -f Makefile
 
 splint:

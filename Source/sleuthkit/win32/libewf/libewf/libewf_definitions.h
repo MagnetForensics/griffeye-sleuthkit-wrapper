@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,7 @@
 #include <common.h>
 #include <byte_stream.h>
 
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
 
 /* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */
@@ -33,11 +33,11 @@
 #include <libewf/definitions.h>
 
 #else
-#define LIBEWF_VERSION						20130331
+#define LIBEWF_VERSION						@VERSION@
 
 /* The version string
  */
-#define LIBEWF_VERSION_STRING					"20130331"
+#define LIBEWF_VERSION_STRING					"@VERSION@"
 
 /* The access flags definitions
  * bit 1	set to 1 for read access
@@ -123,7 +123,7 @@ enum LIBEWF_COMPRESSION_LEVELS
 };
 
 /* The compression flags
- * bit 1	set to 1 for emtpy block compression
+ * bit 1	set to 1 for empty block compression
  *              detects empty blocks and stored them compressed, the compression
  *              is only done once
  * bit 2	set to 1 for pattern fill compression
@@ -186,6 +186,7 @@ enum LIBEWF_DATE_FORMATS
  */
 enum LIBEWF_SEGMENT_FILE_TYPES
 {
+	LIBEWF_SEGMENT_FILE_TYPE_UNDEFINED			= 0,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1				= 1,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART			= 2,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL			= 3,
@@ -307,20 +308,28 @@ enum LIBEWF_SEGMENT_TABLE_FLAGS
 {
 	/* The segment table is corrupted
 	 */
-	LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED			= 0x01,
+	LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED			= 0x04
 };
 
 /* The segment file flags definitions
  */
 enum LIBEWF_SEGMENT_FILE_FLAGS
 {
+	/* The segment file is the last in the set
+	 */
+	LIBEWF_SEGMENT_FILE_FLAG_IS_LAST			= 0x01,
+
+	/* The segment file is encrypted
+	 */
+	LIBEWF_SEGMENT_FILE_FLAG_IS_ENCRYPTED			= 0x02,
+
 	/* The segment file is corrupted
 	 */
-	LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED			= 0x01,
+	LIBEWF_SEGMENT_FILE_FLAG_IS_CORRUPTED			= 0x04,
 
 	/* The segment file is open for writing
 	 */
-	LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN			= 0x02
+	LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN			= 0x80
 };
 
 /* The chunk data flag definitions
@@ -340,47 +349,41 @@ enum LIBEWF_CHUNK_DATA_FLAGS
 	LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL		= 0x00000004UL
 };
 
-#if defined( HAVE_DEBUG_OUTPUT )
-#define LIBEWF_ITEM_FLAGS_DEFAULT				LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE
-#else
-#define LIBEWF_ITEM_FLAGS_DEFAULT				LIBEWF_ITEM_FLAG_NON_MANAGED_FILE_ENTRY_TREE_NODE
-#endif
-
 /* The chunk data range is sparse
  */
-#define LIBEWF_RANGE_FLAG_IS_SPARSE				LIBMFDATA_RANGE_FLAG_IS_SPARSE
+#define LIBEWF_RANGE_FLAG_IS_SPARSE				LIBFDATA_RANGE_FLAG_IS_SPARSE
 
 /* The chunk data range is compressed
  */
-#define LIBEWF_RANGE_FLAG_IS_COMPRESSED				LIBMFDATA_RANGE_FLAG_IS_COMPRESSED
+#define LIBEWF_RANGE_FLAG_IS_COMPRESSED				LIBFDATA_RANGE_FLAG_IS_COMPRESSED
 
 /* The chunk data range included the checksum
  */
-#define LIBEWF_RANGE_FLAG_HAS_CHECKSUM				LIBMFDATA_RANGE_FLAG_USER_DEFINED_1
+#define LIBEWF_RANGE_FLAG_HAS_CHECKSUM				LIBFDATA_RANGE_FLAG_USER_DEFINED_1
 
 /* The chunk data range uses a pattern fill
  */
-#define LIBEWF_RANGE_FLAG_USES_PATTERN_FILL			LIBMFDATA_RANGE_FLAG_USER_DEFINED_2
+#define LIBEWF_RANGE_FLAG_USES_PATTERN_FILL			LIBFDATA_RANGE_FLAG_USER_DEFINED_2
 
 /* The chunk data range refers to a packed (unprocessed) chunk
  */
-#define LIBEWF_RANGE_FLAG_IS_PACKED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_3
-
-/* The chunk data range refers to a delta chunk
- */
-#define LIBEWF_RANGE_FLAG_IS_DELTA				LIBMFDATA_RANGE_FLAG_USER_DEFINED_4
+#define LIBEWF_RANGE_FLAG_IS_PACKED				LIBFDATA_RANGE_FLAG_USER_DEFINED_3
 
 /* The chunk data range is tainted (possibly corrupted)
  */
-#define LIBEWF_RANGE_FLAG_IS_TAINTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_5
+#define LIBEWF_RANGE_FLAG_IS_TAINTED				LIBFDATA_RANGE_FLAG_USER_DEFINED_4
 
 /* The chunk data range is corrupted
  */
-#define LIBEWF_RANGE_FLAG_IS_CORRUPTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_6
+#define LIBEWF_RANGE_FLAG_IS_CORRUPTED				LIBFDATA_RANGE_FLAG_USER_DEFINED_5
 
 /* The chunk data range is encrypted
  */
-#define LIBEWF_RANGE_FLAG_IS_ENCRYPTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_7
+#define LIBEWF_RANGE_FLAG_IS_ENCRYPTED				LIBFDATA_RANGE_FLAG_USER_DEFINED_6
+
+/* The chunk data range refers to a delta chunk
+ */
+#define LIBEWF_RANGE_FLAG_IS_DELTA				LIBFDATA_RANGE_FLAG_USER_DEFINED_8
 
 /* Chunk data pack flag definitions
  */
@@ -409,11 +412,35 @@ enum LIBEWF_PACK_FLAGS
 	LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING			= 0x10
 };
 
+/* The minimum chunk size is 32k or ( 64 sectors * 512 )
+ */
+#define LIBEWF_MINIMUM_CHUNK_SIZE				32768
+
+/* The maximum number of table entries for the EWF format
+ */
+#define LIBEWF_MAXIMUM_TABLE_ENTRIES_EWF			16375
+
+/* The maximum number of table entries for the EWF format as of EnCase 6
+ * For a 32k chunk this would be approximately 32 KiB x 16 KiB = 2 GiB
+ */
+#define LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6			65534
+
+/* The maximum number of table entries allowed by the library (2 MiB / 4)
+ * For a 32k chunk this would be 32 KiB x (2 MiB / 4) = 16 GiB
+ */
+#define LIBEWF_MAXIMUM_TABLE_ENTRIES				( ( 16 * 1024 * 1024 ) / 4 )
+
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
 #define LIBEWF_2_TIB						0x20000000000UL
 #else
 #define LIBEWF_2_TIB						0x20000000000ULL
 #endif
+
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_DELTA_SEGMENT_FILES	4
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_SEGMENT_FILES		64
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS		16
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS			8
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_SECTIONS			4
 
 #endif
 

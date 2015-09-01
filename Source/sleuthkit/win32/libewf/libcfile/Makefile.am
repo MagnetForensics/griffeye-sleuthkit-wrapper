@@ -1,4 +1,3 @@
-if HAVE_LOCAL_LIBCFILE
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
@@ -8,9 +7,10 @@ AM_CPPFLAGS = \
 	@LIBCNOTIFY_CPPFLAGS@ \
 	@LIBUNA_CPPFLAGS@
 
-noinst_LTLIBRARIES = libcfile.la
+lib_LTLIBRARIES = libcfile.la
 
 libcfile_la_SOURCES = \
+	libcfile.c \
 	libcfile_definitions.h \
 	libcfile_error.c libcfile_error.h \
 	libcfile_extern.h \
@@ -25,12 +25,27 @@ libcfile_la_SOURCES = \
 	libcfile_support.c libcfile_support.h \
 	libcfile_types.h \
 	libcfile_unused.h
-endif
+
+libcfile_la_LIBADD  = \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBUNA_LIBADD@
+
+libcfile_la_LDFLAGS = -no-undefined -version-info 1:0:0
+
+EXTRA_DIST = \
+	libcfile_definitions.h.in \
+	libcfile.rc \
+	libcfile.rc.in
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
+	/bin/rm -f libcfile_definitions.h
+	/bin/rm -f libcfile.rc
 	/bin/rm -f Makefile
 
 splint:

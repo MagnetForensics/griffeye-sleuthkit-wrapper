@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libodraw\libodraw_array_type.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libodraw\libodraw_cue_parser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -59,9 +56,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libodraw\libodraw_array_type.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libodraw\libodraw_codepage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -95,6 +89,9 @@
     <ClInclude Include="..\..\libodraw\libodraw_libbfio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libodraw\libodraw_libcdata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\libodraw\libodraw_libcerror.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -102,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libodraw\libodraw_libcnotify.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libodraw\libodraw_libcpath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libodraw\libodraw_libcstring.h">
