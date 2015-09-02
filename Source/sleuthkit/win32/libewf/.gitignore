@@ -143,24 +143,3 @@ stamp-h[1-9]
 /tests/tmp*
 
 # Local library dependencies specific files
-/libbfio
-/libcaes
-/libcdata
-/libcdatetime
-/libcerror
-/libcfile
-/libclocale
-/libcnotify
-/libcpath
-/libcsplit
-/libcstring
-/libcsystem
-/libcthreads
-/libfcache
-/libfdata
-/libfvalue
-/libhmac
-/libodraw
-/libsmdev
-/libsmraw
-/libuna
