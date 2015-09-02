@@ -48,7 +48,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcthreads;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libcsplit;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$LIBEWF_HOME\include;$LIBEWF_HOME\common;$LIBEWF_HOME\libcstring;$LIBEWF_HOME\libcerror;$LIBEWF_HOME\libcthreads;$LIBEWF_HOME\libcdata;$LIBEWF_HOME\libclocale;$LIBEWF_HOME\libcnotify;$LIBEWF_HOME\libcsplit;$LIBEWF_HOME\libuna;$LIBEWF_HOME\libcfile;$LIBEWF_HOME\libcpath;$LIBEWF_HOME\libbfio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCTHREADS;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBODRAW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>

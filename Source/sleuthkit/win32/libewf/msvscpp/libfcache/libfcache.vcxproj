@@ -48,7 +48,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcthreads;..\..\libcdata;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$LIBEWF_HOME\include;$LIBEWF_HOME\common;$LIBEWF_HOME\libcstring;$LIBEWF_HOME\libcerror;$LIBEWF_HOME\libcthreads;$LIBEWF_HOME\libcdata;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCTHREADS;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBFCACHE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>

@@ -48,7 +48,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcthreads;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libcsplit;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache;..\..\libfdata;..\..\libfvalue;..\..\..\zlib;..\..\..\bzip2;..\..\libhmac;..\..\libcaes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$LIBEWF_HOME\include;$LIBEWF_HOME\common;$LIBEWF_HOME\libcstring;$LIBEWF_HOME\libcerror;$LIBEWF_HOME\libcthreads;$LIBEWF_HOME\libcdata;$LIBEWF_HOME\libclocale;$LIBEWF_HOME\libcnotify;$LIBEWF_HOME\libcsplit;$LIBEWF_HOME\libuna;$LIBEWF_HOME\libcfile;$LIBEWF_HOME\libcpath;$LIBEWF_HOME\libbfio;$LIBEWF_HOME\libfcache;$LIBEWF_HOME\libfdata;$LIBEWF_HOME\libfvalue;$LIBEWF_HOME\..\zlib;$LIBEWF_HOME\..\bzip2;$LIBEWF_HOME\libhmac;$LIBEWF_HOME\libcaes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCTHREADS;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFVALUE;ZLIB_DLL;BZ_DLL;HAVE_LOCAL_LIBHMAC;HAVE_LOCAL_LIBCAES;LIBEWF_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
