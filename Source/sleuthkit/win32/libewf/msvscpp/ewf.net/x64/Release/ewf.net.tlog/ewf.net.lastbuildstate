@@ -1,0 +1,2 @@
+#TargetFrameworkVersion=v4.0:PlatformToolSet=v120:EnableManagedIncrementalBuild=true:VCToolArchitecture=Native32Bit
+Release|x64|D:\Git\sleuthkitwrapper\Source\sleuthkit\win32\libewf\msvscpp\|

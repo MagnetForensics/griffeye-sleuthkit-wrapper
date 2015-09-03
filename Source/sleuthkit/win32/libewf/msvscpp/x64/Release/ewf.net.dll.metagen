@@ -1,0 +1,106 @@
+ImageRuntimeVersion: v4.0.30319
+Assembly ewf.net, Version=1.0.5724.23330, Culture=neutral, PublicKeyToken=c0e8495fa322da2d: 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Class EWF.DateTime: AutoLayout, AnsiClass, Class, Public, Sealed, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    FromFiletime(UInt64): PrivateScope, Public, Static, HideBySig
+    FromPOSIXTime(UInt32): PrivateScope, Public, Static, HideBySig
+Class EWF.FileEntry: AutoLayout, AnsiClass, Class, Public, Sealed, BeforeFieldInit
+    Void .ctor(IntPtr): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Methods:
+    GetType(): PrivateScope, Public, HideBySig
+    GetFlags(): PrivateScope, Public, HideBySig
+    GetMediaDataOffset(): PrivateScope, Public, HideBySig
+    GetMediaDataSize(): PrivateScope, Public, HideBySig
+    GetDuplicateMediaDataOffset(): PrivateScope, Public, HideBySig
+    GetName(): PrivateScope, Public, HideBySig
+    GetSize(): PrivateScope, Public, HideBySig
+    GetCreationTime(): PrivateScope, Public, HideBySig
+    GetModificationTime(): PrivateScope, Public, HideBySig
+    GetAccessTime(): PrivateScope, Public, HideBySig
+    GetEntryModificationTime(): PrivateScope, Public, HideBySig
+    GetHashValueMD5(): PrivateScope, Public, HideBySig
+    GetNumberOfSubFileEntries(): PrivateScope, Public, HideBySig
+    GetSubFileEntry(Int32): PrivateScope, Public, HideBySig
+    ReadBuffer(Byte[], Int32): PrivateScope, Public, HideBySig
+    ReadBufferAtOffset(Byte[], Int32, Int64): PrivateScope, Public, HideBySig
+    ReadRandom(Byte[], Int32, Int64): PrivateScope, Public, HideBySig
+    SeekOffset(Int64, SeekOrigin): PrivateScope, Public, HideBySig
+    GetOffset(): PrivateScope, Public, HideBySig
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Class EWF.SectorRange: AutoLayout, AnsiClass, Class, Public, Sealed, BeforeFieldInit
+    Void .ctor(UInt64, UInt64): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    UInt64 start_sector : Public
+    UInt64 number_of_sectors : Public
+Class EWF.Handle: AutoLayout, AnsiClass, Class, Public, Sealed, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Methods:
+    GetAccessFlagsRead(): PrivateScope, Public, Static, HideBySig
+    GetAccessFlagsReadWrite(): PrivateScope, Public, Static, HideBySig
+    GetAccessFlagsWrite(): PrivateScope, Public, Static, HideBySig
+    GetAccessFlagsWriteResume(): PrivateScope, Public, Static, HideBySig
+    CheckFileSignature(String): PrivateScope, Public, Static, HideBySig
+    Glob(String): PrivateScope, Public, Static, HideBySig
+    Clone(): PrivateScope, Public, HideBySig
+    Open(String[], Int32): PrivateScope, Public, HideBySig
+    Close(): PrivateScope, Public, HideBySig
+    ReadBuffer(Byte[], Int32): PrivateScope, Public, HideBySig
+    ReadBufferAtOffset(Byte[], Int32, Int64): PrivateScope, Public, HideBySig
+    ReadRandom(Byte[], Int32, Int64): PrivateScope, Public, HideBySig
+    WriteBuffer(Byte[], Int32): PrivateScope, Public, HideBySig
+    WriteBufferAtOffset(Byte[], Int32, Int64): PrivateScope, Public, HideBySig
+    WriteRandom(Byte[], Int32, Int64): PrivateScope, Public, HideBySig
+    SeekOffset(Int64, SeekOrigin): PrivateScope, Public, HideBySig
+    GetOffset(): PrivateScope, Public, HideBySig
+    GetSectorsPerChunk(): PrivateScope, Public, HideBySig
+    SetSectorsPerChunk(UInt32): PrivateScope, Public, HideBySig
+    GetBytesPerSector(): PrivateScope, Public, HideBySig
+    SetBytesPerSector(UInt32): PrivateScope, Public, HideBySig
+    GetNumberOfSectors(): PrivateScope, Public, HideBySig
+    GetChunkSize(): PrivateScope, Public, HideBySig
+    GetErrorGranularity(): PrivateScope, Public, HideBySig
+    SetErrorGranularity(UInt32): PrivateScope, Public, HideBySig
+    GetMediaSize(): PrivateScope, Public, HideBySig
+    SetMediaSize(UInt64): PrivateScope, Public, HideBySig
+    GetMediaType(): PrivateScope, Public, HideBySig
+    SetMediaType(Byte): PrivateScope, Public, HideBySig
+    GetMediaFlags(): PrivateScope, Public, HideBySig
+    SetMediaFlags(Byte): PrivateScope, Public, HideBySig
+    GetFormat(): PrivateScope, Public, HideBySig
+    SetFormat(Byte): PrivateScope, Public, HideBySig
+    GetNumberOfAcquiryErrors(): PrivateScope, Public, HideBySig
+    GetAcquiryError(Int32): PrivateScope, Public, HideBySig
+    AppendAcquiryError(SectorRange): PrivateScope, Public, HideBySig
+    GetNumberOfChecksumErrors(): PrivateScope, Public, HideBySig
+    GetChecksumError(Int32): PrivateScope, Public, HideBySig
+    AppendChecksumError(SectorRange): PrivateScope, Public, HideBySig
+    GetNumberOfSessions(): PrivateScope, Public, HideBySig
+    GetSession(Int32): PrivateScope, Public, HideBySig
+    AppendSession(SectorRange): PrivateScope, Public, HideBySig
+    GetNumberOfTracks(): PrivateScope, Public, HideBySig
+    GetTrack(Int32): PrivateScope, Public, HideBySig
+    AppendTrack(SectorRange): PrivateScope, Public, HideBySig
+    GetNumberOfHeaderValues(): PrivateScope, Public, HideBySig
+    GetHeaderValueIdentifier(Int32): PrivateScope, Public, HideBySig
+    GetHeaderValue(String): PrivateScope, Public, HideBySig
+    SetHeaderValue(String, String): PrivateScope, Public, HideBySig
+    GetNumberOfHashValues(): PrivateScope, Public, HideBySig
+    GetHashValueIdentifier(Int32): PrivateScope, Public, HideBySig
+    GetHashValue(String): PrivateScope, Public, HideBySig
+    SetHashValue(String, String): PrivateScope, Public, HideBySig
+    GetRootFileEntry(): PrivateScope, Public, HideBySig
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Class EWF.Support: AutoLayout, AnsiClass, Class, Public, Sealed, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    GetVersion(): PrivateScope, Public, Static, HideBySig
