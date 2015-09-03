@@ -43,6 +43,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
+    <LinkKeyFile>"..\ncpub.snk"</LinkKeyFile>
+    <LinkDelaySign>true</LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VSDebug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
