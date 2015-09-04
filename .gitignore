@@ -11,3 +11,4 @@ Source/sleuthkit/win32/libewf/msvscpp/ewf.net/Release/
 *.opensdf
 *.tlog
 *.lastbuildstate
+.svn/
