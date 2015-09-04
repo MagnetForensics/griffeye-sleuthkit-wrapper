@@ -1,9 +1,0 @@
-K 10
-svn:ignore
-V 40
-buildchk_*
-buildfre_*
-objchk_*
-objfre_*
-
-END
