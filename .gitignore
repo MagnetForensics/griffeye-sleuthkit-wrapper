@@ -9,3 +9,5 @@ Source/Sleuthkit Wrapper/unit-tests/obj/
 Source/sleuthkit/win32/libewf/msvscpp/ewf.net/Release/
 *.sdf
 *.opensdf
+*.tlog
+*.lastbuildstate
