@@ -12,3 +12,6 @@ Source/sleuthkit/win32/libewf/msvscpp/ewf.net/Release/
 *.tlog
 *.lastbuildstate
 .svn/
+Source/sleuthkit/win32/libewf/m4
+Release/
+Makefile.am
