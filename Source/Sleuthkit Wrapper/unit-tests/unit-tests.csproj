@@ -91,7 +91,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="resources\USB-disk-image-FAT.E01" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="nunit\nunit.framework.dll" />

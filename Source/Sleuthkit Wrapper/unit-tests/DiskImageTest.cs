@@ -213,7 +213,7 @@
         [SetUp]
         public void SetUpDiskImageTests()
         {
-            var file = new FileInfo(ConfigurationManager.AppSettings["E01Path"]);
+            var file = new FileInfo(@"\\philadelphia\TestShare\Sleuthkit Wrapper\USB-disk-image-FAT.E01");
             this.diskImage = new DiskImage(file);
         }
 

@@ -23,7 +23,7 @@
         [Test]
         public void ExtractTest()
         {
-            string fileName = ConfigurationManager.AppSettings["E01Path"];
+            string fileName = @"\\philadelphia\TestShare\Sleuthkit Wrapper\USB-disk-image-FAT.E01";
             
             // fill up dictionary with the expected values.
             IDictionary<string, string> expected = new Dictionary<string, string>();
