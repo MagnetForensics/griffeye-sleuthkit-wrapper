@@ -55,21 +55,6 @@
         }
 
         /// <summary>
-        ///     A test for GetFileSystems
-        /// </summary>
-        [Test]
-        public void GetFileSystemsTest()
-        {
-            IEnumerable<FileSystem> actual = this.diskImage.GetFileSystems();
-            IEnumerable<FileSystem> fileSystems = actual as FileSystem[] ?? actual.ToArray();
-            Assert.AreEqual(3, fileSystems.Count());
-            foreach (FileSystem fileSystem in fileSystems)
-            {
-                fileSystem.Dispose();
-            }
-        }
-
-        /// <summary>
         ///     A test for OpenFileSystem
         /// </summary>
         [Test]
@@ -169,6 +154,12 @@
                 int count = 0;
                 foreach (Volume volume in volumeSystem.Volumes)
                 {
+                    if (volume.Description == "Primary Table (#0)" ||
+                        volume.Description == "Unallocated")
+                    {
+                        continue;
+                    }
+
                     using (FileSystem fileSystem = volume.OpenFileSystem())
                     {
                         //count += CountFiles(fileSystem.OpenRootDirectory());

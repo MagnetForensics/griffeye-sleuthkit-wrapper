@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sleuthkit-sharp", "src\sleuthkit-sharp.csproj", "{828A2D64-EFAD-496C-A369-7C8658AE4FFA}"
 EndProject
@@ -12,24 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unit-tests", "unit-tests\unit-tests.csproj", "{479E21D5-52E1-44DF-90EA-6EE385EA4973}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://tfs.netclean.com:8080/tfs/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = src\\sleuthkit-sharp.csproj
-		SccProjectName1 = src
-		SccLocalPath1 = src
-		SccProjectUniqueName2 = test\\sleuthkit-sharp-test.csproj
-		SccProjectName2 = test
-		SccLocalPath2 = test
-		SccProjectUniqueName3 = libtsk4-win32\\libtsk4.vcxproj
-		SccProjectName3 = libtsk4-win32
-		SccLocalPath3 = libtsk4-win32
-		SccProjectUniqueName4 = unit-tests\\unit-tests.csproj
-		SccProjectName4 = unit-tests
-		SccLocalPath4 = unit-tests
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -114,7 +96,8 @@ Global
 		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|Win32.ActiveCfg = Release|Any CPU
 		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x64.ActiveCfg = Release|Any CPU
-		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x86.ActiveCfg = Release|Any CPU
+		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x86.ActiveCfg = Release|x86
+		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
