@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\libfcache\libfcache_cache_value.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libfcache\libfcache_date_time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\libfcache\libfcache_error.c">
       <Filter>Source Files</Filter>
     </ClCompile>

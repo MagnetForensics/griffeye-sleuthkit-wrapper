@@ -1,7 +1,7 @@
 /*
  * The libfdatetime header wrapper
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,7 +30,6 @@
 
 #include <libfdatetime_date_time_values.h>
 #include <libfdatetime_definitions.h>
-#include <libfdatetime_error.h>
 #include <libfdatetime_fat_date_time.h>
 #include <libfdatetime_filetime.h>
 #include <libfdatetime_floatingtime.h>
@@ -39,7 +38,9 @@
 #include <libfdatetime_systemtime.h>
 #include <libfdatetime_types.h>
 
-#else
+/* Note that libfvalue does not require to have libfdatetime support
+ */
+#elif defined( HAVE_LIBFDATETIME_H )
 
 /* If libtool DLL support is enabled set LIBFDATETIME_DLL_IMPORT
  * before including libfdatetime.h

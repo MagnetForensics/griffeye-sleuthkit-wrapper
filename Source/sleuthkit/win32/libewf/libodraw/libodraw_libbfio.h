@@ -1,7 +1,7 @@
 /*
  * The libbfio header wrapper
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,7 +35,7 @@
 #include <libbfio_pool.h>
 #include <libbfio_types.h>
 
-#elif defined( HAVE_LIBBFIO_H )
+#else
 
 /* If libtool DLL support is enabled set LIBBFIO_DLL_IMPORT
  * before including libbfio.h
@@ -46,8 +46,6 @@
 
 #include <libbfio.h>
 
-#else
-#error Missing libbfio.h
 #endif
 
 #endif

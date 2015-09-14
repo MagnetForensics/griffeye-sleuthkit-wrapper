@@ -1,7 +1,7 @@
 /*
  * Character string functions
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -124,7 +124,7 @@ int libcsystem_string_decimal_copy_from_64_bit(
 	return( 1 );
 }
 
-/* Copies a string of a decimal value to a 16-bit value
+/* Copies a string of a decimal value to a 64-bit value
  * Returns 1 if successful or -1 on error
  */
 int libcsystem_string_decimal_copy_to_64_bit(

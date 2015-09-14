@@ -1,7 +1,7 @@
 /*
  * Value functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -62,76 +62,7 @@ struct libfvalue_internal_value
 
 	/* The data handle
 	 */
-	intptr_t *data_handle;
-
-	/* The free data handle function
-	 */
-	int (*free_data_handle)(
-	      intptr_t **data_handle,
-	      libcerror_error_t **error );
-
-	/* The clone (duplicate) data handle function
-	 */
-	int (*clone_data_handle)(
-	      intptr_t **destination_data_handle,
-	      intptr_t *source_data_handle,
-	      libcerror_error_t **error );
-
-	/* The data handle get data function
-	 */
-	int (*get_data)(
-	      intptr_t *data_handle,
-	      uint8_t **data,
-	      size_t *data_size,
-	      int *encoding,
-	      libcerror_error_t **error );
-
-	/* The data handle set data function
-	 */
-	int (*set_data)(
-	      intptr_t *data_handle,
-	      const uint8_t *data,
-	      size_t data_size,
-	      int encoding,
-	      uint8_t flags,
-	      libcerror_error_t **error );
-
-	/* The data handle get number of value entries function
-	 */
-	int (*get_number_of_value_entries)(
-	      intptr_t *data_handle,
-	      int *number_of_value_entries,
-	      libcerror_error_t **error );
-
-	/* The data handle get value entry function
-	 */
-	int (*get_value_entry)(
-	      intptr_t *data_handle,
-	      int value_entry_index,
-	      uint8_t **data,
-	      size_t *data_size,
-	      int *encoding,
-	      libcerror_error_t **error );
-
-	/* The data handle set value entry function
-	 */
-	int (*set_value_entry)(
-	      intptr_t *data_handle,
-	      int value_entry_index,
-	      const uint8_t *data,
-	      size_t data_size,
-	      int encoding,
-	      libcerror_error_t **error );
-
-	/* The data handle append value entry function
-	 */
-	int (*append_value_entry)(
-	      intptr_t *data_handle,
-	      int *value_entry_index,
-	      const uint8_t *data,
-	      size_t data_size,
-	      int encoding,
-	      libcerror_error_t **error );
+	libfvalue_data_handle_t *data_handle;
 
 	/* The value instances array
 	 */
@@ -304,54 +235,7 @@ int libfvalue_value_initialize(
      libfvalue_value_t **value,
      const char *type_string,
      const char *type_description,
-     /* Data handle functions */
-     intptr_t *data_handle,
-     int (*free_data_handle)(
-           intptr_t **data_handle,
-           libcerror_error_t **error ),
-     int (*clone_data_handle)(
-           intptr_t **destination_data_handle,
-           intptr_t *source_data_handle,
-           libcerror_error_t **error ),
-     int (*get_data)(
-           intptr_t *data_handle,
-           uint8_t **data,
-           size_t *data_size,
-           int *encoding,
-           libcerror_error_t **error ),
-     int (*set_data)(
-           intptr_t *data_handle,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           uint8_t flags,
-           libcerror_error_t **error ),
-     int (*get_number_of_value_entries)(
-           intptr_t *data_handle,
-           int *number_of_value_entries,
-           libcerror_error_t **error ),
-     int (*get_value_entry)(
-           intptr_t *data_handle,
-           int value_entry_index,
-           uint8_t **data,
-           size_t *data_size,
-           int *encoding,
-           libcerror_error_t **error ),
-     int (*set_value_entry)(
-           intptr_t *data_handle,
-           int value_entry_index,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           libcerror_error_t **error ),
-     int (*append_value_entry)(
-           intptr_t *data_handle,
-           int *value_entry_index,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           libcerror_error_t **error ),
-     /* Value instance functions */
+     libfvalue_data_handle_t *data_handle,
      int (*initialize_instance)(
            intptr_t **instance,
            libcerror_error_t **error ),
@@ -451,6 +335,7 @@ int libfvalue_value_initialize(
            size_t *utf32_string_index,
            uint32_t string_format_flags,
            libcerror_error_t **error ),
+     uint8_t flags,
      libcerror_error_t **error );
 
 LIBFVALUE_EXTERN \
@@ -490,14 +375,27 @@ int libfvalue_value_set_identifier(
      uint8_t flags,
      libcerror_error_t **error );
 
-int libfvalue_value_initialize_data(
-     libfvalue_internal_value_t *internal_value,
-     size_t data_size,
+LIBFVALUE_EXTERN \
+int libfvalue_value_get_data_flags(
+     libfvalue_value_t *value,
+     uint32_t *data_flags,
+     libcerror_error_t **error );
+
+LIBFVALUE_EXTERN \
+int libfvalue_value_set_data_flags(
+     libfvalue_value_t *value,
+     uint32_t data_flags,
      libcerror_error_t **error );
 
 LIBFVALUE_EXTERN \
 int libfvalue_value_has_data(
      libfvalue_value_t *value,
+     libcerror_error_t **error );
+
+LIBFVALUE_EXTERN \
+int libfvalue_value_initialize_data(
+     libfvalue_value_t *value,
+     size_t data_size,
      libcerror_error_t **error );
 
 LIBFVALUE_EXTERN \
@@ -559,6 +457,30 @@ int libfvalue_value_get_number_of_value_entries(
      libcerror_error_t **error );
 
 LIBFVALUE_EXTERN \
+int libfvalue_value_get_entry(
+     libfvalue_value_t *value,
+     int value_entry_index,
+     size_t *entry_data_offset,
+     size_t *entry_data_size,
+     libcerror_error_t **error );
+
+LIBFVALUE_EXTERN \
+int libfvalue_value_set_entry(
+     libfvalue_value_t *value,
+     int value_entry_index,
+     size_t entry_data_offset,
+     size_t entry_data_size,
+     libcerror_error_t **error );
+
+LIBFVALUE_EXTERN \
+int libfvalue_value_append_entry(
+     libfvalue_value_t *value,
+     int *value_entry_index,
+     size_t entry_data_offset,
+     size_t entry_data_size,
+     libcerror_error_t **error );
+
+LIBFVALUE_EXTERN \
 int libfvalue_value_get_entry_data(
      libfvalue_value_t *value,
      int value_entry_index,
@@ -583,6 +505,15 @@ int libfvalue_value_append_entry_data(
      const uint8_t *entry_data,
      size_t entry_data_size,
      int encoding,
+     libcerror_error_t **error );
+
+LIBFVALUE_EXTERN \
+int libfvalue_value_copy_entry_data(
+     libfvalue_value_t *value,
+     int value_entry_index,
+     uint8_t *entry_data,
+     size_t entry_data_size,
+     int *encoding,
      libcerror_error_t **error );
 
 /* Boolean value functions

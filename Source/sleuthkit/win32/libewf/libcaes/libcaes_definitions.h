@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2011-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2011-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,11 +34,19 @@
  * for local use of libcaes
  */
 #else
-#define LIBCAES_VERSION				20130331
+#define LIBCAES_VERSION				@VERSION@
 
 /* The libcaes version string
  */
-#define LIBCAES_VERSION_STRING			"20130331"
+#define LIBCAES_VERSION_STRING			"@VERSION@"
+
+/* The crypt modes
+ */
+enum LIBCAES_CRYPT_MODES
+{
+	LIBCAES_CRYPT_MODE_DECRYPT		= 0,
+	LIBCAES_CRYPT_MODE_ENCRYPT		= 1
+};
 
 #endif
 
@@ -50,19 +58,6 @@
 
 #elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 #define LIBCAES_HAVE_AES_SUPPORT
-
-#endif
-
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_AES_H )
-#define LIBCAES_CRYPT_MODE_DECRYPT		AES_DECRYPT
-#define LIBCAES_CRYPT_MODE_ENCRYPT		AES_ENCRYPT
-
-#else
-enum LIBCAES_CRYPT_MODES
-{
-	LIBCAES_CRYPT_MODE_DECRYPT		= 0,
-	LIBCAES_CRYPT_MODE_ENCRYPT		= 1
-};
 
 #endif
 

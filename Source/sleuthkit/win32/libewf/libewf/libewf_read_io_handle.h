@@ -1,7 +1,7 @@
 /*
  * Low level reading functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,7 +31,7 @@
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfcache.h"
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
 #include "libewf_media_values.h"
 
 #if defined( __cplusplus )
@@ -42,14 +42,6 @@ typedef struct libewf_read_io_handle libewf_read_io_handle_t;
 
 struct libewf_read_io_handle
 {
-	/* The sectors with checksum errors
-	 */
-	libcdata_range_list_t *checksum_errors;
-
-	/* A value to indicate if the chunk data should be zeroed on error
-	 */
-	uint8_t zero_on_error;
-
 	/* Cached version of the case data
 	 */
 	uint8_t *case_data;
@@ -65,6 +57,14 @@ struct libewf_read_io_handle
 	/* Size of the cached version of the device information
 	 */
 	size_t device_information_size;
+
+	/* The storage media size read
+	 */
+	size64_t storage_media_size_read;
+
+        /* The (total) number of chunks read
+         */
+        uint64_t number_of_chunks_read;
 };
 
 int libewf_read_io_handle_initialize(
@@ -78,18 +78,6 @@ int libewf_read_io_handle_free(
 int libewf_read_io_handle_clone(
      libewf_read_io_handle_t **destination_read_io_handle,
      libewf_read_io_handle_t *source_read_io_handle,
-     libcerror_error_t **error );
-
-int libewf_read_io_handle_read_chunk_data(
-     libewf_read_io_handle_t *read_io_handle,
-     libewf_io_handle_t *io_handle,
-     libbfio_pool_t *file_io_pool,
-     libewf_media_values_t *media_values,
-     libmfdata_list_t *chunk_table_list,
-     libfcache_cache_t *chunk_table_cache,
-     int chunk_index,
-     off64_t chunk_offset,
-     libewf_chunk_data_t **chunk_data,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

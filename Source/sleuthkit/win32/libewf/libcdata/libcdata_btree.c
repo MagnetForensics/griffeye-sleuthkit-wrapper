@@ -1,7 +1,7 @@
 /*
- * B-tree type functions
+ * Balanced tree type functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,7 +33,7 @@
 #include "libcdata_types.h"
 
 /* Creates a tree
- * Make sure the value tree is pointing to is set to NULL
+ * Make sure the value tree is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libcdata_btree_initialize(
@@ -264,9 +264,9 @@ int libcdata_btree_free_values_list(
 
 /* Retrieves the sub node for the specific value
  *
- * Uses the value_compare_function to determine the order of the entries
- * The value_compare_function should return LIBCDATA_BTREE_COMPARE_LESS,
- * LIBCDATA_BTREE_COMPARE_EQUAL, LIBCDATA_BTREE_COMPARE_GREATER if successful or -1 on error
+ * Uses the value_compare_function to determine the similarity of the entries
+ * The value_compare_function should return LIBCDATA_COMPARE_LESS,
+ * LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  *
  * If value_compare_function is NULL the pointer of the value is used to check for a match
  *
@@ -542,9 +542,9 @@ int libcdata_btree_node_get_sub_node_by_value(
 
 /* Retrieves the upper node for the specific value
  *
- * Uses the value_compare_function to determine the order of the entries
- * The value_compare_function should return LIBCDATA_BTREE_COMPARE_LESS,
- * LIBCDATA_BTREE_COMPARE_EQUAL, LIBCDATA_BTREE_COMPARE_GREATER if successful or -1 on error
+ * Uses the value_compare_function to determine the similarity of the entries
+ * The value_compare_function should return LIBCDATA_COMPARE_LESS,
+ * LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  *
  * Returns 1 if successful, 0 if the value does not exist or -1 on error
  */
@@ -755,8 +755,8 @@ int libcdata_btree_node_append_value(
  * The tree node must be the most upper node (leaf)
  *
  * Uses the value_compare_function to determine the order of the entries
- * The value_compare_function should return LIBCDATA_BTREE_COMPARE_LESS,
- * LIBCDATA_BTREE_COMPARE_EQUAL, LIBCDATA_BTREE_COMPARE_GREATER if successful or -1 on error
+ * The value_compare_function should return LIBCDATA_COMPARE_LESS,
+ * LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  *
  * Returns 1 if successful, 0 if the value already exists or -1 on error
  */
@@ -1862,9 +1862,9 @@ int libcdata_btree_get_value_by_index(
 
 /* Retrieves a value from the tree
  *
- * Uses the value_compare_function to determine the order of the entries
- * The value_compare_function should return LIBCDATA_BTREE_COMPARE_LESS,
- * LIBCDATA_BTREE_COMPARE_EQUAL, LIBCDATA_BTREE_COMPARE_GREATER if successful or -1 on error
+ * Uses the value_compare_function to determine the similarity of the entries
+ * The value_compare_function should return LIBCDATA_COMPARE_LESS,
+ * LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  *
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
@@ -1954,8 +1954,8 @@ int libcdata_btree_get_value_by_value(
 /* Inserts a value into a tree
  *
  * Uses the value_compare_function to determine the order of the entries
- * The value_compare_function should return LIBCDATA_BTREE_COMPARE_LESS,
- * LIBCDATA_BTREE_COMPARE_EQUAL, LIBCDATA_BTREE_COMPARE_GREATER if successful or -1 on error
+ * The value_compare_function should return LIBCDATA_COMPARE_LESS,
+ * LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  *
  * Returns 1 if successful, 0 if the value already exists or -1 on error
  */

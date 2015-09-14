@@ -1,7 +1,7 @@
 /*
  * Handle functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,15 +26,16 @@
 #include <types.h>
 
 #include "libewf_chunk_data.h"
+#include "libewf_chunk_group.h"
 #include "libewf_chunk_table.h"
 #include "libewf_extern.h"
 #include "libewf_hash_sections.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
-#include "libewf_libfvalue.h"
 #include "libewf_libfcache.h"
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
+#include "libewf_libfvalue.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
@@ -45,10 +46,10 @@
 
 #if defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32_VERSION ) || defined( __MINGW64_VERSION_MAJOR )
 
-/* This inclusion is needed otherwise some linkers
- * mess up exporting the legacy functions
+/* This inclusion is needed otherwise some linkers mess up exporting functions
  */
 #include "libewf_legacy.h"
+
 #endif
 
 #if defined( __cplusplus )
@@ -62,10 +63,6 @@ struct libewf_internal_handle
 	/* The IO handle
 	 */
 	libewf_io_handle_t *io_handle;
-
-	/* The current chunk data
-	 */
-	libewf_chunk_data_t *chunk_data;
 
 	/* The media values
 	 */
@@ -103,17 +100,9 @@ struct libewf_internal_handle
 	 */
 	int maximum_number_of_open_handles;
 
-	/* The segment files list
+	/* The current (storage media) offset
 	 */
-	libmfdata_file_list_t *segment_files_list;
-
-	/* The delta segment files list
-	 */
-	libmfdata_file_list_t *delta_segment_files_list;
-
-	/* The segment files cache
-	 */
-	libfcache_cache_t *segment_files_cache;
+	off64_t current_offset;
 
 	/* The segment file table
 	 */
@@ -123,13 +112,29 @@ struct libewf_internal_handle
 	 */
 	libewf_segment_table_t *delta_segment_table;
 
-	/* The chunk table (data) list
+	/* The chunk table
 	 */
-	libmfdata_list_t *chunk_table_list;
+	libewf_chunk_table_t *chunk_table;
 
-	/* The chunk table cache
+	/* The delta chunks range list
 	 */
-	libfcache_cache_t *chunk_table_cache;
+	libfdata_range_list_t *delta_chunks_range_list;
+
+	/* The chunk groups cache
+	 */
+	libfcache_cache_t *chunk_groups_cache;
+
+	/* The chunks cache
+	 */
+	libfcache_cache_t *chunks_cache;
+
+	/* The chunk group
+	 */
+	libewf_chunk_group_t *chunk_group;
+
+	/* The current chunk data
+	 */
+	libewf_chunk_data_t *chunk_data;
 
 	/* The date format for certain header values
 	 */
@@ -206,10 +211,23 @@ int libewf_handle_open_file_io_pool(
      int access_flags,
      libcerror_error_t **error );
 
+int libewf_handle_open_read_segment_file_section_data(
+     libewf_internal_handle_t *internal_handle,
+     libewf_segment_file_t *segment_file,
+     libbfio_pool_t *file_io_pool,
+     int file_io_pool_entry,
+     libcerror_error_t **error );
+
 int libewf_handle_open_read_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
-     libewf_chunk_table_t *chunk_table,
+     libcerror_error_t **error );
+
+int libewf_handle_open_read_delta_segment_file_section_data(
+     libewf_internal_handle_t *internal_handle,
+     libewf_segment_file_t *segment_file,
+     libbfio_pool_t *file_io_pool,
+     int file_io_pool_entry,
      libcerror_error_t **error );
 
 int libewf_handle_open_read_delta_segment_files(
@@ -253,7 +271,7 @@ ssize_t libewf_handle_read_buffer(
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-ssize_t libewf_handle_read_random(
+ssize_t libewf_handle_read_buffer_at_offset(
          libewf_handle_t *handle,
          void *buffer,
          size_t buffer_size,
@@ -292,7 +310,7 @@ ssize_t libewf_handle_write_buffer(
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-ssize_t libewf_handle_write_random(
+ssize_t libewf_handle_write_buffer_at_offset(
          libewf_handle_t *handle,
          const void *buffer,
          size_t buffer_size,

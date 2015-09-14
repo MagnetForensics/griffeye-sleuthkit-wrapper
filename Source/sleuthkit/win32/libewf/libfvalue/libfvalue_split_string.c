@@ -1,7 +1,7 @@
 /*
  * Split string functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -28,7 +28,8 @@
 #include "libfvalue_split_string.h"
 #include "libfvalue_types.h"
 
-/* Initializes the split UTF-8 string
+/* Creates a split UTF-8 string
+ * Make sure the value split_string is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_split_utf8_string_initialize(
@@ -219,7 +220,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the split UTF-8 string including elements
+/* Frees a split UTF-8 string
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_split_utf8_string_free(
@@ -524,7 +525,8 @@ int libfvalue_split_utf8_string_set_segment_by_index(
 	return( 1 );
 }
 
-/* Initializes the split UTF-16 string
+/* Creates a split UTF-16 string
+ * Make sure the value split_string is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_split_utf16_string_initialize(
@@ -715,7 +717,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the split UTF-16 string including elements
+/* Frees a split UTF-16 string
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_split_utf16_string_free(

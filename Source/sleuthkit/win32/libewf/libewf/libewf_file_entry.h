@@ -1,7 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -61,7 +61,6 @@ int libewf_file_entry_initialize(
      libewf_file_entry_t **file_entry,
      libewf_internal_handle_t *internal_handle,
      libcdata_tree_node_t *file_entry_tree_node,
-     uint8_t flags,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -191,7 +190,7 @@ ssize_t libewf_file_entry_read_buffer(
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-ssize_t libewf_file_entry_read_random(
+ssize_t libewf_file_entry_read_buffer_at_offset(
          libewf_file_entry_t *file_entry,
          void *buffer,
          size_t buffer_size,

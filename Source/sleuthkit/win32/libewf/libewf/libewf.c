@@ -1,7 +1,7 @@
 /*
  * Library to access the Expert Witness Compression Format (EWF)
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,7 +31,7 @@
  */
 #if !defined( HAVE_LOCAL_LIBEWF )
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && defined( HAVE_DLLMAIN )
 
 #if defined( _MANAGED )
 #pragma managed( push, off )
@@ -74,7 +74,7 @@ int libewf_is_dll(
 	return( 1 );
 }
 
-#endif /* defined( WINAPI ) */
+#endif /* defined( WINAPI ) && defined( HAVE_DLLMAIN ) */
 
 #endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 

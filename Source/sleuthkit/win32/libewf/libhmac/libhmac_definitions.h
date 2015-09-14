@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2011-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2011-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,15 +34,19 @@
  * for local use of libhmac
  */
 #else
-#define LIBHMAC_VERSION			20130331
+#define LIBHMAC_VERSION			@VERSION@
 
 /* The libhmac version string
  */
-#define LIBHMAC_VERSION_STRING		"20130331"
+#define LIBHMAC_VERSION_STRING		"@VERSION@"
 
+/* The digest hash sizes
+ */
 #define LIBHMAC_MD5_HASH_SIZE		16
 #define LIBHMAC_SHA1_HASH_SIZE		20
+#define LIBHMAC_SHA224_HASH_SIZE	28
 #define LIBHMAC_SHA256_HASH_SIZE	32
+#define LIBHMAC_SHA512_HASH_SIZE	64
 
 #endif
 

@@ -1,7 +1,7 @@
 /*
  * Hash sections functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,8 @@
 #include "libewf_libcerror.h"
 #include "libewf_hash_sections.h"
 
-/* Initialize the hash sections
+/* Creates hash sections
+ * Make sure the value hash_sections is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_sections_initialize(
@@ -97,7 +98,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the hash sections including elements
+/* Frees hash sections
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_sections_free(

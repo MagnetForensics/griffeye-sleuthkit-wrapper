@@ -41,6 +41,9 @@
     <ClInclude Include="..\..\libcstring\libcstring_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libcstring\libcstring_unused.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\libcstring\libcstring_wide_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>

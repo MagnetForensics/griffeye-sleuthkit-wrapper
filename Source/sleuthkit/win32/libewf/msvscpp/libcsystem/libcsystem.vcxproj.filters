@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\libcsystem\libcsystem_error.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\libcsystem\libcsystem_getopt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,10 +38,13 @@
     <ClInclude Include="..\..\libcsystem\libcsystem_definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libcsystem\libcsystem_file_io.h">
+    <ClInclude Include="..\..\libcsystem\libcsystem_error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libcsystem\libcsystem_file_stream.h">
+    <ClInclude Include="..\..\libcsystem\libcsystem_extern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libcsystem\libcsystem_file_io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcsystem\libcsystem_find.h">
@@ -75,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcsystem\libcsystem_support.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libcsystem\libcsystem_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcsystem\libcsystem_unused.h">

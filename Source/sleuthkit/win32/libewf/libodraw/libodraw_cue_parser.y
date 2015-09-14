@@ -2,7 +2,7 @@
 /*
  * CUE parser functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -69,8 +69,11 @@
         lba += ( ( msf_string[ 6 ] - '0' ) * 10 ) + ( msf_string[ 7 ] - '0' );
 %}
 
-%name-prefix="cue_scanner_"
-%no-lines
+/* %name-prefix="cue_scanner_" replaced by -p cue_scanner_ */
+/* %no-lines replaced by -l */
+
+%lex-param { (void *) NULL }
+%parse-param { void *parser_state }
 
 %start cue_main
 
@@ -224,6 +227,7 @@ extern int cue_scanner_lex(
             void *user_data );
 
 extern void cue_scanner_error(
+             void *parser_state,
              const char *error_string );
 
 extern YY_BUFFER_STATE cue_scanner__scan_buffer(

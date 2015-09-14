@@ -1,7 +1,7 @@
 /*
  * System functions
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-#if defined( WINAPI ) && ( WINVER <= 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER <= 0x0500 )
 DWORD libcerror_FormatMessageA(
        DWORD flags,
        LPCVOID source,

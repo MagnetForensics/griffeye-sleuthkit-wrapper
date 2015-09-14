@@ -1,7 +1,7 @@
 /*
  * Handle functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -27,11 +27,13 @@
 
 #include "libsmraw_extern.h"
 #include "libsmraw_information_file.h"
+#include "libsmraw_io_handle.h"
 #include "libsmraw_libbfio.h"
 #include "libsmraw_libcerror.h"
 #include "libsmraw_libcstring.h"
+#include "libsmraw_libcthreads.h"
+#include "libsmraw_libfdata.h"
 #include "libsmraw_libfvalue.h"
-#include "libsmraw_libmfdata.h"
 #include "libsmraw_types.h"
 
 #if defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32_VERSION ) || defined( __MINGW64_VERSION_MAJOR )
@@ -39,7 +41,6 @@
 /* This inclusion is needed otherwise some linkers
  * mess up exporting the legacy and metadata functions
  */
-#include "libsmraw_legacy.h"
 #include "libsmraw_metadata.h"
 #endif
 
@@ -51,21 +52,13 @@ typedef struct libsmraw_internal_handle libsmraw_internal_handle_t;
 
 struct libsmraw_internal_handle
 {
-        /* The basename
+	/* The IO handle
 	 */
-        libcstring_system_character_t *basename;
+	libsmraw_io_handle_t *io_handle;
 
-        /* The size of the basename
+	/* The segments (file data) stream
 	 */
-        size_t basename_size;
-
-	/* The total number of segments
-	 */
-	int total_number_of_segments;
-
-	/* The segment (file) table
-	 */
-	libmfdata_segment_table_t *segment_table;
+	libfdata_stream_t *segments_stream;
 
 	/* The pool of file IO handles
 	 */
@@ -96,10 +89,6 @@ struct libsmraw_internal_handle
 	 */
 	libsmraw_information_file_t *information_file;
 
-	/* The media size
-	 */
-        size64_t media_size;
-
 	/* The media values table
 	 */
 	libfvalue_table_t *media_values;
@@ -112,9 +101,11 @@ struct libsmraw_internal_handle
 	 */
 	libfvalue_table_t *integrity_hash_values;
 
-	/* Value to indicate if abort was signalled
+#if defined( HAVE_LIBSMRAW_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
 	 */
-	int abort;
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 LIBSMRAW_EXTERN \
@@ -178,6 +169,14 @@ ssize_t libsmraw_handle_read_buffer(
          libcerror_error_t **error );
 
 LIBSMRAW_EXTERN \
+ssize_t libsmraw_handle_read_buffer_at_offset(
+         libsmraw_handle_t *handle,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error );
+
+LIBSMRAW_EXTERN \
 ssize_t libsmraw_handle_read_random(
          libsmraw_handle_t *handle,
          void *buffer,
@@ -190,6 +189,14 @@ ssize_t libsmraw_handle_write_buffer(
          libsmraw_handle_t *handle,
          const void *buffer,
          size_t buffer_size,
+         libcerror_error_t **error );
+
+LIBSMRAW_EXTERN \
+ssize_t libsmraw_handle_write_buffer_at_offset(
+         libsmraw_handle_t *handle,
+         const void *buffer,
+         size_t buffer_size,
+         off64_t offset,
          libcerror_error_t **error );
 
 LIBSMRAW_EXTERN \
@@ -217,12 +224,6 @@ LIBSMRAW_EXTERN \
 int libsmraw_handle_set_maximum_number_of_open_handles(
      libsmraw_handle_t *handle,
      int maximum_number_of_open_handles,
-     libcerror_error_t **error );
-
-int libsmraw_handle_set_segment_name(
-     intptr_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     int segment_index,
      libcerror_error_t **error );
 
 LIBSMRAW_EXTERN \

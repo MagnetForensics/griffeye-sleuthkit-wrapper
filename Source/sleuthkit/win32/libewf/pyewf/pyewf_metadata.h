@@ -2,7 +2,7 @@
  * Metadata functions for the Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,15 +34,62 @@ extern "C" {
 #endif
 
 PyObject *pyewf_handle_get_media_size(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_sectors_per_chunk(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_bytes_per_sector(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_number_of_sectors(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_chunk_size(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_error_granularity(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_compression_method(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_media_type(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_media_flags(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_format(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 PyObject *pyewf_handle_get_header_codepage(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+int pyewf_handle_set_header_codepage_from_string(
+     pyewf_handle_t *pyewf_handle,
+     const char *codepage_string );
 
 PyObject *pyewf_handle_set_header_codepage(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
+
+int pyewf_handle_set_header_codepage_setter(
+     pyewf_handle_t *pyewf_handle,
+     PyObject *string_object,
+     void *closure );
 
 PyObject *pyewf_handle_get_header_value(
            pyewf_handle_t *pyewf_handle,
@@ -50,7 +97,8 @@ PyObject *pyewf_handle_get_header_value(
            PyObject *keywords );
 
 PyObject *pyewf_handle_get_header_values(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 PyObject *pyewf_handle_get_hash_value(
            pyewf_handle_t *pyewf_handle,
@@ -58,7 +106,8 @@ PyObject *pyewf_handle_get_hash_value(
            PyObject *keywords );
 
 PyObject *pyewf_handle_get_hash_values(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 #if defined( __cplusplus )
 }

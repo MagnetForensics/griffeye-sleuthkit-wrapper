@@ -1,7 +1,7 @@
 /*
  * Meta data functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -29,6 +29,7 @@
 #include "libsmraw_libcerror.h"
 #include "libsmraw_libcnotify.h"
 #include "libsmraw_libcstring.h"
+#include "libsmraw_libcthreads.h"
 #include "libsmraw_libfvalue.h"
 #include "libsmraw_types.h"
 
@@ -56,13 +57,24 @@ int libsmraw_handle_get_media_size(
 	}
 	internal_handle = (libsmraw_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->file_io_pool == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing file io pool.",
+		 "%s: invalid handle - missing file IO pool.",
 		 function );
 
 		return( -1 );
@@ -78,8 +90,38 @@ int libsmraw_handle_get_media_size(
 
 		return( -1 );
 	}
-	*media_size = internal_handle->media_size;
+#if defined( HAVE_LIBSMRAW_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
 
+		return( -1 );
+	}
+#endif
+	*media_size = internal_handle->io_handle->media_size;
+
+#if defined( HAVE_LIBSMRAW_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -107,6 +149,17 @@ int libsmraw_handle_set_media_size(
 	}
 	internal_handle = (libsmraw_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( internal_handle->read_values_initialized != 0 )
 	 || ( internal_handle->write_values_initialized != 0 ) )
 	{
@@ -119,7 +172,8 @@ int libsmraw_handle_set_media_size(
 
 		return( -1 );
 	}
-	internal_handle->media_size = media_size;
+/* TODO add thread-safety support */
+	internal_handle->io_handle->media_size = media_size;
 
 	return( 1 );
 }
@@ -164,8 +218,24 @@ int libsmraw_handle_get_bytes_per_sector(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBSMRAW_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*bytes_per_sector = 0;
 
+/* TODO refactor into media_values_get_64bit_value function ? */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->media_values,
 	          (uint8_t *) identifier,
@@ -184,7 +254,7 @@ int libsmraw_handle_get_bytes_per_sector(
 		 function,
 		 identifier );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result != 0 )
 	{
@@ -201,7 +271,7 @@ int libsmraw_handle_get_bytes_per_sector(
 			 "%s: unable to copy value to a 64-bit value.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( value_64bit > (uint64_t) UINT32_MAX )
 		{
@@ -212,11 +282,34 @@ int libsmraw_handle_get_bytes_per_sector(
 			 "%s: 64-bit bytes per sector value out of bounds.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
-		*bytes_per_sector = (size_t) value_64bit;
+		*bytes_per_sector = (uint32_t) value_64bit;
 	}
+#if defined( HAVE_LIBSMRAW_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBSMRAW_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the bytes per sector
@@ -259,6 +352,8 @@ int libsmraw_handle_set_bytes_per_sector(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
+/* TODO refactor into media_values_set_64bit_value function ? */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->media_values,
 	          (uint8_t *) identifier,
@@ -299,7 +394,7 @@ int libsmraw_handle_set_bytes_per_sector(
 		     value,
 		     (uint8_t *) identifier,
 		     identifier_size,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -406,6 +501,7 @@ int libsmraw_handle_get_media_type(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	*media_type = LIBSMRAW_MEDIA_TYPE_UNKNOWN;
 
 	result = libfvalue_table_get_value_by_identifier(
@@ -543,6 +639,7 @@ int libsmraw_handle_set_media_type(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	switch( media_type )
 	{
 		case LIBSMRAW_MEDIA_TYPE_FIXED:
@@ -620,7 +717,7 @@ int libsmraw_handle_set_media_type(
 		     value,
 		     (uint8_t *) identifier,
 		     identifier_size,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -728,6 +825,7 @@ int libsmraw_handle_get_media_flags(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->media_values,
 	          (uint8_t *) identifier,
@@ -855,6 +953,7 @@ int libsmraw_handle_set_media_flags(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	if( ( media_flags & LIBSMRAW_MEDIA_FLAG_PHYSICAL ) != 0 )
 	{
 		value_string        = "physical";
@@ -905,7 +1004,7 @@ int libsmraw_handle_set_media_flags(
 		     value,
 		     (uint8_t *) identifier,
 		     identifier_size,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -995,6 +1094,7 @@ int libsmraw_handle_get_number_of_information_values(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	if( libfvalue_table_get_number_of_values(
 	     internal_handle->information_values,
 	     number_of_information_values,
@@ -1051,6 +1151,7 @@ int libsmraw_handle_get_information_value_identifier_size(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	if( libfvalue_table_get_value_by_index(
 	     internal_handle->information_values,
 	     information_value_index,
@@ -1139,6 +1240,7 @@ int libsmraw_handle_get_information_value_identifier(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	if( libfvalue_table_get_value_by_index(
 	     internal_handle->information_values,
 	     information_value_index,
@@ -1262,6 +1364,7 @@ int libsmraw_handle_get_utf8_information_value_size(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->information_values,
 	          identifier,
@@ -1356,6 +1459,7 @@ int libsmraw_handle_get_utf8_information_value(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->information_values,
 	          identifier,
@@ -1450,6 +1554,7 @@ int libsmraw_handle_set_utf8_information_value(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->information_values,
 	          identifier,
@@ -1490,7 +1595,7 @@ int libsmraw_handle_set_utf8_information_value(
 		     value,
 		     identifier,
 		     identifier_length + 1,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1597,6 +1702,7 @@ int libsmraw_handle_get_utf16_information_value_size(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->information_values,
 	          identifier,
@@ -1691,6 +1797,7 @@ int libsmraw_handle_get_utf16_information_value(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->information_values,
 	          identifier,
@@ -1785,6 +1892,7 @@ int libsmraw_handle_set_utf16_information_value(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->information_values,
 	          identifier,
@@ -1825,7 +1933,7 @@ int libsmraw_handle_set_utf16_information_value(
 		     value,
 		     identifier,
 		     identifier_length + 1,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1916,6 +2024,7 @@ int libsmraw_handle_get_number_of_integrity_hash_values(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	if( libfvalue_table_get_number_of_values(
 	     internal_handle->integrity_hash_values,
 	     number_of_integrity_hash_values,
@@ -1972,6 +2081,7 @@ int libsmraw_handle_get_integrity_hash_value_identifier_size(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	if( libfvalue_table_get_value_by_index(
 	     internal_handle->integrity_hash_values,
 	     integrity_hash_value_index,
@@ -2060,6 +2170,7 @@ int libsmraw_handle_get_integrity_hash_value_identifier(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	if( libfvalue_table_get_value_by_index(
 	     internal_handle->integrity_hash_values,
 	     integrity_hash_value_index,
@@ -2183,6 +2294,7 @@ int libsmraw_handle_get_utf8_integrity_hash_value_size(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->integrity_hash_values,
 	          identifier,
@@ -2277,6 +2389,7 @@ int libsmraw_handle_get_utf8_integrity_hash_value(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->integrity_hash_values,
 	          identifier,
@@ -2371,6 +2484,7 @@ int libsmraw_handle_set_utf8_integrity_hash_value(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->integrity_hash_values,
 	          identifier,
@@ -2411,7 +2525,7 @@ int libsmraw_handle_set_utf8_integrity_hash_value(
 		     value,
 		     identifier,
 		     identifier_length + 1,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2518,6 +2632,7 @@ int libsmraw_handle_get_utf16_integrity_hash_value_size(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->integrity_hash_values,
 	          identifier,
@@ -2612,6 +2727,7 @@ int libsmraw_handle_get_utf16_integrity_hash_value(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->integrity_hash_values,
 	          identifier,
@@ -2706,6 +2822,7 @@ int libsmraw_handle_set_utf16_integrity_hash_value(
 
 		return( -1 );
 	}
+/* TODO add thread-safety support */
 	result = libfvalue_table_get_value_by_identifier(
 	          internal_handle->integrity_hash_values,
 	          identifier,
@@ -2746,7 +2863,7 @@ int libsmraw_handle_set_utf16_integrity_hash_value(
 		     value,
 		     identifier,
 		     identifier_length + 1,
-		     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

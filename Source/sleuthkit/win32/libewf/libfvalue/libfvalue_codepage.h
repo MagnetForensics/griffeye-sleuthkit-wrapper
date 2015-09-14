@@ -1,7 +1,7 @@
 /*
  * Codepage functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -74,6 +74,8 @@ enum LIBFVALUE_CODEPAGES
 	LIBFVALUE_CODEPAGE_WINDOWS_874			= 874,
 	LIBFVALUE_CODEPAGE_WINDOWS_932			= 932,
 	LIBFVALUE_CODEPAGE_WINDOWS_936			= 936,
+	LIBFVALUE_CODEPAGE_WINDOWS_949			= 949,
+	LIBFVALUE_CODEPAGE_WINDOWS_950			= 950,
 	LIBFVALUE_CODEPAGE_WINDOWS_1250			= 1250,
 	LIBFVALUE_CODEPAGE_WINDOWS_1251			= 1251,
 	LIBFVALUE_CODEPAGE_WINDOWS_1252			= 1252,
@@ -82,7 +84,12 @@ enum LIBFVALUE_CODEPAGES
 	LIBFVALUE_CODEPAGE_WINDOWS_1255			= 1255,
 	LIBFVALUE_CODEPAGE_WINDOWS_1256			= 1256,
 	LIBFVALUE_CODEPAGE_WINDOWS_1257			= 1257,
-	LIBFVALUE_CODEPAGE_WINDOWS_1258			= 1258
+	LIBFVALUE_CODEPAGE_WINDOWS_1258			= 1258,
+
+	/* A special codepage to indicate codepage 1200 that uses ASCII strings as well.
+	 * This has primarily been seen in the ESE database format and could be SCSU.
+	 */
+	LIBFVALUE_CODEPAGE_1200_MIXED			= (int) 0x800004b0
 };
 
 #endif

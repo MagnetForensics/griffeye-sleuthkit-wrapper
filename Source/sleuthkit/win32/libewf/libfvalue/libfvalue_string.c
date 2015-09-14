@@ -1,7 +1,7 @@
 /*
  * String value functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <memory.h>
 #include <types.h>
 
 #include "libfvalue_codepage.h"
@@ -32,7 +33,8 @@
 #include "libfvalue_string.h"
 #include "libfvalue_types.h"
 
-/* Initialize a string
+/* Creates a string
+ * Make sure the value string is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_string_initialize(
@@ -196,6 +198,25 @@ int libfvalue_string_clone(
 
 		goto on_error;
 	}
+	if( memory_set(
+	     *destination_string,
+	     0,
+	     sizeof( libfvalue_string_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear destination string.",
+		 function );
+
+		memory_free(
+		 *destination_string );
+
+		*destination_string = NULL;
+
+		return( -1 );
+	}
 	if( ( source_string->flags & LIBFVALUE_VALUE_FLAG_DATA_MANAGED ) == 0 )
 	{
 		( *destination_string )->data      = source_string->data;
@@ -236,7 +257,7 @@ int libfvalue_string_clone(
 			goto on_error;
 		}
 	}
-	( *destination_string )->codepage   = source_string->codepage;
+	( *destination_string )->codepage = source_string->codepage;
 
 	return( 1 );
 
@@ -307,14 +328,18 @@ int libfvalue_string_copy_from_byte_stream(
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_874 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_932 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_936 )
+	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_949 )
+	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_950 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1250 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1251 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1252 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1253 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1254 )
+	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1255 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1256 )
 	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1257 )
-	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1258 ) )
+	 && ( encoding != LIBFVALUE_CODEPAGE_WINDOWS_1258 )
+	 && ( encoding != LIBFVALUE_CODEPAGE_1200_MIXED ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -405,6 +430,16 @@ int libfvalue_string_copy_from_utf8_string_with_index(
 	}
 	switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported encoding.",
+			 function );
+
+			goto on_error;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( libuna_utf16_stream_size_from_utf8(
@@ -675,7 +710,8 @@ int libfvalue_string_get_utf8_string_size(
      libcerror_error_t **error )
 {
 	static char *function = "libfvalue_string_get_utf8_string_size";
-	int byte_order         = 0;
+	int byte_order        = 0;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -718,6 +754,58 @@ int libfvalue_string_get_utf8_string_size(
 	}
 	else switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			if( ( string->data_size % 2 ) == 0 )
+			{
+				result = libuna_utf8_string_size_from_utf16_stream(
+				          string->data,
+				          string->data_size,
+				          LIBFVALUE_ENDIAN_LITTLE,
+				          utf8_string_size,
+				          error );
+
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine UTF-8 string size of UTF-16 stream.",
+					 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+#endif
+					libcerror_error_free(
+					 error );
+				}
+			}
+			if( result != 1 )
+			{
+				if( libuna_utf8_string_size_from_byte_stream(
+				     string->data,
+				     string->data_size,
+				     LIBUNA_CODEPAGE_ASCII,
+				     utf8_string_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine UTF-8 string size of byte stream.",
+					 function );
+
+					return( -1 );
+				}
+			}
+			break;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( string->codepage == LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN )
@@ -844,7 +932,8 @@ int libfvalue_string_copy_to_utf8_string_with_index(
      libcerror_error_t **error )
 {
 	static char *function = "libfvalue_string_copy_to_utf8_string_with_index";
-	int byte_order         = 0;
+	int byte_order        = 0;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -922,6 +1011,62 @@ int libfvalue_string_copy_to_utf8_string_with_index(
 	}
 	else switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			if( ( string->data_size % 2 ) == 0 )
+			{
+				result = libuna_utf8_string_with_index_copy_from_utf16_stream(
+				          utf8_string,
+				          utf8_string_size,
+				          utf8_string_index,
+				          string->data,
+				          string->data_size,
+				          LIBFVALUE_ENDIAN_LITTLE,
+				          error );
+
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+					 "%s: unable to copy UTF-16 stream to UTF-8 string.",
+					 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+#endif
+					libcerror_error_free(
+					 error );
+				}
+			}
+			if( result != 1 )
+			{
+				if( libuna_utf8_string_with_index_copy_from_byte_stream(
+				     utf8_string,
+				     utf8_string_size,
+				     utf8_string_index,
+				     string->data,
+				     string->data_size,
+				     LIBUNA_CODEPAGE_ASCII,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+					 "%s: unable to copy byte stream to UTF-8 string.",
+					 function );
+
+					return( -1 );
+				}
+			}
+			break;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( string->codepage == LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN )
@@ -1119,6 +1264,16 @@ int libfvalue_string_copy_from_utf16_string_with_index(
 	}
 	switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported encoding.",
+			 function );
+
+			goto on_error;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( libuna_utf16_stream_size_from_utf16(
@@ -1389,7 +1544,8 @@ int libfvalue_string_get_utf16_string_size(
      libcerror_error_t **error )
 {
 	static char *function = "libfvalue_string_get_utf16_string_size";
-	int byte_order         = 0;
+	int byte_order        = 0;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -1432,6 +1588,58 @@ int libfvalue_string_get_utf16_string_size(
 	}
 	else switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			if( ( string->data_size % 2 ) == 0 )
+			{
+				result = libuna_utf16_string_size_from_utf16_stream(
+				          string->data,
+				          string->data_size,
+				          LIBFVALUE_ENDIAN_LITTLE,
+				          utf16_string_size,
+				          error );
+
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine UTF-16 string size of UTF-16 stream.",
+					 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+#endif
+					libcerror_error_free(
+					 error );
+				}
+			}
+			if( result != 1 )
+			{
+				if( libuna_utf16_string_size_from_byte_stream(
+				     string->data,
+				     string->data_size,
+				     LIBUNA_CODEPAGE_ASCII,
+				     utf16_string_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine UTF-16 string size of byte stream.",
+					 function );
+
+					return( -1 );
+				}
+			}
+			break;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( string->codepage == LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN )
@@ -1558,7 +1766,8 @@ int libfvalue_string_copy_to_utf16_string_with_index(
      libcerror_error_t **error )
 {
 	static char *function = "libfvalue_string_copy_to_utf16_string_with_index";
-	int byte_order         = 0;
+	int byte_order        = 0;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -1636,6 +1845,62 @@ int libfvalue_string_copy_to_utf16_string_with_index(
 	}
 	else switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			if( ( string->data_size % 2 ) == 0 )
+			{
+				result = libuna_utf16_string_with_index_copy_from_utf16_stream(
+				          utf16_string,
+				          utf16_string_size,
+				          utf16_string_index,
+				          string->data,
+				          string->data_size,
+				          LIBFVALUE_ENDIAN_LITTLE,
+				          error );
+
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+					 "%s: unable to copy UTF-16 stream to UTF-16 string.",
+					 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+#endif
+					libcerror_error_free(
+					 error );
+				}
+			}
+			if( result != 1 )
+			{
+				if( libuna_utf16_string_with_index_copy_from_byte_stream(
+				     utf16_string,
+				     utf16_string_size,
+				     utf16_string_index,
+				     string->data,
+				     string->data_size,
+				     LIBUNA_CODEPAGE_ASCII,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+					 "%s: unable to copy byte stream to UTF-16 string.",
+					 function );
+
+					return( -1 );
+				}
+			}
+			break;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( string->codepage == LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN )
@@ -1833,6 +2098,16 @@ int libfvalue_string_copy_from_utf32_string_with_index(
 	}
 	switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported encoding.",
+			 function );
+
+			goto on_error;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( libuna_utf16_stream_size_from_utf32(
@@ -2103,7 +2378,8 @@ int libfvalue_string_get_utf32_string_size(
      libcerror_error_t **error )
 {
 	static char *function = "libfvalue_string_get_utf32_string_size";
-	int byte_order         = 0;
+	int byte_order        = 0;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -2146,6 +2422,58 @@ int libfvalue_string_get_utf32_string_size(
 	}
 	else switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			if( ( string->data_size % 2 ) == 0 )
+			{
+				result = libuna_utf32_string_size_from_utf16_stream(
+				          string->data,
+				          string->data_size,
+				          LIBFVALUE_ENDIAN_LITTLE,
+				          utf32_string_size,
+				          error );
+
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine UTF-32 string size of UTF-16 stream.",
+					 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+#endif
+					libcerror_error_free(
+					 error );
+				}
+			}
+			if( result != 1 )
+			{
+				if( libuna_utf32_string_size_from_byte_stream(
+				     string->data,
+				     string->data_size,
+				     LIBUNA_CODEPAGE_ASCII,
+				     utf32_string_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine UTF-32 string size of byte stream.",
+					 function );
+
+					return( -1 );
+				}
+			}
+			break;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( string->codepage == LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN )
@@ -2272,7 +2600,8 @@ int libfvalue_string_copy_to_utf32_string_with_index(
      libcerror_error_t **error )
 {
 	static char *function = "libfvalue_string_copy_to_utf32_string_with_index";
-	int byte_order         = 0;
+	int byte_order        = 0;
+	int result            = 0;
 
 	if( string == NULL )
 	{
@@ -2350,6 +2679,62 @@ int libfvalue_string_copy_to_utf32_string_with_index(
 	}
 	else switch( string->codepage )
 	{
+		case LIBFVALUE_CODEPAGE_1200_MIXED:
+			if( ( string->data_size % 2 ) == 0 )
+			{
+				result = libuna_utf32_string_with_index_copy_from_utf16_stream(
+				          utf32_string,
+				          utf32_string_size,
+				          utf32_string_index,
+				          string->data,
+				          string->data_size,
+				          LIBFVALUE_ENDIAN_LITTLE,
+				          error );
+
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+					 "%s: unable to copy UTF-32 stream to UTF-16 string.",
+					 function );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( ( error != NULL )
+					 && ( *error != NULL ) )
+					{
+						libcnotify_print_error_backtrace(
+						 *error );
+					}
+#endif
+					libcerror_error_free(
+					 error );
+				}
+			}
+			if( result != 1 )
+			{
+				if( libuna_utf32_string_with_index_copy_from_byte_stream(
+				     utf32_string,
+				     utf32_string_size,
+				     utf32_string_index,
+				     string->data,
+				     string->data_size,
+				     LIBUNA_CODEPAGE_ASCII,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+					 "%s: unable to copy byte stream to UTF-32 string.",
+					 function );
+
+					return( -1 );
+				}
+			}
+			break;
+
 		case LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN:
 		case LIBFVALUE_CODEPAGE_UTF16_LITTLE_ENDIAN:
 			if( string->codepage == LIBFVALUE_CODEPAGE_UTF16_BIG_ENDIAN )
@@ -2664,8 +3049,7 @@ int libfvalue_utf8_string_split(
 
 		goto on_error;
 	}
-	segment_end = segment_start;
-	string_end  = &( segment_start[ string_size - 1 ] );
+	string_end = &( segment_start[ string_size - 1 ] );
 
 	for( segment_index = 0;
 	     segment_index < number_of_segments;
@@ -2933,8 +3317,7 @@ int libfvalue_utf16_string_split(
 
 		goto on_error;
 	}
-	segment_end = segment_start;
-	string_end  = &( segment_start[ string_size - 1 ] );
+	string_end = &( segment_start[ string_size - 1 ] );
 
 	for( segment_index = 0;
 	     segment_index < number_of_segments;

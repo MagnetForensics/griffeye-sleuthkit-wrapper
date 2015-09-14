@@ -1,7 +1,7 @@
 /*
  * Narrow character string functions
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -28,6 +28,7 @@
 #include "libcsplit_types.h"
 
 /* Splits a narrow character string
+ * Make sure the value split_string is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libcsplit_narrow_string_split(
@@ -216,8 +217,7 @@ int libcsplit_narrow_string_split(
 
 		goto on_error;
 	}
-	segment_end = segment_start;
-	string_end  = &( segment_start[ string_size - 1 ] );
+	string_end = &( segment_start[ string_size - 1 ] );
 
 	for( segment_index = 0;
 	     segment_index < number_of_segments;

@@ -1,7 +1,7 @@
 /*
  * Compression handling functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -567,7 +567,7 @@ int libewf_decompress_data(
 			  (char *) uncompressed_data,
 			  &bzip2_uncompressed_data_size,
 			  (char *) compressed_data,
-			  (uLong) compressed_data_size,
+			  (unsigned int) compressed_data_size,
 			  0,
 			  0 );
 

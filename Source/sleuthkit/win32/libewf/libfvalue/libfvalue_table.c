@@ -1,7 +1,7 @@
 /*
  * Values table functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,7 +33,8 @@
 #include "libfvalue_value.h"
 #include "libfvalue_value_type.h"
 
-/* Initializes the values table
+/* Creates a values table
+ * Make sure the value table is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_table_initialize(
@@ -128,8 +129,9 @@ int libfvalue_table_free(
      libfvalue_table_t **table,
      libcerror_error_t **error )
 {
-	static char *function = "libfvalue_table_free";
-	int result            = 1;
+	libfvalue_internal_table_t *internal_table = NULL;
+	static char *function                      = "libfvalue_table_free";
+	int result                                 = 1;
 
 	if( table == NULL )
 	{
@@ -144,65 +146,26 @@ int libfvalue_table_free(
 	}
 	if( *table != NULL )
 	{
-		if( libfvalue_table_free_as_value(
-		     (intptr_t *) *table,
+		internal_table = (libfvalue_internal_table_t *) *table;
+		*table         = NULL;
+
+		if( libcdata_array_free(
+		     &( internal_table->values ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_value_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free table.",
+			 "%s: unable to free the values array.",
 			 function );
 
 			result = -1;
 		}
-		*table = NULL;
+		memory_free(
+		 internal_table );
 	}
-	return( result );
-}
-
-/* Frees the values table including elements
- * Returns 1 if successful or -1 on error
- */
-int libfvalue_table_free_as_value(
-     intptr_t *table,
-     libcerror_error_t **error )
-{
-	libfvalue_internal_table_t *internal_table = NULL;
-	static char *function                      = "libfvalue_table_free_as_value";
-	int result                                 = 1;
-
-	if( table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid values table.",
-		 function );
-
-		return( -1 );
-	}
-	internal_table = (libfvalue_internal_table_t *) table;
-
-	if( libcdata_array_free(
-	     &( internal_table->values ),
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_value_free,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free the values array.",
-		 function );
-
-		result = -1;
-	}
-	memory_free(
-	 internal_table );
-
 	return( result );
 }
 
@@ -328,6 +291,8 @@ int libfvalue_table_clone(
 
 		return( 1 );
 	}
+	internal_source_table = (libfvalue_internal_table_t *) source_table;
+
 	internal_destination_table = memory_allocate_structure(
 			              libfvalue_internal_table_t );
 
@@ -1100,9 +1065,6 @@ int libfvalue_table_copy_from_utf8_xml_string(
 		 */
 		if( utf8_string[ string_index++ ] != 0x3e )
 		{
-			xml_tag_name        = NULL;
-			xml_tag_name_length = 0;
-
 			continue;
 		}
 		if( ( xml_tag_name == NULL )
@@ -1132,9 +1094,8 @@ int libfvalue_table_copy_from_utf8_xml_string(
 			       xml_tag_name,
 			       xml_tag_name_length ) == 0 ) )
 			{
-				xml_table_name        = NULL;
-				xml_table_name_length = 0;
-				result                = 1;
+				xml_table_name = NULL;
+				result         = 1;
 
 				break;
 			}
@@ -1225,7 +1186,7 @@ int libfvalue_table_copy_from_utf8_xml_string(
 					     value,
 					     value_identifier,
 					     value_identifier_length + 1,
-					     LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED,
+					     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
 					     error ) != 1 )
 					{
 						libcerror_error_set(
@@ -1324,7 +1285,7 @@ int libfvalue_table_copy_from_utf8_xml_string(
 				     (uint8_t *) value_data,
 				     value_data_length + 1,
 				     LIBFVALUE_CODEPAGE_UTF8,
-				     LIBFVALUE_VALUE_FLAG_DATA_MANAGED | LIBFVALUE_VALUE_DATA_FLAG_CLONE_BY_REFERENCE,
+				     LIBFVALUE_VALUE_DATA_FLAG_MANAGED | LIBFVALUE_VALUE_DATA_FLAG_CLONE_BY_REFERENCE,
 				     error ) != 1 )
 				{
 					libcerror_error_set(

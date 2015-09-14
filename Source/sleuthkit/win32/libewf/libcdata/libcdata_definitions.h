@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,11 +35,11 @@
  */
 #else
 
-#define LIBCDATA_VERSION				20130103
+#define LIBCDATA_VERSION				@VERSION@
 
 /* The libcstring version string
  */
-#define LIBCDATA_VERSION_STRING				"20130103"
+#define LIBCDATA_VERSION_STRING				"@VERSION@"
 
 /* The comparison function definitions
  */

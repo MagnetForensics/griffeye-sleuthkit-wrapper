@@ -1,7 +1,7 @@
 /*
  * Definitions for libewf
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,11 +24,11 @@
 
 #include <libewf/types.h>
 
-#define LIBEWF_VERSION						20130331
+#define LIBEWF_VERSION						20150831
 
 /* The version string
  */
-#define LIBEWF_VERSION_STRING					"20130331"
+#define LIBEWF_VERSION_STRING					"20150831"
 
 /* The access flags definitions
  * bit 1	set to 1 for read access
@@ -117,7 +117,7 @@ enum LIBEWF_COMPRESSION_LEVELS
 };
 
 /* The compression flags
- * bit 1	set to 1 for emtpy block compression
+ * bit 1	set to 1 for empty block compression
  *              detects empty blocks and stored them compressed, the compression
  *              is only done once
  * bit 2	set to 1 for pattern fill compression
@@ -153,7 +153,7 @@ enum LIBEWF_MEDIA_FLAGS
 	LIBEWF_MEDIA_FLAG_TABLEAU				= 0x08
 };
 
-#if 0
+#if HAVE_V1_API
 /* The volume type definitions
  */
 enum LIBEWF_VOLUME_TYPES
@@ -188,6 +188,7 @@ enum LIBEWF_DATE_FORMATS
  */
 enum LIBEWF_SEGMENT_FILE_TYPES
 {
+	LIBEWF_SEGMENT_FILE_TYPE_UNDEFINED			= 0,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1				= 1,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART			= 2,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL			= 3,

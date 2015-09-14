@@ -1,7 +1,7 @@
 /*
  * Value functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,6 +25,7 @@
 #include "libfvalue_binary_data.h"
 #include "libfvalue_data_handle.h"
 #include "libfvalue_definitions.h"
+#include "libfvalue_filetime.h"
 #include "libfvalue_floating_point.h"
 #include "libfvalue_integer.h"
 #include "libfvalue_libcerror.h"
@@ -47,7 +48,7 @@
 #include "libfvalue_libfwnt.h"
 #endif
 
-const char *libfvalue_value_type_strings[ 27 ] = {
+const char *libfvalue_value_type_strings[ 28 ] = {
 	NULL,
 
 	"binary-data",
@@ -68,6 +69,8 @@ const char *libfvalue_value_type_strings[ 27 ] = {
 	"float32",
 	"float64",
 
+	"NULL",
+
 	"byte-stream-string",
 	"utf8-string",
 	"utf16-string",
@@ -86,7 +89,7 @@ const char *libfvalue_value_type_strings[ 27 ] = {
 	"nt-sid",
 };
 
-const char *libfvalue_value_type_descriptions[ 27 ] = {
+const char *libfvalue_value_type_descriptions[ 28 ] = {
 	NULL,
 
 	"Binary data",
@@ -107,6 +110,8 @@ const char *libfvalue_value_type_descriptions[ 27 ] = {
 	"Floating point 32-bit (single precision)",
 	"Floating point 64-bit (double precision)",
 
+	"Null (None)",
+
 	"Byte stream string",
 	"UTF-8 string",
 	"UTF-16 string",
@@ -125,7 +130,8 @@ const char *libfvalue_value_type_descriptions[ 27 ] = {
 	"NT Security Identifier (SID)",
 };
 
-/* Initialize a value of a specific type
+/* Creates a value of a specific type
+ * Make sure the value value is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_value_type_initialize(
@@ -133,36 +139,13 @@ int libfvalue_value_type_initialize(
      int type,
      libcerror_error_t **error )
 {
-	libfvalue_data_handle_t *data_handle = NULL;
-	static char *function                = "libfvalue_value_type_initialize";
+	static char *function = "libfvalue_value_type_initialize";
 
-	if( libfvalue_data_handle_initialize(
-	     &data_handle,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create data handle.",
-		 function );
-
-		goto on_error;
-	}
 	if( libfvalue_value_type_initialize_with_data_handle(
 	     value,
 	     type,
-	     (intptr_t *) data_handle,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_data_handle_free,
-	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libfvalue_data_handle_clone,
-
-	     (int (*)(intptr_t *, uint8_t **, size_t *, int *, libcerror_error_t **)) &libfvalue_data_handle_get_data,
-	     (int (*)(intptr_t *, const uint8_t *, size_t, int, uint8_t, libcerror_error_t **)) &libfvalue_data_handle_set_data,
-
-	     (int (*)(intptr_t *, int *, libcerror_error_t **)) &libfvalue_data_handle_get_number_of_value_entries,
-	     (int (*)(intptr_t *, int, uint8_t **, size_t *, int *, libcerror_error_t **)) &libfvalue_data_handle_get_value_entry,
-	     (int (*)(intptr_t *, int, const uint8_t *, size_t, int, libcerror_error_t **)) &libfvalue_data_handle_set_value_entry,
-	     (int (*)(intptr_t *, int *, const uint8_t *, size_t, int, libcerror_error_t **)) &libfvalue_data_handle_append_value_entry,
+	     NULL,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -172,18 +155,9 @@ int libfvalue_value_type_initialize(
 		 "%s: unable to create value with data handle.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	return( 1 );
-
-on_error:
-	if( data_handle != NULL )
-	{
-		libfvalue_data_handle_free(
-		 &data_handle,
-		 NULL );
-	}
-	return( -1 );
 }
 
 /* Initialize a value of a specific type with a custom data handle
@@ -192,52 +166,8 @@ on_error:
 int libfvalue_value_type_initialize_with_data_handle(
      libfvalue_value_t **value,
      int type,
-     intptr_t *data_handle,
-     int (*free_data_handle)(
-           intptr_t **data_handle,
-           libcerror_error_t **error ),
-     int (*clone_data_handle)(
-           intptr_t **destination_data_handle,
-           intptr_t *source_data_handle,
-           libcerror_error_t **error ),
-     int (*get_data)(
-           intptr_t *data_handle,
-           uint8_t **data,
-           size_t *data_size,
-           int *encoding,
-           libcerror_error_t **error ),
-     int (*set_data)(
-           intptr_t *data_handle,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           uint8_t flags,
-           libcerror_error_t **error ),
-     int (*get_number_of_value_entries)(
-           intptr_t *data_handle,
-           int *number_of_value_entries,
-           libcerror_error_t **error ),
-     int (*get_value_entry)(
-           intptr_t *data_handle,
-           int value_entry_index,
-           uint8_t **data,
-           size_t *data_size,
-           int *encoding,
-           libcerror_error_t **error ),
-     int (*set_value_entry)(
-           intptr_t *data_handle,
-           int value_entry_index,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           libcerror_error_t **error ),
-     int (*append_value_entry)(
-           intptr_t *data_handle,
-           int *value_entry_index,
-           const uint8_t *data,
-           size_t data_size,
-           int encoding,
-           libcerror_error_t **error ),
+     libfvalue_data_handle_t *data_handle,
+     uint8_t flags,
      libcerror_error_t **error )
 {
 	static char *function = "libfvalue_value_type_initialize_with_data_handle";
@@ -263,16 +193,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_binary_data_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_binary_data_free,
@@ -288,17 +208,18 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          NULL,
 
 			          NULL,
-			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_get_string_size,
+			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_get_utf8_string_size,
 			          (int (*)(intptr_t *, uint8_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_copy_to_utf8_string_with_index,
 
 			          NULL,
-			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_get_string_size,
+			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_get_utf16_string_size,
 			          (int (*)(intptr_t *, uint16_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_copy_to_utf16_string_with_index,
 
 			          NULL,
-			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_get_string_size,
+			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_get_utf32_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_binary_data_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 
@@ -310,16 +231,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_floating_point_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_floating_point_free,
@@ -331,8 +242,8 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, uint64_t, size_t, libcerror_error_t **)) &libfvalue_floating_point_copy_from_integer,
 			          (int (*)(intptr_t *, uint64_t *, size_t *, libcerror_error_t **)) &libfvalue_floating_point_copy_to_integer,
 
-			          NULL,
-			          NULL,
+			          (int (*)(intptr_t *, double, size_t, libcerror_error_t **)) &libfvalue_floating_point_copy_from_floating_point,
+			          (int (*)(intptr_t *, double *, size_t *, libcerror_error_t **)) &libfvalue_floating_point_copy_to_floating_point,
 
 			          (int (*)(intptr_t *, const uint8_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_floating_point_copy_from_utf8_string_with_index,
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_floating_point_get_string_size,
@@ -346,6 +257,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_floating_point_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_floating_point_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 
@@ -364,16 +276,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_integer_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_integer_free,
@@ -400,6 +302,44 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_integer_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_integer_copy_to_utf32_string_with_index,
 
+			          flags,
+			          error );
+			break;
+
+		case LIBFVALUE_VALUE_TYPE_NULL:
+			result = libfvalue_value_initialize(
+			          value,
+			          libfvalue_value_type_strings[ type ],
+			          libfvalue_value_type_descriptions[ type ],
+
+			          data_handle,
+
+			          NULL,
+			          NULL,
+			          NULL,
+
+			          NULL,
+			          NULL,
+
+			          NULL,
+			          NULL,
+
+			          NULL,
+			          NULL,
+
+			          NULL,
+			          NULL,
+			          NULL,
+
+			          NULL,
+			          NULL,
+			          NULL,
+
+			          NULL,
+			          NULL,
+			          NULL,
+
+			          flags,
 			          error );
 			break;
 
@@ -413,16 +353,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_string_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfvalue_string_free,
@@ -449,6 +379,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_string_get_utf32_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfvalue_string_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 
@@ -460,16 +391,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_fat_date_time_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_fat_date_time_free,
@@ -496,6 +417,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_fat_date_time_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_fat_date_time_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 
@@ -506,16 +428,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_filetime_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_filetime_free,
@@ -524,8 +436,8 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, const uint8_t *, size_t, int, libcerror_error_t **)) &libfdatetime_filetime_copy_from_byte_stream,
 			          NULL,
 
-			          NULL,
-			          NULL,
+			          (int (*)(intptr_t *, uint64_t, size_t, libcerror_error_t **)) &libfvalue_filetime_copy_from_integer,
+			          (int (*)(intptr_t *, uint64_t *, size_t *, libcerror_error_t **)) &libfvalue_filetime_copy_to_integer,
 
 			          NULL,
 			          NULL,
@@ -542,6 +454,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_filetime_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_filetime_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 
@@ -552,16 +465,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_floatingtime_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_floatingtime_free,
@@ -588,6 +491,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_floatingtime_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_floatingtime_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 
@@ -598,16 +502,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_nsf_timedate_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_nsf_timedate_free,
@@ -634,6 +528,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_nsf_timedate_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_nsf_timedate_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 
@@ -644,16 +539,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_posix_time_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_posix_time_free,
@@ -680,6 +565,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_posix_time_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_posix_time_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 
@@ -690,16 +576,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_systemtime_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfdatetime_systemtime_free,
@@ -726,6 +602,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_systemtime_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfdatetime_systemtime_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 #endif
@@ -737,16 +614,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfguid_identifier_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfguid_identifier_free,
@@ -773,6 +640,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfguid_identifier_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfguid_identifier_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 #endif
@@ -784,16 +652,6 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          libfvalue_value_type_descriptions[ type ],
 
 			          data_handle,
-			          free_data_handle,
-			          clone_data_handle,
-
-			          get_data,
-			          set_data,
-
-			          get_number_of_value_entries,
-			          get_value_entry,
-			          set_value_entry,
-			          append_value_entry,
 
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfwnt_security_identifier_initialize,
 			          (int (*)(intptr_t **, libcerror_error_t **)) &libfwnt_security_identifier_free,
@@ -820,6 +678,7 @@ int libfvalue_value_type_initialize_with_data_handle(
 			          (int (*)(intptr_t *, size_t *, uint32_t, libcerror_error_t **)) &libfwnt_security_identifier_get_string_size,
 			          (int (*)(intptr_t *, uint32_t *, size_t, size_t *, uint32_t, libcerror_error_t **)) &libfwnt_security_identifier_copy_to_utf32_string_with_index,
 
+			          flags,
 			          error );
 			break;
 #endif
@@ -904,6 +763,17 @@ ssize_t libfvalue_value_type_get_string_size(
 
 		return( -1 );
 	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( data != NULL )
 	{
 		if( ( internal_value->type == LIBFVALUE_VALUE_TYPE_STRING_BYTE_STREAM )
@@ -922,7 +792,18 @@ ssize_t libfvalue_value_type_get_string_size(
 		}
 		else if( internal_value->type == LIBFVALUE_VALUE_TYPE_STRING_UTF16 )
 		{
-			while( ( data_index + 1 ) < data_size )
+			if( data_size < 2 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 "%s: invalid data size value too small.",
+				 function );
+
+				return( -1 );
+			}
+			while( data_index <= ( data_size - 2 ) )
 			{
 				if( ( data[ data_index ] == 0 )
 				 && ( data[ data_index + 1 ] == 0 ) )
@@ -936,7 +817,18 @@ ssize_t libfvalue_value_type_get_string_size(
 		}
 		else if( internal_value->type == LIBFVALUE_VALUE_TYPE_STRING_UTF32 )
 		{
-			while( ( data_index + 3 ) < data_size )
+			if( data_size < 4 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 "%s: invalid data size value too small.",
+				 function );
+
+				return( -1 );
+			}
+			while( data_index <= ( data_size - 4 ) )
 			{
 				if( ( data[ data_index ] == 0 )
 				 && ( data[ data_index + 1 ] == 0 )
@@ -1144,6 +1036,12 @@ ssize_t libfvalue_value_type_set_data_strings_array(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
+			libcnotify_printf(
+			 "%s: strings array value entry: %d data offset: 0x%08" PRIzx "\n",
+			 function,
+			 value_entry_index, 
+			 last_data_index );
+
 			libcnotify_printf(
 			 "%s: strings array value entry: %d data:\n",
 			 function,

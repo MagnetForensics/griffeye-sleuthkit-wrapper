@@ -1,7 +1,7 @@
 /*
  * The internal inline definition
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -27,7 +27,7 @@
 #if defined( _MSC_VER )
 #define LIBUNA_INLINE _inline
 
-#elif defined( __BORLANDC__ ) || defined( __clang__ )
+#elif defined( __BORLANDC__ ) || defined( __clang__ ) || ( defined( __GNUC__ ) && __GNUC__ >= 5 )
 #define LIBUNA_INLINE /* inline */
 
 #else

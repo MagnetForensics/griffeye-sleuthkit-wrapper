@@ -1,7 +1,7 @@
 /*
  * The internal type definitions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,9 +33,15 @@
 
 /* The following type definitions hide internal data structures
  */
+#if defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI )
+typedef struct libsmraw_handle {}	libsmraw_handle_t;
+
+#else
 typedef intptr_t libsmraw_handle_t;
 
 #endif
+
+#endif /* defined( HAVE_LOCAL_LIBSMRAW ) */
 
 #endif
 

@@ -12,6 +12,7 @@
 
     using Directory = SleuthKit.Directory;
     using File = SleuthKit.File;
+    using SleuthKit.Structs;
 
     /// <summary>
     ///     This is a test class for DiskImageTest and is intended
@@ -51,21 +52,6 @@
 
             // empty the list 
             FilePaths.Clear();
-        }
-
-        /// <summary>
-        ///     A test for GetFileSystems
-        /// </summary>
-        [Test]
-        public void GetFileSystemsTest()
-        {
-            IEnumerable<FileSystem> actual = this.diskImage.GetFileSystems();
-            IEnumerable<FileSystem> fileSystems = actual as FileSystem[] ?? actual.ToArray();
-            Assert.AreEqual(3, fileSystems.Count());
-            foreach (FileSystem fileSystem in fileSystems)
-            {
-                fileSystem.Dispose();
-            }
         }
 
         /// <summary>
@@ -168,6 +154,12 @@
                 int count = 0;
                 foreach (Volume volume in volumeSystem.Volumes)
                 {
+                    if (volume.Description == "Primary Table (#0)" ||
+                        volume.Description == "Unallocated")
+                    {
+                        continue;
+                    }
+
                     using (FileSystem fileSystem = volume.OpenFileSystem())
                     {
                         //count += CountFiles(fileSystem.OpenRootDirectory());
@@ -221,7 +213,7 @@
         [SetUp]
         public void SetUpDiskImageTests()
         {
-            var file = new FileInfo(ConfigurationManager.AppSettings["E01Path"]);
+            var file = new FileInfo(@"\\philadelphia\TestShare\Sleuthkit Wrapper\USB-disk-image-FAT.E01");
             this.diskImage = new DiskImage(file);
         }
 
@@ -266,7 +258,7 @@
         ///     Value to control the directory walk.
         /// </returns>
         private static WalkReturnEnum FileCount_DirectoryWalkCallback(
-            ref FileStruct file,
+            ref TSK_FS_FILE file,
             string directoryPath,
             IntPtr dataPtr)
         {
@@ -294,7 +286,7 @@
         ///     Value to control the directory walk.
         /// </returns>
         private static WalkReturnEnum FindFiles_DirectoryWalkCallback(
-            ref FileStruct file,
+            ref TSK_FS_FILE file,
             string directoryPath,
             IntPtr dataPtr)
         {

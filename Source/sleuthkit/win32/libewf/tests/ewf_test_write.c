@@ -1,7 +1,7 @@
 /*
  * Expert Witness Compression Format (EWF) library write testing program
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -42,7 +42,7 @@
  * Return 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_write(
-     const char *filename,
+     const libcstring_system_character_t *filename,
      size64_t media_size,
      size64_t maximum_segment_size,
      int8_t compression_level,

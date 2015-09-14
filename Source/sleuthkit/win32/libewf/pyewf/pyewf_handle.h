@@ -2,7 +2,7 @@
  * Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,6 +26,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "pyewf_libbfio.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libewf.h"
 #include "pyewf_python.h"
@@ -45,6 +46,10 @@ struct pyewf_handle
 	/* The libewf handle
 	 */
 	libewf_handle_t *handle;
+
+	/* The file IO pool
+	 */
+	libbfio_pool_t *file_io_pool;
 };
 
 extern PyMethodDef pyewf_handle_object_methods[];
@@ -58,7 +63,10 @@ PyObject *pyewf_handle_new_open(
            PyObject *arguments,
            PyObject *keywords );
 
-/* TODO new open file pool - list of file objects */
+PyObject *pyewf_handle_new_open_file_objects(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
 
 int pyewf_handle_init(
      pyewf_handle_t *pyewf_handle );
@@ -67,22 +75,29 @@ void pyewf_handle_free(
       pyewf_handle_t *pyewf_handle );
 
 PyObject *pyewf_handle_signal_abort(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 PyObject *pyewf_handle_open(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
 
+PyObject *pyewf_handle_open_file_objects(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments,
+           PyObject *keywords );
+
 PyObject *pyewf_handle_close(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 PyObject *pyewf_handle_read_buffer(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyewf_handle_read_random(
+PyObject *pyewf_handle_read_buffer_at_offset(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
@@ -92,7 +107,7 @@ PyObject *pyewf_handle_write_buffer(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyewf_handle_write_random(
+PyObject *pyewf_handle_write_buffer_at_offset(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
@@ -103,10 +118,12 @@ PyObject *pyewf_handle_seek_offset(
            PyObject *keywords );
 
 PyObject *pyewf_handle_get_offset(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 PyObject *pyewf_handle_get_root_file_entry(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 #if defined( __cplusplus )
 }

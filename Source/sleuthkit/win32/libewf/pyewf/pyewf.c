@@ -2,7 +2,7 @@
  * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -28,6 +28,8 @@
 #endif
 
 #include "pyewf.h"
+#include "pyewf_compression_methods.h"
+#include "pyewf_error.h"
 #include "pyewf_file_entries.h"
 #include "pyewf_file_entry.h"
 #include "pyewf_file_object_io_handle.h"
@@ -35,7 +37,10 @@
 #include "pyewf_libcerror.h"
 #include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
+#include "pyewf_media_flags.h"
+#include "pyewf_media_types.h"
 #include "pyewf_python.h"
+#include "pyewf_unused.h"
 
 #if !defined( LIBEWF_HAVE_BFIO )
 LIBEWF_EXTERN \
@@ -97,11 +102,15 @@ PyMethodDef pyewf_module_methods[] = {
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_get_version(
-           PyObject *self )
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	const char *errors           = NULL;
 	const char *version_string   = NULL;
 	size_t version_string_length = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( self )
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	Py_BEGIN_ALLOW_THREADS
 
@@ -126,83 +135,212 @@ PyObject *pyewf_get_version(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_check_file_signature(
-           PyObject *self,
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+	PyObject *string_object      = NULL;
+	libcerror_error_t *error     = NULL;
+	static char *function        = "pyewf_check_file_signature";
+	static char *keyword_list[]  = { "filename", NULL };
+	const char *filename_narrow  = NULL;
+	int result                   = 0;
 
-	libcerror_error_t *error    = NULL;
-	static char *function       = "pyewf_check_file_signature";
-	static char *keyword_list[] = { "filename", NULL };
-	const char *filename        = NULL;
-	int result                  = 0;
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	const wchar_t *filename_wide = NULL;
+#else
+	PyObject *utf8_string_object = NULL;
+#endif
 
+	PYEWF_UNREFERENCED_PARAMETER( self )
+
+	/* Note that PyArg_ParseTupleAndKeywords with "s" will force Unicode strings to be converted to narrow character string.
+	 * On Windows the narrow character strings contains an extended ASCII string with a codepage. Hence we get a conversion
+	 * exception. This will also fail if the default encoding is not set correctly. We cannot use "u" here either since that
+	 * does not allow us to pass non Unicode string objects and Python (at least 2.7) does not seems to automatically upcast them.
+	 */
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|s",
+	     "|O",
 	     keyword_list,
-	     &filename ) == 0 )
+	     &string_object ) == 0 )
 	{
 		return( NULL );
 	}
-	Py_BEGIN_ALLOW_THREADS
+	PyErr_Clear();
 
-	result = libewf_check_file_signature(
-	          filename,
-	          &error );
-
-	Py_END_ALLOW_THREADS
+	result = PyObject_IsInstance(
+	          string_object,
+	          (PyObject *) &PyUnicode_Type );
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to check file signature.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to check file signature.\n%s",
-			 function,
-			 error_string );
-		}
-		libcerror_error_free(
-		 &error );
+		pyewf_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type unicode.",
+		 function );
 
 		return( NULL );
 	}
-	if( result != 0 )
+	else if( result != 0 )
 	{
-		return( Py_True );
+		PyErr_Clear();
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
+		                             string_object );
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_check_file_signature_wide(
+		          filename_wide,
+		          &error );
+
+		Py_END_ALLOW_THREADS
+#else
+		utf8_string_object = PyUnicode_AsUTF8String(
+		                      string_object );
+
+		if( utf8_string_object == NULL )
+		{
+			pyewf_error_fetch_and_raise(
+			 PyExc_RuntimeError,
+			 "%s: unable to convert unicode string to UTF-8.",
+			 function );
+
+			return( NULL );
+		}
+#if PY_MAJOR_VERSION >= 3
+		filename_narrow = PyBytes_AsString(
+				   utf8_string_object );
+#else
+		filename_narrow = PyString_AsString(
+				   utf8_string_object );
+#endif
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_check_file_signature(
+		          filename_narrow,
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		Py_DecRef(
+		 utf8_string_object );
+#endif
+		if( result == -1 )
+		{
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to check file signature.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+		if( result != 0 )
+		{
+			Py_IncRef(
+			 (PyObject *) Py_True );
+
+			return( Py_True );
+		}
+		Py_IncRef(
+		 (PyObject *) Py_False );
+
+		return( Py_False );
 	}
-	return( Py_False );
+	PyErr_Clear();
+
+#if PY_MAJOR_VERSION >= 3
+	result = PyObject_IsInstance(
+		  string_object,
+		  (PyObject *) &PyBytes_Type );
+#else
+	result = PyObject_IsInstance(
+		  string_object,
+		  (PyObject *) &PyString_Type );
+#endif
+	if( result == -1 )
+	{
+		pyewf_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type string.",
+		 function );
+
+		return( NULL );
+	}
+	else if( result != 0 )
+	{
+		PyErr_Clear();
+
+#if PY_MAJOR_VERSION >= 3
+		filename_narrow = PyBytes_AsString(
+				   string_object );
+#else
+		filename_narrow = PyString_AsString(
+				   string_object );
+#endif
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_check_file_signature(
+		          filename_narrow,
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result == -1 )
+		{
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to check file signature.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+		if( result != 0 )
+		{
+			Py_IncRef(
+			 (PyObject *) Py_True );
+
+			return( Py_True );
+		}
+		Py_IncRef(
+		 (PyObject *) Py_False );
+
+		return( Py_False );
+	}
+	PyErr_Format(
+	 PyExc_TypeError,
+	 "%s: unsupported string object type.",
+	 function );
+
+	return( NULL );
 }
 
 /* Checks if the file has a Windows Event Log (EWF) file signature using a file-like object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_check_file_signature_file_object(
-           PyObject *self,
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error         = NULL;
 	libbfio_handle_t *file_io_handle = NULL;
 	PyObject *file_object            = NULL;
 	static char *function            = "pyewf_check_file_signature_file_object";
 	static char *keyword_list[]      = { "file_object", NULL };
 	int result                       = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( self )
 
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
@@ -218,24 +356,12 @@ PyObject *pyewf_check_file_signature_file_object(
 	     file_object,
 	     &error ) != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to initialize file IO handle.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to initialize file IO handle.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_MemoryError,
+		 "%s: unable to initialize file IO handle.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
@@ -251,24 +377,12 @@ PyObject *pyewf_check_file_signature_file_object(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to check file signature.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to check file signature.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to check file signature.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
@@ -278,24 +392,12 @@ PyObject *pyewf_check_file_signature_file_object(
 	     &file_io_handle,
 	     &error ) != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to free file IO handle.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to free file IO handle.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_MemoryError,
+		 "%s: unable to free file IO handle.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
@@ -303,8 +405,14 @@ PyObject *pyewf_check_file_signature_file_object(
 	}
 	if( result != 0 )
 	{
+		Py_IncRef(
+		 (PyObject *) Py_True );
+
 		return( Py_True );
 	}
+	Py_IncRef(
+	 (PyObject *) Py_False );
+
 	return( Py_False );
 
 on_error:
@@ -321,188 +429,457 @@ on_error:
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_glob(
-           PyObject *self,
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+	char **filenames_narrow          = NULL;
+	libcerror_error_t *error         = NULL;
+	PyObject *filename_string_object = NULL;
+	PyObject *list_object            = NULL;
+	PyObject *string_object          = NULL;
+	static char *function            = "pyewf_glob";
+	static char *keyword_list[]      = { "filename", NULL };
+	const char *errors               = NULL;
+	const char *filename_narrow      = NULL;
+	size_t filename_length           = 0;
+	int filename_index               = 0;
+	int number_of_filenames          = 0;
+	int result                       = 0;
 
-	char **filenames            = NULL;
-	libcerror_error_t *error     = NULL;
-	PyObject *list_object       = NULL;
-	PyObject *string_object     = NULL;
-	static char *function       = "pyewf_glob";
-	static char *keyword_list[] = { "filename", NULL };
-	const char *errors          = NULL;
-	const char *filename        = NULL;
-	size_t filename_length      = 0;
-	int filename_index          = 0;
-	int number_of_filenames     = 0;
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	wchar_t **filenames_wide         = NULL;
+	const wchar_t *filename_wide     = NULL;
+#else
+	PyObject *utf8_string_object     = NULL;
+#endif
 
+	PYEWF_UNREFERENCED_PARAMETER( self )
+
+	/* Note that PyArg_ParseTupleAndKeywords with "s" will force Unicode strings to be converted to narrow character string.
+	 * On Windows the narrow character strings contains an extended ASCII string with a codepage. Hence we get a conversion
+	 * exception. We cannot use "u" here either since that does not allow us to pass non Unicode string objects and
+	 * Python (at least 2.7) does not seems to automatically upcast them.
+	 */
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|s",
+	     "|O",
 	     keyword_list,
-	     &filename ) == 0 )
+	     &string_object ) == 0 )
 	{
 		return( NULL );
 	}
-	filename_length = libcstring_narrow_string_length(
-	                   filename );
+	PyErr_Clear();
 
-	if( libewf_glob(
-	     filename,
-	     filename_length,
-	     LIBEWF_FORMAT_UNKNOWN,
-	     &filenames,
-	     &number_of_filenames,
-	     &error ) != 1 )
+	result = PyObject_IsInstance(
+	          string_object,
+	          (PyObject *) &PyUnicode_Type );
+
+	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
+		pyewf_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type unicode.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		PyErr_Clear();
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
+		                             string_object );
+
+		filename_length = libcstring_wide_string_length(
+		                   filename_wide );
+
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_glob_wide(
+			  filename_wide,
+			  filename_length,
+			  LIBEWF_FORMAT_UNKNOWN,
+			  &filenames_wide,
+			  &number_of_filenames,
+			  &error );
+
+		Py_END_ALLOW_THREADS
+#else
+		utf8_string_object = PyUnicode_AsUTF8String(
+		                      string_object );
+
+		if( utf8_string_object == NULL )
 		{
-			PyErr_Format(
+			pyewf_error_fetch_and_raise(
+			 PyExc_RuntimeError,
+			 "%s: unable to convert unicode string to UTF-8.",
+			 function );
+
+			return( NULL );
+		}
+#if PY_MAJOR_VERSION >= 3
+		filename_narrow = PyBytes_AsString(
+				   utf8_string_object );
+#else
+		filename_narrow = PyString_AsString(
+				   utf8_string_object );
+#endif
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_glob(
+			  filename_narrow,
+			  filename_length,
+			  LIBEWF_FORMAT_UNKNOWN,
+			  &filenames_narrow,
+			  &number_of_filenames,
+			  &error );
+
+		Py_END_ALLOW_THREADS
+
+		Py_DecRef(
+		 utf8_string_object );
+#endif
+		if( result != 1 )
+		{
+			pyewf_error_raise(
+			 error,
 			 PyExc_IOError,
 			 "%s: unable to glob filenames.",
 			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			goto on_error;
 		}
-		else
+		list_object = PyList_New(
+			       (Py_ssize_t) number_of_filenames );
+
+		for( filename_index = 0;
+		     filename_index < number_of_filenames;
+		     filename_index++ )
 		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to glob filenames.\n%s",
-			 function,
-			 error_string );
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			filename_length = libcstring_wide_string_length(
+					   filenames_wide[ filename_index ] );
+
+			filename_string_object = PyUnicode_FromWideChar(
+						  filenames_wide[ filename_index ],
+						  filename_length );
+#else
+			filename_length = libcstring_narrow_string_length(
+			                   filenames_narrow[ filename_index ] );
+
+			/* Pass the string length to PyUnicode_DecodeUTF8
+			 * otherwise it makes the end of string character is part
+			 * of the string
+			 */
+			filename_string_object = PyUnicode_DecodeUTF8(
+			                          filenames_narrow[ filename_index ],
+			                          filename_length,
+			                          errors );
+#endif
+			if( filename_string_object == NULL )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to convert filename: %d into Unicode.",
+				 function,
+				 filename_index );
+
+				goto on_error;
+			}
+			if( PyList_SetItem(
+			     list_object,
+			     (Py_ssize_t) filename_index,
+			     filename_string_object ) != 0 )
+			{
+				PyErr_Format(
+				 PyExc_MemoryError,
+				 "%s: unable to set filename: %d in list.",
+				 function,
+				 filename_index );
+
+				goto on_error;
+			}
+			filename_string_object = NULL;
 		}
-		libcerror_error_free(
-		 &error );
+		Py_BEGIN_ALLOW_THREADS
 
-		return( NULL );
-	}
-	list_object = PyList_New(
-	               (Py_ssize_t) number_of_filenames );
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_glob_wide_free(
+			  filenames_wide,
+			  number_of_filenames,
+			  &error );
+#else
+		result = libewf_glob_free(
+			  filenames_narrow,
+			  number_of_filenames,
+			  &error );
+#endif
 
-	for( filename_index = 0;
-	     filename_index < number_of_filenames;
-	     filename_index++ )
-	{
-		filename_length = libcstring_narrow_string_length(
-		                   filenames[ filename_index ] );
+		Py_END_ALLOW_THREADS
 
-		/* Pass the string length to PyUnicode_DecodeUTF8
-		 * otherwise it makes the end of string character is part
-		 * of the string
-		 */
-		string_object = PyUnicode_DecodeUTF8(
-		                 filenames[ filename_index ],
-		                 filename_length,
-		                 errors );
-
-		if( string_object == NULL )
+		if( result != 1 )
 		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to convert UTF-8 filename: %d into Unicode.",
-			 function,
-			 filename_index );
-
-			libewf_glob_free(
-			 filenames,
-			 number_of_filenames,
-			 NULL );
-
-			Py_DecRef(
-			 list_object );
-
-			return( NULL );
-		}
-		if( PyList_SetItem(
-		     list_object,
-		     (Py_ssize_t) filename_index,
-		     string_object ) != 0 )
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to set filename: %d in list.",
-			 function,
-			 filename_index );
-
-			libewf_glob_free(
-			 filenames,
-			 number_of_filenames,
-			 NULL );
-
-			Py_DecRef(
-			 string_object );
-			Py_DecRef(
-			 list_object );
-
-			return( NULL );
-		}
-	}
-	if( libewf_glob_free(
-	     filenames,
-	     number_of_filenames,
-	     &error ) != 1 )
-	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
+			pyewf_error_raise(
+			 error,
 			 PyExc_MemoryError,
 			 "%s: unable to free globbed filenames.",
 			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to free globbed filenames.\n%s",
-			 function,
-			 error_string );
-		}
-		libcerror_error_free(
-		 &error );
 
+			libcerror_error_free(
+			 &error );
+
+			goto on_error;
+		}
+		return( list_object );
+	}
+	PyErr_Clear();
+
+#if PY_MAJOR_VERSION >= 3
+	result = PyObject_IsInstance(
+		  string_object,
+		  (PyObject *) &PyBytes_Type );
+#else
+	result = PyObject_IsInstance(
+		  string_object,
+		  (PyObject *) &PyString_Type );
+#endif
+	if( result == -1 )
+	{
+		pyewf_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type string.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		PyErr_Clear();
+
+#if PY_MAJOR_VERSION >= 3
+		filename_narrow = PyBytes_AsString(
+				   string_object );
+#else
+		filename_narrow = PyString_AsString(
+				   string_object );
+#endif
+		filename_length = libcstring_narrow_string_length(
+		                   filename_narrow );
+
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_glob(
+			  filename_narrow,
+			  filename_length,
+			  LIBEWF_FORMAT_UNKNOWN,
+			  &filenames_narrow,
+			  &number_of_filenames,
+			  &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to glob filenames.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			goto on_error;
+		}
+		list_object = PyList_New(
+			       (Py_ssize_t) number_of_filenames );
+
+		for( filename_index = 0;
+		     filename_index < number_of_filenames;
+		     filename_index++ )
+		{
+			filename_length = libcstring_narrow_string_length(
+					   filenames_narrow[ filename_index ] );
+
+			filename_string_object = PyUnicode_Decode(
+						  filenames_narrow[ filename_index ],
+						  filename_length,
+						  PyUnicode_GetDefaultEncoding(),
+						  errors );
+
+			if( filename_string_object == NULL )
+			{
+				PyErr_Format(
+				 PyExc_IOError,
+				 "%s: unable to convert filename: %d into Unicode.",
+				 function,
+				 filename_index );
+
+				goto on_error;
+			}
+			if( PyList_SetItem(
+			     list_object,
+			     (Py_ssize_t) filename_index,
+			     filename_string_object ) != 0 )
+			{
+				PyErr_Format(
+				 PyExc_MemoryError,
+				 "%s: unable to set filename: %d in list.",
+				 function,
+				 filename_index );
+
+				goto on_error;
+			}
+			filename_string_object = NULL;
+		}
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_glob_free(
+			  filenames_narrow,
+			  number_of_filenames,
+			  &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyewf_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free globbed filenames.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			goto on_error;
+		}
+		return( list_object );
+	}
+	PyErr_Format(
+	 PyExc_TypeError,
+	 "%s: unsupported string object type",
+	 function );
+
+on_error:
+	if( filename_string_object != NULL )
+	{
+		Py_DecRef(
+		 filename_string_object );
+	}
+	if( list_object != NULL )
+	{
 		Py_DecRef(
 		 list_object );
-
-		return( NULL );
 	}
-	return( list_object );
+	if( filenames_narrow != NULL )
+	{
+		Py_BEGIN_ALLOW_THREADS
+
+		libewf_glob_free(
+		 filenames_narrow,
+		 number_of_filenames,
+		 NULL );
+
+		Py_END_ALLOW_THREADS
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( filenames_wide != NULL )
+	{
+		Py_BEGIN_ALLOW_THREADS
+
+		libewf_glob_wide_free(
+		 filenames_wide,
+		 number_of_filenames,
+		 NULL );
+
+		Py_END_ALLOW_THREADS
+	}
+#endif
+	return( NULL );
 }
 
-/* Declarations for DLL import/export
+#if PY_MAJOR_VERSION >= 3
+
+/* The pyewf module definition
  */
-#ifndef PyMODINIT_FUNC
-#define PyMODINIT_FUNC void
-#endif
+PyModuleDef pyewf_module_definition = {
+	PyModuleDef_HEAD_INIT,
+
+	/* m_name */
+	"pyewf",
+	/* m_doc */
+	"Python libewf module (pyewf).",
+	/* m_size */
+	-1,
+	/* m_methods */
+	pyewf_module_methods,
+	/* m_reload */
+	NULL,
+	/* m_traverse */
+	NULL,
+	/* m_clear */
+	NULL,
+	/* m_free */
+	NULL,
+};
+
+#endif /* PY_MAJOR_VERSION >= 3 */
 
 /* Initializes the pyewf module
  */
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit_pyewf(
+                void )
+#else
 PyMODINIT_FUNC initpyewf(
                 void )
+#endif
 {
-	PyObject *module                       = NULL;
-	PyTypeObject *file_entries_type_object = NULL;
-	PyTypeObject *file_entry_type_object   = NULL;
-	PyTypeObject *handle_type_object       = NULL;
-	PyGILState_STATE gil_state             = 0;
+	PyObject *module                              = NULL;
+	PyTypeObject *compression_methods_type_object = NULL;
+	PyTypeObject *file_entries_type_object        = NULL;
+	PyTypeObject *file_entry_type_object          = NULL;
+	PyTypeObject *handle_type_object              = NULL;
+	PyTypeObject *media_flags_type_object         = NULL;
+	PyTypeObject *media_types_type_object         = NULL;
+	PyGILState_STATE gil_state                    = 0;
 
-        /* Create the module
+#if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+	libewf_notify_set_verbose(
+	 1 );
+#endif
+
+	/* Create the module
 	 * This function must be called before grabbing the GIL
 	 * otherwise the module will segfault on a version mismatch
 	 */
+#if PY_MAJOR_VERSION >= 3
+	module = PyModule_Create(
+	          &pyewf_module_definition );
+#else
 	module = Py_InitModule3(
 	          "pyewf",
 	          pyewf_module_methods,
 	          "Python libewf module (pyewf)." );
-
+#endif
+	if( module == NULL )
+	{
+#if PY_MAJOR_VERSION >= 3
+		return( NULL );
+#else
+		return;
+#endif
+	}
 	PyEval_InitThreads();
 
 	gil_state = PyGILState_Ensure();
@@ -526,6 +903,78 @@ PyMODINIT_FUNC initpyewf(
 	 "handle",
 	 (PyObject *) handle_type_object );
 
+	/* Setup the compression methods type object
+	 */
+	pyewf_compression_methods_type_object.tp_new = PyType_GenericNew;
+
+	if( pyewf_compression_methods_init_type(
+	     &pyewf_compression_methods_type_object ) != 1 )
+	{
+		goto on_error;
+	}
+	if( PyType_Ready(
+	     &pyewf_compression_methods_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyewf_compression_methods_type_object );
+
+	compression_methods_type_object = &pyewf_compression_methods_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "compression_methods",
+	 (PyObject *) compression_methods_type_object );
+
+	/* Setup the media types type object
+	 */
+	pyewf_media_types_type_object.tp_new = PyType_GenericNew;
+
+	if( pyewf_media_types_init_type(
+	     &pyewf_media_types_type_object ) != 1 )
+	{
+		goto on_error;
+	}
+	if( PyType_Ready(
+	     &pyewf_media_types_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyewf_media_types_type_object );
+
+	media_types_type_object = &pyewf_media_types_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "media_types",
+	 (PyObject *) media_types_type_object );
+
+	/* Setup the media flags type object
+	 */
+	pyewf_media_flags_type_object.tp_new = PyType_GenericNew;
+
+	if( pyewf_media_flags_init_type(
+	     &pyewf_media_flags_type_object ) != 1 )
+	{
+		goto on_error;
+	}
+	if( PyType_Ready(
+	     &pyewf_media_flags_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyewf_media_flags_type_object );
+
+	media_flags_type_object = &pyewf_media_flags_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "media_flags",
+	 (PyObject *) media_flags_type_object );
+
 	/* Setup the file entry type object
 	 */
 	pyewf_file_entry_type_object.tp_new = PyType_GenericNew;
@@ -542,8 +991,8 @@ PyMODINIT_FUNC initpyewf(
 
 	PyModule_AddObject(
 	 module,
-	"file_entry",
-	(PyObject *) file_entry_type_object );
+	 "file_entry",
+	 (PyObject *) file_entry_type_object );
 
 	/* Setup the file entries type object
 	 */
@@ -561,11 +1010,26 @@ PyMODINIT_FUNC initpyewf(
 
 	PyModule_AddObject(
 	 module,
-	"_file_entries",
-	(PyObject *) file_entries_type_object );
+	 "_file_entries",
+	 (PyObject *) file_entries_type_object );
+
+	PyGILState_Release(
+	 gil_state );
+
+#if PY_MAJOR_VERSION >= 3
+	return( module );
+#else
+	return;
+#endif
 
 on_error:
 	PyGILState_Release(
 	 gil_state );
+
+#if PY_MAJOR_VERSION >= 3
+	return( NULL );
+#else
+	return;
+#endif
 }
 

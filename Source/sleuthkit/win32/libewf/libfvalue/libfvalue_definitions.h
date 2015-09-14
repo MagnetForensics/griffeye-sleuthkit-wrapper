@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -36,17 +36,56 @@
 #else
 #include <byte_stream.h>
 
-#define LIBFVALUE_VERSION					20121214
+#define LIBFVALUE_VERSION					@VERSION@
 
 /* The libfvalue version string
  */
-#define LIBFVALUE_VERSION_STRING				"20121214"
+#define LIBFVALUE_VERSION_STRING				"@VERSION@"
 
 /* The endian definitions
  */
 #define LIBFVALUE_ENDIAN_BIG					_BYTE_STREAM_ENDIAN_BIG
 #define LIBFVALUE_ENDIAN_LITTLE					_BYTE_STREAM_ENDIAN_LITTLE
 #define LIBFVALUE_ENDIAN_NATIVE					(uint8_t) 'n'
+
+/* The value flags definitions
+ */
+enum LIBFVALUE_VALUE_FLAGS
+{
+	/* The data handle is not managed by the value
+	 * the data handle is expected to be available
+	 * during the life-time of the value
+	 */
+        LIBFVALUE_VALUE_FLAG_DATA_HANDLE_NON_MANAGED		= 0x00,
+
+	/* The data handle is managed by the value
+	 */
+        LIBFVALUE_VALUE_FLAG_DATA_HANDLE_MANAGED		= 0x01,
+
+	/* The identifier is not managed by the value
+	 * the identifier is expected to be available
+	 * during the life-time of the value
+	 */
+        LIBFVALUE_VALUE_FLAG_IDENTIFIER_NON_MANAGED		= 0x00,
+
+	/* The identifier is managed by the value
+	 */
+        LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED			= 0x02,
+
+	/* The data is not managed by the value
+	 * the data is expected to be available
+	 * during the life-time of the value
+	 */
+        LIBFVALUE_VALUE_FLAG_DATA_NON_MANAGED			= 0x00,
+
+	/* The data is managed by the value
+	 */
+        LIBFVALUE_VALUE_FLAG_DATA_MANAGED			= 0x04,
+
+	/* The value has a runtime instance of the value type
+	 */
+	LIBFVALUE_VALUE_FLAG_HAS_RUNTIME_INSTANCE		= 0x08,
+};
 
 /* The value identifier flags definitions
  */
@@ -117,6 +156,8 @@ enum LIBFVALUE_VALUE_CLASSES
 enum LIBFVALUE_VALUE_TYPES
 {
 	LIBFVALUE_VALUE_TYPE_UNDEFINED				= 0,
+
+	LIBFVALUE_VALUE_TYPE_NULL,
 
 	LIBFVALUE_VALUE_TYPE_BINARY_DATA,
 
@@ -284,35 +325,6 @@ enum LIBFVALUE_PRINT_FLAGS
 };
 
 #endif
-
-/* The value flags definitions
- */
-enum LIBFVALUE_VALUE_FLAGS
-{
-	/* The identifier is not managed by the value
-	 * the identifier is expected to be available
-	 * during the life-time of the value
-	 */
-        LIBFVALUE_VALUE_FLAG_IDENTIFIER_NON_MANAGED		= 0x00,
-
-	/* The identifier is managed by the value
-	 */
-        LIBFVALUE_VALUE_FLAG_IDENTIFIER_MANAGED			= 0x01,
-
-	/* The data is not managed by the value
-	 * the data is expected to be available
-	 * during the life-time of the value
-	 */
-        LIBFVALUE_VALUE_FLAG_DATA_NON_MANAGED			= 0x00,
-
-	/* The data is managed by the value
-	 */
-        LIBFVALUE_VALUE_FLAG_DATA_MANAGED			= 0x02,
-
-	/* The value has a runtime instance of the value type
-	 */
-	LIBFVALUE_VALUE_FLAG_HAS_RUNTIME_INSTANCE		= 0x10,
-};
 
 #endif
 

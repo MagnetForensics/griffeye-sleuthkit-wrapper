@@ -1,7 +1,7 @@
 /*
  * Integer value functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -28,7 +28,8 @@
 #include "libfvalue_integer.h"
 #include "libfvalue_libcerror.h"
 
-/* Initialize an integer
+/* Creates an integer
+ * Make sure the value integer is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libfvalue_integer_initialize(

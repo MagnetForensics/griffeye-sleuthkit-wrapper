@@ -1,7 +1,7 @@
 /*
  * Export media data from EWF files to a file
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -29,6 +29,10 @@
 
 #if defined( HAVE_SYS_RESOURCE_H )
 #include <sys/resource.h>
+#endif
+
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
 #endif
 
 #include "byte_size_string.h"
@@ -108,7 +112,7 @@ void usage_fprint(
 	                 "                 [ -B number_of_bytes ] [ -c compression_values ]\n"
 	                 "                 [ -d digest_type ] [ -f format ] [ -l log_filename ]\n"
 	                 "                 [ -o offset ] [ -p process_buffer_size ]\n"
-	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
+	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVwx ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
@@ -172,6 +176,8 @@ void usage_fprint(
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 	fprintf( stream, "\t-w:        zero sectors on checksum error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-x:        use the chunk data instead of the buffered read and write\n"
+	                 "\t           functions.\n" );
 }
 
 /* Signal handler for ewfexport
@@ -226,11 +232,11 @@ int main( int argc, char * const argv[] )
 #endif
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
 
-	libcstring_system_character_t * const *argv_filenames         = NULL;
+	libcstring_system_character_t * const *source_filenames       = NULL;
 
 	libcerror_error_t *error                                       = NULL;
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	libcsystem_glob_t *glob                                        = NULL;
 #endif
 
@@ -255,6 +261,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                                         = 1;
 	uint8_t print_status_information                              = 1;
 	uint8_t swap_byte_pairs                                       = 0;
+	uint8_t use_chunk_data_functions                              = 0;
 	uint8_t verbose                                               = 0;
 	uint8_t zero_chunk_on_error                                   = 0;
 	int interactive_mode                                          = 1;
@@ -318,7 +325,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVwx" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -437,6 +444,11 @@ int main( int argc, char * const argv[] )
 				zero_chunk_on_error = 1;
 
 				break;
+
+			case (libcstring_system_integer_t) 'x':
+				use_chunk_data_functions = 1;
+
+				break;
 		}
 	}
 	if( optind == argc )
@@ -469,7 +481,7 @@ int main( int argc, char * const argv[] )
 	 NULL );
 #endif
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
@@ -492,16 +504,27 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	argv_filenames      = glob->result;
-	number_of_filenames = glob->number_of_results;
+	if( libcsystem_glob_get_results(
+	     glob,
+	     &number_of_filenames,
+	     (libcstring_system_character_t ***) &source_filenames,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve glob results.\n" );
+
+		goto on_error;
+	}
 #else
-	argv_filenames      = &( argv[ optind ] );
+	source_filenames    = &( argv[ optind ] );
 	number_of_filenames = argc - optind;
 #endif
 
 	if( export_handle_initialize(
 	     &ewfexport_export_handle,
 	     calculate_md5,
+	     use_chunk_data_functions,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -554,7 +577,7 @@ int main( int argc, char * const argv[] )
 	}
 	result = export_handle_open_input(
 	          ewfexport_export_handle,
-	          argv_filenames,
+	          source_filenames,
 	          number_of_filenames,
 	          &error );
 
@@ -570,7 +593,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
@@ -1316,7 +1339,7 @@ on_error:
 		 &ewfexport_export_handle,
 		 NULL );
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( glob != NULL )
 	{
 		libcsystem_glob_free(

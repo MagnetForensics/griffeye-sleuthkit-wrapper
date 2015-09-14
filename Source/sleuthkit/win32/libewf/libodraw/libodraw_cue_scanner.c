@@ -1,6 +1,6 @@
-#line 2 "libodraw_cue_scanner.c"
+#line 2 "lex.yy.c"
 
-#line 4 "libodraw_cue_scanner.c"
+#line 4 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -28,7 +28,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 39
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -53,7 +53,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types.
+ * if you want the limit (max/min) macros for int types. 
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -70,10 +70,9 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t;
+typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
-#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -103,6 +102,8 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+
+#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -172,7 +173,12 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-extern int cue_scanner_leng;
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
+extern yy_size_t cue_scanner_leng;
 
 extern FILE *cue_scanner_in, *cue_scanner_out;
 
@@ -181,7 +187,8 @@ extern FILE *cue_scanner_in, *cue_scanner_out;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
-
+    #define YY_LINENO_REWIND_TO(ptr)
+    
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
 	do \
@@ -197,11 +204,6 @@ extern FILE *cue_scanner_in, *cue_scanner_out;
 	while ( 0 )
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
-
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
@@ -220,7 +222,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	int yy_n_chars;
+	yy_size_t yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -243,7 +245,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-
+    
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -290,8 +292,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when cue_scanner_text is formed. */
 static char yy_hold_char;
-static int yy_n_chars;		/* number of characters read into yy_ch_buf */
-int cue_scanner_leng;
+static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
+yy_size_t cue_scanner_leng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -319,7 +321,7 @@ static void cue_scanner__init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE cue_scanner__scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE cue_scanner__scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE cue_scanner__scan_bytes (yyconst char *bytes,int len  );
+YY_BUFFER_STATE cue_scanner__scan_bytes (yyconst char *bytes,yy_size_t len  );
 
 void *cue_scanner_alloc (yy_size_t  );
 void *cue_scanner_realloc (void *,yy_size_t  );
@@ -363,6 +365,7 @@ int cue_scanner_lineno = 1;
 
 extern char *cue_scanner_text;
 #define yytext_ptr cue_scanner_text
+
 static yyconst flex_int16_t yy_nxt[][256] =
     {
     {
@@ -8845,14 +8848,14 @@ int cue_scanner__flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *cue_scanner_text;
-#line 1 "libodraw_cue_scanner.l"
+#line 1 "libodraw/libodraw_cue_scanner.l"
 #define YY_NO_INPUT 1
 #define YY_NO_UNISTD_H 1
-#line 7 "libodraw_cue_scanner.l"
+#line 7 "libodraw/libodraw_cue_scanner.l"
 /*
  * CUE scanner functions
  *
- * Copyright (c) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -8860,12 +8863,12 @@ char *cue_scanner_text;
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -8894,7 +8897,7 @@ size_t cue_scanner_buffer_offset = 0;
 /* The catalog number is a 13 digit number */
 /* The ISRC code is a 12 character value, first 5 are alpha numeric, last 7 are numeric */
 /* The MSF consists of mm:ss:ff (minutes:seconds:frames) */
-#line 8898 "libodraw_cue_scanner.c"
+#line 8901 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -8933,7 +8936,7 @@ FILE *cue_scanner_get_out (void );
 
 void cue_scanner_set_out  (FILE * out_str  );
 
-int cue_scanner_get_leng (void );
+yy_size_t cue_scanner_get_leng (void );
 
 char *cue_scanner_get_text (void );
 
@@ -8992,7 +8995,7 @@ static int input (void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		unsigned n; \
+		size_t n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( cue_scanner_in )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -9073,12 +9076,7 @@ YY_DECL
 	register yy_state_type yy_current_state;
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
-
-#line 74 "libodraw_cue_scanner.l"
-
-
-#line 9081 "libodraw_cue_scanner.c"
-
+    
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -9104,6 +9102,12 @@ YY_DECL
 
 		cue_scanner__load_buffer_state( );
 		}
+
+	{
+#line 74 "libodraw/libodraw_cue_scanner.l"
+
+
+#line 9111 "lex.yy.c"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -9150,7 +9154,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 76 "libodraw_cue_scanner.l"
+#line 76 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "CATALOG" );
@@ -9160,7 +9164,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 83 "libodraw_cue_scanner.l"
+#line 83 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "CDTEXTFILE" );
@@ -9170,7 +9174,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 90 "libodraw_cue_scanner.l"
+#line 90 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "FILE" );
@@ -9180,7 +9184,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 97 "libodraw_cue_scanner.l"
+#line 97 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "FLAGS" );
@@ -9190,7 +9194,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 104 "libodraw_cue_scanner.l"
+#line 104 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "INDEX" );
@@ -9200,7 +9204,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 111 "libodraw_cue_scanner.l"
+#line 111 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "ISRC" );
@@ -9210,7 +9214,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 118 "libodraw_cue_scanner.l"
+#line 118 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "POSTGAP" );
@@ -9220,7 +9224,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 125 "libodraw_cue_scanner.l"
+#line 125 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "PREGAP" );
@@ -9230,7 +9234,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 132 "libodraw_cue_scanner.l"
+#line 132 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "TRACK" );
@@ -9240,7 +9244,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 139 "libodraw_cue_scanner.l"
+#line 139 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "ARRANGER" );
@@ -9250,7 +9254,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 146 "libodraw_cue_scanner.l"
+#line 146 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "COMPOSER" );
@@ -9260,7 +9264,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 153 "libodraw_cue_scanner.l"
+#line 153 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "DISC_ID" );
@@ -9270,7 +9274,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 160 "libodraw_cue_scanner.l"
+#line 160 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "GENRE" );
@@ -9280,7 +9284,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 167 "libodraw_cue_scanner.l"
+#line 167 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "MESSAGE" );
@@ -9290,7 +9294,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 174 "libodraw_cue_scanner.l"
+#line 174 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "PERFORMER" );
@@ -9300,7 +9304,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 181 "libodraw_cue_scanner.l"
+#line 181 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "SIZE_INFO" );
@@ -9310,7 +9314,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 188 "libodraw_cue_scanner.l"
+#line 188 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "SONGWRITER" );
@@ -9320,7 +9324,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 195 "libodraw_cue_scanner.l"
+#line 195 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "TITLE" );
@@ -9330,7 +9334,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 202 "libodraw_cue_scanner.l"
+#line 202 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "TOC_INFO1" );
@@ -9340,7 +9344,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 209 "libodraw_cue_scanner.l"
+#line 209 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "TOC_INFO2" );
@@ -9350,7 +9354,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 216 "libodraw_cue_scanner.l"
+#line 216 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "UPC_EAN" );
@@ -9360,7 +9364,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 223 "libodraw_cue_scanner.l"
+#line 223 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "REM LEAD-OUT" );
@@ -9370,7 +9374,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 230 "libodraw_cue_scanner.l"
+#line 230 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "REM ORIGINAL MEDIA-TYPE" );
@@ -9380,7 +9384,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 237 "libodraw_cue_scanner.l"
+#line 237 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "REM RUN-OUT" );
@@ -9390,7 +9394,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 244 "libodraw_cue_scanner.l"
+#line 244 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "REM SESSION" );
@@ -9400,7 +9404,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 251 "libodraw_cue_scanner.l"
+#line 251 "libodraw/libodraw_cue_scanner.l"
 {
 	/* BEGIN( REM ); */
 
@@ -9412,7 +9416,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 260 "libodraw_cue_scanner.l"
+#line 260 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "cue_catalog_number" );
@@ -9425,7 +9429,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 270 "libodraw_cue_scanner.l"
+#line 270 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "cue_isrc_code" );
@@ -9438,7 +9442,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 280 "libodraw_cue_scanner.l"
+#line 280 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "cue_msf" );
@@ -9451,7 +9455,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 290 "libodraw_cue_scanner.l"
+#line 290 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "cue_2digit" );
@@ -9464,7 +9468,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 300 "libodraw_cue_scanner.l"
+#line 300 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "cue_keyword" );
@@ -9477,13 +9481,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 310 "libodraw_cue_scanner.l"
+#line 310 "libodraw/libodraw_cue_scanner.l"
 ;
 	YY_BREAK
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
-#line 312 "libodraw_cue_scanner.l"
+#line 312 "libodraw/libodraw_cue_scanner.l"
 {
 	return( CUE_END_OF_LINE );
 }
@@ -9491,7 +9495,7 @@ YY_RULE_SETUP
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 316 "libodraw_cue_scanner.l"
+#line 316 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "string" );
@@ -9511,7 +9515,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 333 "libodraw_cue_scanner.l"
+#line 333 "libodraw/libodraw_cue_scanner.l"
 {
 	cue_scanner_token_print(
 	 "string" );
@@ -9524,15 +9528,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 343 "libodraw_cue_scanner.l"
+#line 343 "libodraw/libodraw_cue_scanner.l"
 ;
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 345 "libodraw_cue_scanner.l"
+#line 345 "libodraw/libodraw_cue_scanner.l"
 ECHO;
 	YY_BREAK
-#line 9536 "libodraw_cue_scanner.c"
+#line 9540 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -9663,6 +9667,7 @@ case YY_STATE_EOF(INITIAL):
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of cue_scanner_lex */
 
 /* yy_get_next_buffer - try to read in a new buffer
@@ -9718,21 +9723,21 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
 
 			int yy_c_buf_p_offset =
 				(int) ((yy_c_buf_p) - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				int new_size = b->yy_buf_size * 2;
+				yy_size_t new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -9763,7 +9768,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), (size_t) num_to_read );
+			(yy_n_chars), num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -9810,7 +9815,7 @@ static int yy_get_next_buffer (void)
 {
 	register yy_state_type yy_current_state;
 	register char *yy_cp;
-
+    
 	yy_current_state = (yy_start);
 
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
@@ -9853,7 +9858,7 @@ static int yy_get_next_buffer (void)
 			}
 		}
 
-	return yy_is_jam ? 0 : yy_current_state;
+		return yy_is_jam ? 0 : yy_current_state;
 }
 
 #ifndef YY_NO_INPUT
@@ -9865,7 +9870,7 @@ static int yy_get_next_buffer (void)
 
 {
 	int c;
-
+    
 	*(yy_c_buf_p) = (yy_hold_char);
 
 	if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
@@ -9880,7 +9885,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			int offset = (yy_c_buf_p) - (yytext_ptr);
+			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -9932,12 +9937,12 @@ static int yy_get_next_buffer (void)
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- *
+ * 
  * @note This function does not reset the start condition to @c INITIAL .
  */
     void cue_scanner_restart  (FILE * input_file )
 {
-
+    
 	if ( ! YY_CURRENT_BUFFER ){
         cue_scanner_ensure_buffer_stack ();
 		YY_CURRENT_BUFFER_LVALUE =
@@ -9950,11 +9955,11 @@ static int yy_get_next_buffer (void)
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- *
+ * 
  */
     void cue_scanner__switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
-
+    
 	/* TODO. We should be able to replace this entire function body
 	 * with
 	 *		cue_scanner_pop_buffer_state();
@@ -9994,13 +9999,13 @@ static void cue_scanner__load_buffer_state  (void)
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- *
+ * 
  * @return the allocated buffer state.
  */
     YY_BUFFER_STATE cue_scanner__create_buffer  (FILE * file, int  size )
 {
 	YY_BUFFER_STATE b;
-
+    
 	b = (YY_BUFFER_STATE) cue_scanner_alloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in cue_scanner__create_buffer()" );
@@ -10023,11 +10028,11 @@ static void cue_scanner__load_buffer_state  (void)
 
 /** Destroy the buffer.
  * @param b a buffer created with cue_scanner__create_buffer()
- *
+ * 
  */
     void cue_scanner__delete_buffer (YY_BUFFER_STATE  b )
 {
-
+    
 	if ( ! b )
 		return;
 
@@ -10048,7 +10053,7 @@ static void cue_scanner__load_buffer_state  (void)
 
 {
 	int oerrno = errno;
-
+    
 	cue_scanner__flush_buffer(b );
 
 	b->yy_input_file = file;
@@ -10064,13 +10069,13 @@ static void cue_scanner__load_buffer_state  (void)
     }
 
         b->yy_is_interactive = 0;
-
+    
 	errno = oerrno;
 }
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- *
+ * 
  */
     void cue_scanner__flush_buffer (YY_BUFFER_STATE  b )
 {
@@ -10099,7 +10104,7 @@ static void cue_scanner__load_buffer_state  (void)
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *
+ *  
  */
 void cue_scanner_push_buffer_state (YY_BUFFER_STATE new_buffer )
 {
@@ -10129,7 +10134,7 @@ void cue_scanner_push_buffer_state (YY_BUFFER_STATE new_buffer )
 
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *
+ *  
  */
 void cue_scanner_pop_buffer_state (void)
 {
@@ -10152,8 +10157,8 @@ void cue_scanner_pop_buffer_state (void)
  */
 static void cue_scanner_ensure_buffer_stack (void)
 {
-	int num_to_alloc;
-
+	yy_size_t num_to_alloc;
+    
 	if (!(yy_buffer_stack)) {
 
 		/* First allocation is just for 2 elements, since we don't know if this
@@ -10166,7 +10171,7 @@ static void cue_scanner_ensure_buffer_stack (void)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in cue_scanner_ensure_buffer_stack()" );
-								
+								  
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
 				
 		(yy_buffer_stack_max) = num_to_alloc;
@@ -10196,13 +10201,13 @@ static void cue_scanner_ensure_buffer_stack (void)
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
- *
- * @return the newly allocated buffer state object.
+ * 
+ * @return the newly allocated buffer state object. 
  */
 YY_BUFFER_STATE cue_scanner__scan_buffer  (char * base, yy_size_t  size )
 {
 	YY_BUFFER_STATE b;
-
+    
 	if ( size < 2 ||
 	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
 	     base[size-1] != YY_END_OF_BUFFER_CHAR )
@@ -10231,31 +10236,31 @@ YY_BUFFER_STATE cue_scanner__scan_buffer  (char * base, yy_size_t  size )
 /** Setup the input buffer state to scan a string. The next call to cue_scanner_lex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
- *
+ * 
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       cue_scanner__scan_bytes() instead.
  */
 YY_BUFFER_STATE cue_scanner__scan_string (yyconst char * yystr )
 {
-
+    
 	return cue_scanner__scan_bytes(yystr,strlen(yystr) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to cue_scanner_lex() will
  * scan from a @e copy of @a bytes.
- * @param bytes the byte buffer to scan
- * @param len the number of bytes in the buffer pointed to by @a bytes.
- *
+ * @param yybytes the byte buffer to scan
+ * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
+ * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE cue_scanner__scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
+YY_BUFFER_STATE cue_scanner__scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
-
+	yy_size_t i;
+    
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
 	buf = (char *) cue_scanner_alloc(n  );
@@ -10309,16 +10314,16 @@ static void yy_fatal_error (yyconst char* msg )
 /* Accessor  methods (get/set functions) to struct members. */
 
 /** Get the current line number.
- *
+ * 
  */
 int cue_scanner_get_lineno  (void)
 {
-
+        
     return cue_scanner_lineno;
 }
 
 /** Get the input stream.
- *
+ * 
  */
 FILE *cue_scanner_get_in  (void)
 {
@@ -10326,7 +10331,7 @@ FILE *cue_scanner_get_in  (void)
 }
 
 /** Get the output stream.
- *
+ * 
  */
 FILE *cue_scanner_get_out  (void)
 {
@@ -10334,15 +10339,15 @@ FILE *cue_scanner_get_out  (void)
 }
 
 /** Get the length of the current token.
- *
+ * 
  */
-int cue_scanner_get_leng  (void)
+yy_size_t cue_scanner_get_leng  (void)
 {
         return cue_scanner_leng;
 }
 
 /** Get the current token.
- *
+ * 
  */
 
 char *cue_scanner_get_text  (void)
@@ -10352,18 +10357,18 @@ char *cue_scanner_get_text  (void)
 
 /** Set the current line number.
  * @param line_number
- *
+ * 
  */
 void cue_scanner_set_lineno (int  line_number )
 {
-
+    
     cue_scanner_lineno = line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param in_str A readable stream.
- *
+ * 
  * @see cue_scanner__switch_to_buffer
  */
 void cue_scanner_set_in (FILE *  in_str )
@@ -10417,7 +10422,7 @@ static int yy_init_globals (void)
 /* cue_scanner_lex_destroy is for both reentrant and non-reentrant scanners. */
 int cue_scanner_lex_destroy  (void)
 {
-
+    
     /* Pop the buffer stack, destroying each element. */
 	while(YY_CURRENT_BUFFER){
 		cue_scanner__delete_buffer(YY_CURRENT_BUFFER  );
@@ -10462,7 +10467,7 @@ static int yy_flex_strlen (yyconst char * s )
 
 #define YYTABLES_NAME "yytables"
 
-#line 345 "libodraw_cue_scanner.l"
+#line 345 "libodraw/libodraw_cue_scanner.l"
 
 
 
@@ -10496,17 +10501,18 @@ int cue_scanner_wrap(
 }
 
 void cue_scanner_error(
+      void *parser_state,
       const char *error_string )
 {
 	if( cue_scanner_suppress_error == 0 )
 	{
 	        fprintf(
         	 stderr,
-	         "%s at token: %s (offset: %" PRIzd " size: %d)\n",
+	         "%s at token: %s (offset: %" PRIzd " size: %" PRIzd ")\n",
         	 error_string,
 	         cue_scanner_text,
 	         cue_scanner_buffer_offset - (size_t) cue_scanner_leng,
-	         cue_scanner_leng );
+	         (size_t) cue_scanner_leng );
 	}
 }
 

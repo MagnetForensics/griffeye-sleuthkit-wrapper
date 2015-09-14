@@ -1,7 +1,7 @@
 /*
  * Device handle
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -102,7 +102,7 @@ struct device_handle
 
 	/* libsmraw input handle
 	 */
-	libsmdev_handle_t *smraw_input_handle;
+	libsmraw_handle_t *smraw_input_handle;
 
 	/* The number of error retries
 	 */

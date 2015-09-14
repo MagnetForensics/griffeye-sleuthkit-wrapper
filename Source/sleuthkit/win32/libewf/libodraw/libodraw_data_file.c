@@ -1,7 +1,7 @@
 /*
  * Data file functions
  *
- * Copyright (C) 2010-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,8 +30,8 @@
 #include "libodraw_libuna.h"
 #include "libodraw_types.h"
 
-/* Initialize a data file
- * Make sure the value data_file is pointing to is set to NULL
+/* Creates a data file
+ * Make sure the value data_file is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libodraw_data_file_initialize(
@@ -71,7 +71,7 @@ int libodraw_data_file_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );

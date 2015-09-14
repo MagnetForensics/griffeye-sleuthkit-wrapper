@@ -1,7 +1,7 @@
 /*
  * Hash values functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,9 +31,8 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 
-#include "ewf_definitions.h"
-
-/* Initializes the hash values
+/* Creates hash values
+ * Make sure the value hash_values is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_initialize(

@@ -24,6 +24,9 @@
     <ClCompile Include="..\..\libfvalue\libfvalue_error.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libfvalue\libfvalue_filetime.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\libfvalue\libfvalue_floating_point.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libfvalue\libfvalue_extern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libfvalue\libfvalue_filetime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libfvalue\libfvalue_floating_point.h">

@@ -1,7 +1,7 @@
 /*
- * Expert Witness Compression Format (EWF) library seek offset testing program
+ * Library seek testing program
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -28,6 +28,7 @@
 #include <stdio.h>
 
 #include "ewf_test_libcerror.h"
+#include "ewf_test_libcnotify.h"
 #include "ewf_test_libcstring.h"
 #include "ewf_test_libewf.h"
 
@@ -35,21 +36,24 @@
 #define EWF_TEST_SEEK_VERBOSE
  */
 
-/* Tests seeking an offset
+/* Tests libewf_handle_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_seek_offset(
      libewf_handle_t *handle,
      off64_t input_offset,
      int input_whence,
-     off64_t expected_offset )
+     off64_t output_offset )
 {
-	libcerror_error_t *error  = NULL;
 	const char *whence_string = NULL;
-	static char *function     = "ewf_test_seek_offset";
+	libcerror_error_t *error  = NULL;
 	off64_t result_offset     = 0;
 	int result                = 0;
 
+	if( handle == NULL )
+	{
+		return( -1 );
+	}
 	if( input_whence == SEEK_CUR )
 	{
 		whence_string = "SEEK_CUR";
@@ -78,28 +82,17 @@ int ewf_test_seek_offset(
 	                 input_whence,
 	                 &error );
 
-	if( result_offset != expected_offset )
+	if( result_offset == -1 )
 	{
-		if( result_offset == -1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek offset: %" PRIi64 ".",
-			 function,
-			 input_offset );
+		libewf_error_backtrace_fprint(
+		 error,
+		 stderr );
 
-			result = -1;
-		}
+		libewf_error_free(
+		 &error );
 	}
-	else
+	if( result_offset == output_offset )
 	{
-		if( result_offset == -1 )
-		{
-			libcerror_error_free(
-			 &error );
-		}
 		result = 1;
 	}
 	if( result != 0 )
@@ -118,97 +111,21 @@ int ewf_test_seek_offset(
 	 stdout,
 	 "\n" );
 
-	if( result == -1 )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
-
-		libcerror_error_free(
-		 &error );
-	}
-	else if( result == 0 )
-	{
-		fprintf(
-		 stdout,
-		 "%s: unexpected result offset: %" PRIi64 "\n",
-		 function,
-		 result_offset );
-	}
 	return( result );
 }
 
-/* The main program
+/* Tests seeking in a handle
+ * Returns 1 if successful, 0 if not or -1 on error
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] )
-#else
-int main( int argc, char * const argv[] )
-#endif
+int ewf_handle_test_seek(
+     libewf_handle_t *handle,
+     size64_t media_size )
 {
-	libcerror_error_t *error = NULL;
-	libewf_handle_t *handle  = NULL;
-	size64_t media_size      = 0;
+	int result = 0;
 
-	if( argc < 2 )
+	if( handle == NULL )
 	{
-		fprintf(
-		 stderr,
-		 "Missing filename(s).\n" );
-
-		return( EXIT_FAILURE );
-	}
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_SEEK_VERBOSE )
-	libewf_notify_set_verbose(
-	 1 );
-	libewf_notify_set_stream(
-	 stderr,
-	 NULL );
-#endif
-	/* Initialization
-	 */
-	if( libewf_handle_initialize(
-	     &handle,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to create handle.\n" );
-
-		goto on_error;
-	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libewf_handle_open_wide(
-	     handle,
-	     &( argv[ 1 ] ),
-	     argc - 1,
-	     LIBEWF_OPEN_READ,
-	     &error ) != 1 )
-#else
-	if( libewf_handle_open(
-	     handle,
-	     &( argv[ 1 ] ),
-	     argc - 1,
-	     LIBEWF_OPEN_READ,
-	     &error ) != 1 )
-#endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to open file(s).\n" );
-
-		goto on_error;
-	}
-	if( libewf_handle_get_media_size(
-	     handle,
-	     &media_size,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve media size.\n" );
-
-		goto on_error;
+		return( -1 );
 	}
 	if( media_size > (size64_t) INT64_MAX )
 	{
@@ -216,22 +133,24 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Media size exceeds maximum.\n" );
 
-		goto on_error;
+		return( -1 );
 	}
 	/* Test: SEEK_SET offset: 0
 	 * Expected result: 0
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     0,
-	     SEEK_SET,
-	     0 ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          0,
+	          SEEK_SET,
+	          0 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_SET offset: <media_size>
 	 * Expected result: <media_size>
@@ -246,7 +165,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_SET offset: <media_size / 5>
 	 * Expected result: <media_size / 5>
@@ -261,7 +180,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_SET offset: <media_size + 987>
 	 * Expected result: <media_size + 987>
@@ -276,7 +195,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_SET offset: -987
 	 * Expected result: -1
@@ -291,7 +210,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_CUR offset: 0
 	 * Expected result: <media_size + 987>
@@ -306,7 +225,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_CUR offset: <-1 * (media_size + 987)>
 	 * Expected result: 0
@@ -321,7 +240,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_CUR offset: <media_size / 3>
 	 * Expected result: <media_size / 3>
@@ -336,7 +255,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	if( media_size == 0 )
 	{
@@ -353,7 +272,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test seek offset.\n" );
 
-			goto on_error;
+			return( result );
 		}
 	}
 	else
@@ -371,7 +290,7 @@ int main( int argc, char * const argv[] )
 			 stderr,
 			 "Unable to test seek offset.\n" );
 
-			goto on_error;
+			return( result );
 		}
 	}
 	/* Test: SEEK_END offset: 0
@@ -387,7 +306,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_END offset: <-1 * media_size>
 	 * Expected result: 0
@@ -402,7 +321,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_END offset: <-1 * (media_size / 4)>
 	 * Expected result: <media_size - (media_size / 4)>
@@ -417,7 +336,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_END offset: 542
 	 * Expected result: <media_size + 542>
@@ -432,7 +351,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: SEEK_END offset: <-1 * (media_size + 542)>
 	 * Expected result: -1
@@ -447,7 +366,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
-		goto on_error;
+		return( result );
 	}
 	/* Test: UNKNOWN (88) offset: 0
 	 * Expected result: -1
@@ -462,6 +381,135 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to test seek offset.\n" );
 
+		return( result );
+	}
+	return( result );
+}
+
+/* The main program
+ */
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+int wmain( int argc, wchar_t * const argv[] )
+#else
+int main( int argc, char * const argv[] )
+#endif
+{
+	libcstring_system_character_t **filenames = NULL;
+	libewf_error_t *error                     = NULL;
+	libewf_handle_t *handle                   = NULL;
+	size64_t media_size                       = 0;
+	int number_of_filenames                   = 0;
+
+	if( argc < 2 )
+	{
+		fprintf(
+		 stderr,
+		 "Missing filename(s).\n" );
+
+		return( EXIT_FAILURE );
+	}
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_SEEK_VERBOSE )
+	libewf_notify_set_verbose(
+	 1 );
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libewf_glob_wide(
+	     argv[ 1 ],
+	     libcstring_wide_string_length(
+	      argv[ 1 ] ),
+	     LIBEWF_FORMAT_UNKNOWN,
+	     &filenames,
+	     &number_of_filenames,
+	     &error ) != 1 )
+#else
+	if( libewf_glob(
+	     argv[ 1 ],
+	     libcstring_narrow_string_length(
+	      argv[ 1 ] ),
+	     LIBEWF_FORMAT_UNKNOWN,
+	     &filenames,
+	     &number_of_filenames,
+	     &error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to glob filenames.\n" );
+
+		goto on_error;
+	}
+	if( number_of_filenames < 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Invalid number of filenames.\n" );
+
+		goto on_error;
+	}
+	else if( number_of_filenames == 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Missing filenames.\n" );
+
+		goto on_error;
+	}
+	/* Initialization
+	 */
+	if( libewf_handle_initialize(
+	     &handle,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create handle.\n" );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libewf_handle_open_wide(
+	     handle,
+	     filenames,
+	     number_of_filenames,
+	     LIBEWF_OPEN_READ,
+	     &error ) != 1 )
+#else
+	if( libewf_handle_open(
+	     handle,
+	     filenames,
+	     number_of_filenames,
+	     LIBEWF_OPEN_READ,
+	     &error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to open handle.\n" );
+
+		goto on_error;
+	}
+	if( libewf_handle_get_media_size(
+	     handle,
+	     &media_size,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve media size.\n" );
+
+		goto on_error;
+	}
+	if( ewf_handle_test_seek(
+	     handle,
+	     media_size ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to seek in handle.\n" );
+
 		goto on_error;
 	}
 	/* Clean up
@@ -472,7 +520,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to close file(s).\n" );
+		 "Unable to close handle.\n" );
 
 		goto on_error;
 	}
@@ -483,6 +531,24 @@ int main( int argc, char * const argv[] )
 		fprintf(
 		 stderr,
 		 "Unable to free handle.\n" );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libewf_glob_wide_free(
+	     filenames,
+	     number_of_filenames,
+	     &error ) != 1 )
+#else
+	if( libewf_glob_free(
+	     filenames,
+	     number_of_filenames,
+	     &error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free glob.\n" );
 
 		goto on_error;
 	}
@@ -505,6 +571,20 @@ on_error:
 		libewf_handle_free(
 		 &handle,
 		 NULL );
+	}
+	if( filenames != NULL )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libewf_glob_wide_free(
+		 filenames,
+		 number_of_filenames,
+		 NULL );
+#else
+		libewf_glob_free(
+		 filenames,
+		 number_of_filenames,
+		 NULL );
+#endif
 	}
 	return( EXIT_FAILURE );
 }

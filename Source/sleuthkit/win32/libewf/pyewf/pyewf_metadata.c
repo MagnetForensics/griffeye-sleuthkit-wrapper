@@ -2,7 +2,7 @@
  *  Metadata functions for the Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,28 +23,32 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyewf.h"
 #include "pyewf_codepage.h"
+#include "pyewf_error.h"
 #include "pyewf_handle.h"
+#include "pyewf_integer.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libclocale.h"
 #include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
+#include "pyewf_unused.h"
 
 /* Retrieves the size of the media data
- * Returns a Python object holding the offset if successful or NULL on error
+ * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_get_media_size(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_handle_get_media_size";
 	size64_t media_size      = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -66,70 +70,505 @@ PyObject *pyewf_handle_get_media_size(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve media size.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve media size.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve media size.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( media_size > (size64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: media size value exceeds maximum.",
-		 function );
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) media_size );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) media_size ) );
-#else
-	if( media_size > (size64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: media size value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) media_size ) );
-#endif
+	return( integer_object );
 }
 
-/* Retrieves the codepage used for header strings
- * Returns a Python object holding the offset if successful or NULL on error
+/* Retrieves the number of sectors per chunk
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_sectors_per_chunk(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *integer_object   = NULL;
+	static char *function      = "pyewf_handle_get_sectors_per_chunk";
+	uint32_t sectors_per_chunk = 0;
+	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_sectors_per_chunk(
+	          pyewf_handle->handle,
+	          &sectors_per_chunk,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve sectors per chunk.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) sectors_per_chunk );
+
+	return( integer_object );
+}
+
+/* Retrieves the number of bytes per sector
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_bytes_per_sector(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error  = NULL;
+	PyObject *integer_object  = NULL;
+	static char *function     = "pyewf_handle_get_bytes_per_sector";
+	uint32_t bytes_per_sector = 0;
+	int result                = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_bytes_per_sector(
+	          pyewf_handle->handle,
+	          &bytes_per_sector,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve bytes per sectors.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) bytes_per_sector );
+
+	return( integer_object );
+}
+
+/* Retrieves the number of sectors
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_number_of_sectors(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *integer_object   = NULL;
+	static char *function      = "pyewf_handle_get_number_of_sectors";
+	uint64_t number_of_sectors = 0;
+	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_number_of_sectors(
+	          pyewf_handle->handle,
+	          &number_of_sectors,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of sectors.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  number_of_sectors );
+
+	return( integer_object );
+}
+
+/* Retrieves the chunk size
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_chunk_size(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error  = NULL;
+	PyObject *integer_object  = NULL;
+	static char *function     = "pyewf_handle_get_chunk_size";
+	size32_t chunk_size       = 0;
+	int result                = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_chunk_size(
+	          pyewf_handle->handle,
+	          &chunk_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve chunk size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) chunk_size );
+
+	return( integer_object );
+}
+
+/* Retrieves the error granularity
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_error_granularity(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *integer_object   = NULL;
+	static char *function      = "pyewf_handle_get_error_granularity";
+	uint32_t error_granularity = 0;
+	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_error_granularity(
+	          pyewf_handle->handle,
+	          &error_granularity,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve error granularity.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) error_granularity );
+
+	return( integer_object );
+}
+
+/* Retrieves the compression method
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_compression_method(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error    = NULL;
+	PyObject *integer_object    = NULL;
+	static char *function       = "pyewf_handle_get_compression_method";
+	uint16_t compression_method = 0;
+	int result                  = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_compression_method(
+	          pyewf_handle->handle,
+	          &compression_method,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve compression method.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) compression_method );
+
+	return( integer_object );
+}
+
+/* Retrieves the media type
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_media_type(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyewf_handle_get_media_type";
+	uint8_t media_type       = 0;
+	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_media_type(
+	          pyewf_handle->handle,
+	          &media_type,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve media type.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) media_type );
+
+	return( integer_object );
+}
+
+/* Retrieves the media flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_media_flags(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyewf_handle_get_media_flags";
+	uint8_t media_flags      = 0;
+	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_media_flags(
+	          pyewf_handle->handle,
+	          &media_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve media flags.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) media_flags );
+
+	return( integer_object );
+}
+
+/* Retrieves the format
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_format(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyewf_handle_get_format";
+	uint8_t format           = 0;
+	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_format(
+	          pyewf_handle->handle,
+	          &format,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve format.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) format );
+
+	return( integer_object );
+}
+
+/* Retrieves the codepage used for ASCII strings in the header
+ * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_get_header_codepage(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
 	PyObject *string_object     = NULL;
 	const char *codepage_string = NULL;
 	static char *function       = "pyewf_handle_get_header_codepage";
 	int header_codepage         = 0;
-	int result                  = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -140,35 +579,17 @@ PyObject *pyewf_handle_get_header_codepage(
 
 		return( NULL );
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libewf_handle_get_header_codepage(
-	          pyewf_handle->handle,
-	          &header_codepage,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( libewf_handle_get_header_codepage(
+	     pyewf_handle->handle,
+	     &header_codepage,
+	     &error ) != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header codepage.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header codepage.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve header codepage.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
@@ -187,7 +608,7 @@ PyObject *pyewf_handle_get_header_codepage(
 
 		return( NULL );
 	}
-	string_object = PyString_FromString(
+	string_object = PyUnicode_FromString(
 	                 codepage_string );
 
 	if( string_object == NULL )
@@ -202,20 +623,15 @@ PyObject *pyewf_handle_get_header_codepage(
 	return( string_object );
 }
 
-/* Sets the codepage used for header strings
- * Returns a Python object holding the offset if successful or NULL on error
+/* Sets the codepage used for ASCII strings in the header
+ * Returns 1 if successful or -1 on error
  */
-PyObject *pyewf_handle_set_header_codepage(
-           pyewf_handle_t *pyewf_handle,
-           PyObject *arguments,
-           PyObject *keywords )
+int pyewf_handle_set_header_codepage_from_string(
+     pyewf_handle_t *pyewf_handle,
+     const char *codepage_string )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error      = NULL;
-	char *codepage_string         = NULL;
-	static char *keyword_list[]   = { "codepage", NULL };
-	static char *function         = "pyewf_handle_set_header_codepage";
+	static char *function         = "pyewf_handle_set_header_codepage_from_string";
 	size_t codepage_string_length = 0;
 	uint32_t feature_flags        = 0;
 	int header_codepage           = 0;
@@ -228,17 +644,8 @@ PyObject *pyewf_handle_set_header_codepage(
 		 "%s: invalid handle.",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( PyArg_ParseTupleAndKeywords(
-	     arguments,
-	     keywords,
-	     "s",
-	     keyword_list,
-	     &codepage_string ) == 0 )
-        {
-                return( NULL );
-        }
 	if( codepage_string == NULL )
 	{
 		PyErr_Format(
@@ -246,7 +653,7 @@ PyObject *pyewf_handle_set_header_codepage(
 		 "%s: invalid codepage string.",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	codepage_string_length = libcstring_narrow_string_length(
 	                          codepage_string );
@@ -261,28 +668,16 @@ PyObject *pyewf_handle_set_header_codepage(
 	     feature_flags,
 	     &error ) != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_RuntimeError,
-			 "%s: unable to determine ASCII codepage.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_RuntimeError,
-			 "%s: unable to determine ASCII codepage.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_RuntimeError,
+		 "%s: unable to determine header codepage.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
-		return( NULL );
+		return( -1 );
 	}
 	Py_BEGIN_ALLOW_THREADS
 
@@ -295,33 +690,171 @@ PyObject *pyewf_handle_set_header_codepage(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to set ASCII codepage.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to set ASCII codepage.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to set header codepage.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets the codepage used for ASCII strings in the header
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_set_header_codepage(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	static char *keyword_list[] = { "codepage", NULL };
+	char *codepage_string       = NULL;
+	int result                  = 0;
+
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "s",
+	     keyword_list,
+	     &codepage_string ) == 0 )
+	{
+		return( NULL );
+	}
+	result = pyewf_handle_set_header_codepage_from_string(
+	          pyewf_handle,
+	          codepage_string );
+
+	if( result != 1 )
+	{
 		return( NULL );
 	}
 	Py_IncRef(
 	 Py_None );
 
 	return( Py_None );
+}
+
+/* Sets the codepage used for ASCII strings in the header
+ * Returns a Python object if successful or NULL on error
+ */
+int pyewf_handle_set_header_codepage_setter(
+     pyewf_handle_t *pyewf_handle,
+     PyObject *string_object,
+     void *closure PYEWF_ATTRIBUTE_UNUSED )
+{
+	PyObject *utf8_string_object = NULL;
+	static char *function        = "pyewf_handle_set_ascii_codepage_setter";
+	char *codepage_string        = NULL;
+	int result                   = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( closure )
+
+	PyErr_Clear();
+
+	result = PyObject_IsInstance(
+	          string_object,
+	          (PyObject *) &PyUnicode_Type );
+
+	if( result == -1 )
+	{
+		pyewf_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type unicode.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		/* The codepage string should only contain ASCII characters.
+		 */
+		utf8_string_object = PyUnicode_AsUTF8String(
+		                      string_object );
+
+		if( utf8_string_object == NULL )
+		{
+			pyewf_error_fetch_and_raise(
+			 PyExc_RuntimeError,
+			 "%s: unable to convert unicode string to UTF-8.",
+			 function );
+
+			return( -1 );
+		}
+#if PY_MAJOR_VERSION >= 3
+		codepage_string = PyBytes_AsString(
+				   utf8_string_object );
+#else
+		codepage_string = PyString_AsString(
+				   utf8_string_object );
+#endif
+		if( codepage_string == NULL )
+		{
+			return( -1 );
+		}
+		result = pyewf_handle_set_header_codepage_from_string(
+		          pyewf_handle,
+		          codepage_string );
+
+		if( result != 1 )
+		{
+			return( -1 );
+		}
+		return( 0 );
+	}
+	PyErr_Clear();
+
+#if PY_MAJOR_VERSION >= 3
+	result = PyObject_IsInstance(
+		  string_object,
+		  (PyObject *) &PyBytes_Type );
+#else
+	result = PyObject_IsInstance(
+		  string_object,
+		  (PyObject *) &PyString_Type );
+#endif
+	if( result == -1 )
+	{
+		pyewf_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type string.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+#if PY_MAJOR_VERSION >= 3
+		codepage_string = PyBytes_AsString(
+		                   string_object );
+#else
+		codepage_string = PyString_AsString(
+		                   string_object );
+#endif
+		if( codepage_string == NULL )
+		{
+			return( -1 );
+		}
+		result = pyewf_handle_set_header_codepage_from_string(
+			  pyewf_handle,
+			  codepage_string );
+
+		if( result != 1 )
+		{
+			return( -1 );
+		}
+		return( 0 );
+	}
+	PyErr_Format(
+	 PyExc_TypeError,
+	 "%s: unsupported string object type.",
+	 function );
+
+	return( -1 );
 }
 
 /* Retrieves a header value
@@ -332,8 +865,6 @@ PyObject *pyewf_handle_get_header_value(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error              = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_value";
@@ -379,26 +910,13 @@ PyObject *pyewf_handle_get_header_value(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 header value: %s size.",
-			 function,
-			 header_value_identifier );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 header value: %s size.\n%s",
-			 function,
-			 header_value_identifier,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve UTF-8 header value: %s size.",
+		 function,
+		 header_value_identifier );
+
 		libcerror_error_free(
 		 &error );
 
@@ -439,26 +957,13 @@ PyObject *pyewf_handle_get_header_value(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 header value: %s.",
-			 function,
-			 header_value_identifier );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 header value: %s.\n%s",
-			 function,
-			 header_value_identifier,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve UTF-8 header value: %s.",
+		 function,
+		 header_value_identifier );
+
 		libcerror_error_free(
 		 &error );
 
@@ -513,11 +1018,10 @@ on_error:
  * Returns a Python object holding the offset if successful or NULL on error
  */
 PyObject *pyewf_handle_get_header_values(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
-	libcerror_error_t *error               = NULL;
+	libcerror_error_t *error              = NULL;
 	PyObject *dictionary_object           = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_values";
@@ -530,6 +1034,8 @@ PyObject *pyewf_handle_get_header_values(
 	uint32_t number_of_header_values      = 0;
 	uint32_t header_value_index           = 0;
 	int result                            = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -551,24 +1057,12 @@ PyObject *pyewf_handle_get_header_values(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve number of header values.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve number of header values.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: failed to retrieve number of header values.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
@@ -592,26 +1086,13 @@ PyObject *pyewf_handle_get_header_values(
 
 		if( result != 1 )
 		{
-			if( libcerror_error_backtrace_sprint(
-			     error,
-			     error_string,
-			     PYEWF_ERROR_STRING_SIZE ) == -1 )
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve header value: %d identifier size.",
-				 function,
-				 header_value_index );
-			}
-			else
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve header value: %d identifier size.\n%s",
-				 function,
-				 header_value_index,
-				 error_string );
-			}
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve header value: %d identifier size.",
+			 function,
+			 header_value_index );
+
 			libcerror_error_free(
 			 &error );
 
@@ -642,26 +1123,13 @@ PyObject *pyewf_handle_get_header_values(
 
 		if( result != 1 )
 		{
-			if( libcerror_error_backtrace_sprint(
-			     error,
-			     error_string,
-			     PYEWF_ERROR_STRING_SIZE ) == -1 )
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve header value: %d identifier.",
-				 function,
-				 header_value_index );
-			}
-			else
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve header value: %d identifier.\n%s",
-				 function,
-				 header_value_index,
-				 error_string );
-			}
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve header value: %d identifier.",
+			 function,
+			 header_value_index );
+
 			libcerror_error_free(
 			 &error );
 
@@ -683,32 +1151,19 @@ PyObject *pyewf_handle_get_header_values(
 
 		if( result == -1 )
 		{
-			if( libcerror_error_backtrace_sprint(
-			     error,
-			     error_string,
-			     PYEWF_ERROR_STRING_SIZE ) == -1 )
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve UTF-8 header value: %s size.",
-				 function,
-				 header_value_identifier );
-			}
-			else
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve UTF-8 header value: %s size.\n%s",
-				 function,
-				 header_value_identifier,
-				 error_string );
-			}
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 header value: %s size.",
+			 function,
+			 header_value_identifier );
+
 			libcerror_error_free(
 			 &error );
 
 			goto on_error;
 		}
-		/* Ignore emtpy header values
+		/* Ignore empty header values
 		 */
 		if( ( result != 0 )
 		 && ( header_value_size > 0 ) )
@@ -739,26 +1194,13 @@ PyObject *pyewf_handle_get_header_values(
 
 			if( result != 1 )
 			{
-				if( libcerror_error_backtrace_sprint(
-				     error,
-				     error_string,
-				     PYEWF_ERROR_STRING_SIZE ) == -1 )
-				{
-					PyErr_Format(
-					 PyExc_IOError,
-					 "%s: unable to retrieve UTF-8 header value: %s.",
-					 function,
-					 header_value_identifier );
-				}
-				else
-				{
-					PyErr_Format(
-					 PyExc_IOError,
-					 "%s: unable to retrieve UTF-8 header value: %s.\n%s",
-					 function,
-					 header_value_identifier,
-					 error_string );
-				}
+				pyewf_error_raise(
+				 error,
+				 PyExc_IOError,
+				 "%s: unable to retrieve UTF-8 header value: %s.",
+				 function,
+				 header_value_identifier );
+
 				libcerror_error_free(
 				 &error );
 
@@ -842,8 +1284,6 @@ PyObject *pyewf_handle_get_hash_value(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error             = NULL;
 	PyObject *string_object             = NULL;
 	static char *function               = "pyewf_handle_get_hash_value";
@@ -889,26 +1329,13 @@ PyObject *pyewf_handle_get_hash_value(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 hash value: %s size.",
-			 function,
-			 hash_value_identifier );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 hash value: %s size.\n%s",
-			 function,
-			 hash_value_identifier,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve UTF-8 hash value: %s size.",
+		 function,
+		 hash_value_identifier );
+
 		libcerror_error_free(
 		 &error );
 
@@ -949,26 +1376,13 @@ PyObject *pyewf_handle_get_hash_value(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 hash value: %s.",
-			 function,
-			 hash_value_identifier );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve UTF-8 hash value: %s.\n%s",
-			 function,
-			 hash_value_identifier,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve UTF-8 hash value: %s.",
+		 function,
+		 hash_value_identifier );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1023,10 +1437,9 @@ on_error:
  * Returns a Python object holding the offset if successful or NULL on error
  */
 PyObject *pyewf_handle_get_hash_values(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error            = NULL;
 	PyObject *dictionary_object         = NULL;
 	PyObject *string_object             = NULL;
@@ -1040,6 +1453,8 @@ PyObject *pyewf_handle_get_hash_values(
 	uint32_t number_of_hash_values      = 0;
 	uint32_t hash_value_index           = 0;
 	int result                          = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -1061,24 +1476,12 @@ PyObject *pyewf_handle_get_hash_values(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve number of hash values.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve number of hash values.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: failed to retrieve number of hash values.",
+		 function );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1102,26 +1505,13 @@ PyObject *pyewf_handle_get_hash_values(
 
 		if( result != 1 )
 		{
-			if( libcerror_error_backtrace_sprint(
-			     error,
-			     error_string,
-			     PYEWF_ERROR_STRING_SIZE ) == -1 )
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve hash value: %d identifier size.",
-				 function,
-				 hash_value_index );
-			}
-			else
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve hash value: %d identifier size.\n%s",
-				 function,
-				 hash_value_index,
-				 error_string );
-			}
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve hash value: %d identifier size.",
+			 function,
+			 hash_value_index );
+
 			libcerror_error_free(
 			 &error );
 
@@ -1152,26 +1542,13 @@ PyObject *pyewf_handle_get_hash_values(
 
 		if( result != 1 )
 		{
-			if( libcerror_error_backtrace_sprint(
-			     error,
-			     error_string,
-			     PYEWF_ERROR_STRING_SIZE ) == -1 )
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve hash value: %d identifier.",
-				 function,
-				 hash_value_index );
-			}
-			else
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve hash value: %d identifier.\n%s",
-				 function,
-				 hash_value_index,
-				 error_string );
-			}
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve hash value: %d identifier.",
+			 function,
+			 hash_value_index );
+
 			libcerror_error_free(
 			 &error );
 
@@ -1193,32 +1570,19 @@ PyObject *pyewf_handle_get_hash_values(
 
 		if( result == -1 )
 		{
-			if( libcerror_error_backtrace_sprint(
-			     error,
-			     error_string,
-			     PYEWF_ERROR_STRING_SIZE ) == -1 )
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve UTF-8 hash value: %s size.",
-				 function,
-				 hash_value_identifier );
-			}
-			else
-			{
-				PyErr_Format(
-				 PyExc_IOError,
-				 "%s: unable to retrieve UTF-8 hash value: %s size.\n%s",
-				 function,
-				 hash_value_identifier,
-				 error_string );
-			}
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve UTF-8 hash value: %s size.",
+			 function,
+			 hash_value_identifier );
+
 			libcerror_error_free(
 			 &error );
 
 			goto on_error;
 		}
-		/* Ignore emtpy hash values
+		/* Ignore empty hash values
 		 */
 		if( ( result != 0 )
 		 && ( hash_value_size > 0 ) )
@@ -1249,26 +1613,13 @@ PyObject *pyewf_handle_get_hash_values(
 
 			if( result != 1 )
 			{
-				if( libcerror_error_backtrace_sprint(
-				     error,
-				     error_string,
-				     PYEWF_ERROR_STRING_SIZE ) == -1 )
-				{
-					PyErr_Format(
-					 PyExc_IOError,
-					 "%s: unable to retrieve UTF-8 hash value: %s.",
-					 function,
-					 hash_value_identifier );
-				}
-				else
-				{
-					PyErr_Format(
-					 PyExc_IOError,
-					 "%s: unable to retrieve UTF-8 hash value: %s.\n%s",
-					 function,
-					 hash_value_identifier,
-					 error_string );
-				}
+				pyewf_error_raise(
+				 error,
+				 PyExc_IOError,
+				 "%s: unable to retrieve UTF-8 hash value: %s.",
+				 function,
+				 hash_value_identifier );
+
 				libcerror_error_free(
 				 &error );
 

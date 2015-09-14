@@ -23,7 +23,7 @@
         [Test]
         public void ExtractTest()
         {
-            string fileName = ConfigurationManager.AppSettings["E01Path"];
+            string fileName = @"\\philadelphia\TestShare\Sleuthkit Wrapper\USB-disk-image-FAT.E01";
             
             // fill up dictionary with the expected values.
             IDictionary<string, string> expected = new Dictionary<string, string>();
@@ -35,6 +35,8 @@
             expected.Add("examiner_name", "TheExaminerJohnL");
             expected.Add("evidence_number", "UNKNOWN");
             expected.Add("notes", "UNKNOWN");
+            expected.Add("acquiry_date", "Tue Oct  1 08:47:26 2013");
+            expected.Add("system_date", "Mon Sep 30 14:43:12 2013");
             expected.Add("acquiry_operating_system", "Windows 2008 Server R2");
             expected.Add("acquiry_software_version", "7.06.02");
             expected.Add("password", "UNKNOWN");
@@ -60,7 +62,7 @@
             // get the metadata from USB-disk-image-FAT.Ex01
             IDictionary<string, string> actual = MetaDataExtractor.Extract(Path.GetFullPath(fileName));
 
-            CollectionAssert.AreEquivalent(actual, expected);
+            CollectionAssert.AreEquivalent(expected, actual);
         }
 
         #endregion

@@ -1,7 +1,7 @@
 /*
  * Header values functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -43,7 +43,8 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 
-/* Initializes the header values
+/* Creates header values
+ * Make sure the value header_values is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_initialize(
