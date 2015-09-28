@@ -4,14 +4,15 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
 
-AC_INIT(sleuthkit, 4.1.2)
+AC_INIT(sleuthkit, 4.2.0)
 m4_include([m4/ax_pthread.m4])
 dnl include the version from 1.12.1. This will work for 
 m4_include([m4/cppunit.m4])
 m4_include([m4/ax_jni_include_dir.m4])
 m4_include([m4/ac_prog_javac_works.m4])
 m4_include([m4/ac_prog_javac.m4])
-
+m4_include([m4/ac_prog_java_works.m4])
+m4_include([m4/ac_prog_java.m4])
 
 AC_CONFIG_SRCDIR([tsk/base/tsk_base.h])
 AC_CONFIG_HEADERS([tsk/tsk_config.h])
@@ -74,6 +75,8 @@ AC_FUNC_UTIME_NULL
 AC_FUNC_VPRINTF
 dnl AC_CHECK_FUNCS([dup2 gethostname isascii iswprint memset munmap regcomp select setlocale strcasecmp strchr strdup strerror strndup strrchr strtol strtoul strtoull utime wcwidth])
 AC_CHECK_FUNCS([ishexnumber err errx warn warnx vasprintf getrusage])
+AC_CHECK_FUNCS([strlcpy strlcat])
+
 AX_PTHREAD([
     AC_DEFINE(HAVE_PTHREAD,1,[Define if you have POSIX threads libraries and header files.])
     CLIBS="$PTHREAD_LIBS $LIBS"
@@ -81,12 +84,23 @@ AX_PTHREAD([
     LDFLAGS="$LDFLAGS $PTHREAD_CFLAGS"
     CC="$PTHREAD_CC"],[])
 
-dnl Not all compilers include /usr/local in the include and link path
-if test -d /usr/local/include; then
+case "$host" in
+*-*-mingw*)
+  dnl Adding the native /usr/local is wrong for cross-compiling
+  ;;
+*)
+  dnl Not all compilers include /usr/local in the include and link path
+  if test -d /usr/local/include; then
     CPPFLAGS="$CPPFLAGS -I/usr/local/include"
     LDFLAGS="$LDFLAGS -L/usr/local/lib"
-fi
+  fi
+  ;;
+esac
 
+dnl Add enable/disable option
+AC_ARG_ENABLE([java],
+    [AS_HELP_STRING([--disable-java], [Do not build the java bindings or jar file])])
+ 
 dnl Checks for libraries.
 
 
@@ -173,6 +187,13 @@ AS_IF(
 )
 AS_IF([test "x$ac_cv_lib_z_inflate" = "xyes"], [ax_zlib=yes], [ax_zlib=no])
 
+AM_CONDITIONAL([X_ZLIB],[test "x$with_zlib" != "xno" && test "x$with_zlib" != "xyes"])
+AS_IF([test "x$with_zlib" != "xno"],
+   [Z_PATH="${with_zlib}/lib"],
+   [AC_MSG_NOTICE([failed to make Z_PATH])]
+)
+AC_SUBST(Z_PATH, $Z_PATH)
+
 dnl needed for sqllite
 AC_CHECK_LIB(dl, dlopen)
 
@@ -198,25 +219,42 @@ AS_IF([test "x$with_libewf" != "xno"],
     )]
     dnl Check for the header file first to make sure they have the dev install
     [AC_CHECK_HEADERS([libewf.h],
-      [AC_CHECK_LIB([ewf], [libewf_get_version])]
+      [AC_CHECK_LIB([ewf], [libewf_get_version], [], [NO_LIBEWF=true])]
     )]
 )
 AS_IF([test "x$ac_cv_lib_ewf_libewf_get_version" = "xyes"], [ax_libewf=yes], [ax_libewf=no])
 
-dnl Test for java/jni so that we can compile the java bindings
-AC_PROG_JAVAC
-if test "x$JAVAC" != x; then
-    AX_JNI_INCLUDE_DIR
-    for JNI_INCLUDE_DIR in $JNI_INCLUDE_DIRS
-    do
-        JNI_CPPFLAGS="$JNI_CPPFLAGS -I$JNI_INCLUDE_DIR"
-    done
-    dnl Export the paths so that the makefile gets them
-    AC_SUBST(JNI_CPPFLAGS, $JNI_CPPFLAGS)
-fi
-AM_CONDITIONAL([X_JNI],[test "x$JNI_CPPFLAGS" != x])
+dnl sqlite requires pthread libraries - this was copied from its configure.ac
+dnl AC_SEARCH_LIBS(pthread_create, pthread)
+AC_SEARCH_LIBS(dlopen, dl)
 
-AS_IF([test "x$JNI_CPPFLAGS" != x], [ax_java_support=yes], [ax_java_support=no])
+dnl Test for the various java things that we need for bindings
+AS_IF([test "x$enable_java" != "xno"], [
+    dnl javac is needed to compile the JAR file
+    AC_PROG_JAVAC
+    if test "x$JAVAC" != x; then
+        AX_JNI_INCLUDE_DIR
+        for JNI_INCLUDE_DIR in $JNI_INCLUDE_DIRS
+        do
+            JNI_CPPFLAGS="$JNI_CPPFLAGS -I$JNI_INCLUDE_DIR"
+        done
+        dnl Export the paths so that the makefile gets them
+        AC_SUBST(JNI_CPPFLAGS, $JNI_CPPFLAGS)
+    fi
+
+    dnl java is needed by ant
+    dnl we had one report of a system with javac and not java
+    AC_PROG_JAVA
+
+    dnl Test is ant is available
+    AC_PATH_PROG([ANT_FOUND], [ant], [])
+
+]) dnl test enable_java
+
+dnl if we found everything we need, set ax_java_support for the
+dnl status message and set X_JNI for use in Makefile
+AS_IF([test "x$JNI_CPPFLAGS" != x && test "x$ANT_FOUND" != x && test "x$JAVA" != x], [ax_java_support=yes], [ax_java_support=no])
+AM_CONDITIONAL([X_JNI],[test "x$ax_java_support" == "xyes"])
 
 AC_CONFIG_COMMANDS([tsk/tsk_incs.h],
     [echo "#ifndef _TSK_INCS_H" > tsk/tsk_incs.h
@@ -249,6 +287,23 @@ AC_CONFIG_COMMANDS([tsk/tsk_incs.h],
     ac_cv_header_sys_param_h=$ac_cv_header_sys_param_h
     ax_pthread_ok=$ax_pthread_ok])
 
+AC_MSG_CHECKING([if libtool needs -no-undefined flag to build shared libraries])
+case "$host" in
+*-*-mingw*)
+  dnl Add -no-undefined flag to LDFLAGS to let libtool build DLLs.
+  AC_MSG_RESULT([yes])
+  LIBTSK_LDFLAGS="-no-undefined"
+  AC_SUBST([LIBTSK_LDFLAGS])
+  ;;
+  *)
+  dnl No additional flags needed.
+  AC_MSG_RESULT([no])
+  ;;
+esac
+
+dnl Dependencies for fiwalk
+AC_CHECK_FUNCS([getline])
+AC_SEARCH_LIBS(regexec, [regex], , AC_MSG_ERROR([missing regex]))
 
 AC_CONFIG_FILES([
     Makefile
@@ -274,6 +329,7 @@ AC_CONFIG_FILES([
     tests/Makefile
     samples/Makefile
     man/Makefile
+    bindings/java/Makefile 
     bindings/java/jni/Makefile
     unit_tests/Makefile
     unit_tests/base/Makefile])
