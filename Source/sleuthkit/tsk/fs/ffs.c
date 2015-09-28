@@ -1740,11 +1740,11 @@ ffs_istat(TSK_FS_INFO * fs, FILE * hFile, TSK_INUM_T inum,
         tsk_fprintf(hFile, "Inode Modified:\t%s\n",
             tsk_fs_time_to_str(fs_meta->ctime, timeBuf));
 
-        if (fs_meta->mtime == 0)
+        if (fs_meta->mtime)
             fs_meta->mtime += sec_skew;
-        if (fs_meta->atime == 0)
+        if (fs_meta->atime)
             fs_meta->atime += sec_skew;
-        if (fs_meta->ctime == 0)
+        if (fs_meta->ctime)
             fs_meta->ctime += sec_skew;
 
         tsk_fprintf(hFile, "\nOriginal Inode Times:\n");
@@ -2016,7 +2016,7 @@ ffs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset, TSK_FS_TYPE_ENUM ftype)
     ffs->fs.sb1 = (ffs_sb1 *) tsk_malloc(len);
     if (ffs->fs.sb1 == NULL) {
         fs->tag = 0;
-        free(ffs);
+        tsk_fs_free((TSK_FS_INFO *)ffs);
         return NULL;
     }
 
@@ -2037,7 +2037,7 @@ ffs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset, TSK_FS_TYPE_ENUM ftype)
             (TSK_OFF_T) UFS2_SBOFF);
         fs->tag = 0;
         free(ffs->fs.sb1);
-        free(ffs);
+        tsk_fs_free((TSK_FS_INFO *)ffs);
         return NULL;
     }
 
@@ -2058,7 +2058,7 @@ ffs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset, TSK_FS_TYPE_ENUM ftype)
                 myname, (TSK_OFF_T) UFS2_SBOFF2);
             fs->tag = 0;
             free(ffs->fs.sb1);
-            free(ffs);
+            tsk_fs_free((TSK_FS_INFO *)ffs);
             return NULL;
         }
 
@@ -2078,7 +2078,7 @@ ffs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset, TSK_FS_TYPE_ENUM ftype)
                     myname, (TSK_OFF_T) UFS1_SBOFF);
                 fs->tag = 0;
                 free(ffs->fs.sb1);
-                free(ffs);
+                tsk_fs_free((TSK_FS_INFO *)ffs);
                 return NULL;
             }
             if (tsk_fs_guessu32(fs, ffs->fs.sb1->magic, UFS1_FS_MAGIC)) {
@@ -2089,7 +2089,7 @@ ffs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset, TSK_FS_TYPE_ENUM ftype)
                     fprintf(stderr, "ufs_open: No UFS magic found\n");
                 fs->tag = 0;
                 free(ffs->fs.sb1);
-                free(ffs);
+                tsk_fs_free((TSK_FS_INFO *)ffs);
                 return NULL;
             }
             else {
@@ -2148,7 +2148,7 @@ ffs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset, TSK_FS_TYPE_ENUM ftype)
             fprintf(stderr, "ufs_open: invalid fragment or block size\n");
         fs->tag = 0;
         free(ffs->fs.sb1);
-        free(ffs);
+        tsk_fs_free((TSK_FS_INFO *)ffs);
         return NULL;
     }
 
@@ -2160,7 +2160,7 @@ ffs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset, TSK_FS_TYPE_ENUM ftype)
             fprintf(stderr, "ufs_open: fragment / block size mismatch\n");
         fs->tag = 0;
         free(ffs->fs.sb1);
-        free(ffs);
+        tsk_fs_free((TSK_FS_INFO *)ffs);
         return NULL;
     }
 
