@@ -95,7 +95,8 @@ Global
 		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|Win32.ActiveCfg = Release|Any CPU
-		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x64.ActiveCfg = Release|Any CPU
+		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x64.ActiveCfg = Release|x64
+		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x64.Build.0 = Release|x64
 		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x86.ActiveCfg = Release|x86
 		{479E21D5-52E1-44DF-90EA-6EE385EA4973}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
