@@ -76,7 +76,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Org.SleuthKit.Crash.CrashOnDSS3</StartupObject>
+    <StartupObject>Test.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -112,7 +112,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Crash\CrashOnDSS3.cs" />
     <Compile Include="MemoryLeak\ImportSource.cs" />
     <Compile Include="MemoryLeak\MediaInfo.cs" />
     <Compile Include="MemoryLeak\MediaPath.cs" />
