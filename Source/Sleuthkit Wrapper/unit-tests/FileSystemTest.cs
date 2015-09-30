@@ -21,6 +21,7 @@ namespace SleuthkitSharp_UnitTests
             Assert.AreEqual("ExFAT", fileSystems.First().Type.ToString());
         }
 
+#if Bit64
         [Test]
         public void TestCrashingImage(String[] args)
         {
@@ -75,5 +76,6 @@ namespace SleuthkitSharp_UnitTests
                 return WalkReturnEnum.Continue;
             }
         }
+#endif
     }
 }
