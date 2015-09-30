@@ -99,7 +99,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libewf.lib;libtsk.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>src\Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>

@@ -333,7 +333,7 @@ namespace SleuthKit.Structs
 #elif Bit64
         [FieldOffset(336)]
 #endif
-        private IntPtr ir_open_meta_ptr;
+        private IntPtr dir_open_meta_ptr;
 
 #if Bit32
         [FieldOffset(244)]
