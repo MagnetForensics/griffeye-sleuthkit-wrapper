@@ -1,8 +1,6 @@
 ﻿using SleuthKit;
 using SleuthKit.Structs;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Org.SleuthKit.Crash
 {
@@ -10,13 +8,40 @@ namespace Org.SleuthKit.Crash
     {
         public static void Main(String[] args)
         {
-            String imagePath = @"I:\TestSets\Mixed\DATASET_SAFE_III\Images and exports\DSIII.E01";
+            //String imagePath = @"I:\TestSets\Mixed\DATASET_SAFE_III\Images and exports\DSIII.E01";
+            String imagePath = @"I:\TestSets\ForensicImages\DATASAFE_3-2014.E01";
             DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath));
 
-            List<FileSystem> fileSystems = image.GetFileSystems().ToList();
-            foreach (FileSystem fs in image.GetFileSystems())
+            if (image.HasVolumes)
             {
-                fs.WalkDirectories(DirWalkCallback);
+                VolumeSystem vs = image.OpenVolumeSystem();
+                foreach (Volume v in vs.Volumes)
+                {
+                    try
+                    {
+                        Console.WriteLine(String.Format("Desc: {0}", v.Description));
+                        FileSystem fs = v.OpenFileSystem();
+                        fs.WalkDirectories(DirWalkCallback);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("FAIL");
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    foreach (FileSystem fs in image.GetFileSystems())
+                    {
+                        fs.WalkDirectories(DirWalkCallback);
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("FAIL");
+                }
             }
 
             Console.WriteLine(String.Format("Found {0} files.", fileCount));
