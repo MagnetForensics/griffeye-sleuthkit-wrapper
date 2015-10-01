@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using SleuthKit;
-using SleuthKit.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,13 +21,15 @@ namespace SleuthkitSharp_UnitTests
         }
 
 #if Bit64
+
         [Test]
-        public void TestCrashingImage(String[] args)
+        public void TestCrashingImage()
         {
             String imagePath = @"\\philadelphia\TestShare\Sleuthkit Wrapper\DATASAFE_3-2014.E01";
             DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath));
             FileCounter counter = new FileCounter();
             int failCount = 0;
+            String labels = String.Empty;
 
             if (image.HasVolumes)
             {
@@ -37,8 +38,9 @@ namespace SleuthkitSharp_UnitTests
                 {
                     try
                     {
-                        Console.WriteLine(String.Format("Desc: {0}", v.Description));
                         FileSystem fs = v.OpenFileSystem();
+                        labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
+
                         fs.WalkDirectories(counter.DirWalkCallback);
                     }
                     catch (Exception)
@@ -53,6 +55,7 @@ namespace SleuthkitSharp_UnitTests
                 {
                     foreach (FileSystem fs in image.GetFileSystems())
                     {
+                        labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
                         fs.WalkDirectories(counter.DirWalkCallback);
                     }
                 }
@@ -64,6 +67,7 @@ namespace SleuthkitSharp_UnitTests
 
             Assert.GreaterOrEqual(counter.FileCount, 1000);
             Assert.AreEqual(2, failCount);
+            Assert.AreNotEqual(String.Empty, labels);
         }
 
         private class FileCounter

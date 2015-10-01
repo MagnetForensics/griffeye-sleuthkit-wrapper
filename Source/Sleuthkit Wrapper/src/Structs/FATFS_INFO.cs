@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SleuthKit.Structs
 {
-    [StructLayout(LayoutKind.Explicit, 
-#if Bit32        
+    [StructLayout(LayoutKind.Explicit,
+#if Bit32
         Size = 16832
 #elif Bit64
         Size = 17008
@@ -17,18 +13,20 @@ namespace SleuthKit.Structs
     public struct FATFS_INFO
     {
         [FieldOffset(0)]
-        TSK_FS_INFO fs_info;
+        private TSK_FS_INFO fs_info;
+
+        //[FieldOffset(120)]
+        //private IntPtr boot_sector_buffer_ptr;
 
         /// <summary>
         /// super block
         /// </summary>
 #if Bit32
-        [FieldOffset(16724)]
+        [FieldOffset(16860)]
 #elif Bit64
-        [FieldOffset(16872)]
+        [FieldOffset(17024)]
 #endif
-        IntPtr sb_ptr;
-
+        private IntPtr sb_ptr;
 
         internal TSK_FS_INFO tsk_fs_info
         {
