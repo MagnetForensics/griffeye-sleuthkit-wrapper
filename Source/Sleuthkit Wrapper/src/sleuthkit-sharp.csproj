@@ -149,7 +149,7 @@
     <Compile Include="Structs\TSK_FS_DIR.cs" />
     <Compile Include="Structs\ext2fs_sb.cs" />
     <Compile Include="Structs\FATFS_INFO.cs" />
-    <Compile Include="Structs\fatfs_sb.cs" />
+    <Compile Include="Structs\FATXXFS_SB.cs" />
     <Compile Include="Structs\FFS_INFO.cs" />
     <Compile Include="Structs\ffs_sb2.cs" />
     <Compile Include="Structs\TSK_FS_META.cs" />
