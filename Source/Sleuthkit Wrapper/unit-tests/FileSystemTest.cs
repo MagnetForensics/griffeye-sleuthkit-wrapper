@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SleuthKit;
+using SleuthKit.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +20,6 @@ namespace SleuthkitSharp_UnitTests
             Assert.AreEqual(1, fileSystems.Count);
             Assert.AreEqual("ExFAT", fileSystems.First().Type.ToString());
         }
-
-#if Bit64
 
         [Test]
         public void TestCrashingImage()
@@ -80,6 +79,5 @@ namespace SleuthkitSharp_UnitTests
                 return WalkReturnEnum.Continue;
             }
         }
-#endif
     }
 }

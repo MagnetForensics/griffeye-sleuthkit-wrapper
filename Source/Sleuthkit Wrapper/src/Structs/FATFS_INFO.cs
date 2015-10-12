@@ -1,22 +1,18 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace SleuthKit.Structs
 {
     [StructLayout(LayoutKind.Explicit,
 #if Bit32
-        Size = 16832
+        Size = 17424
 #elif Bit64
-        Size = 17008
+        Size = 17616
 #endif
     )]
     public struct FATFS_INFO
     {
         [FieldOffset(0)]
         private TSK_FS_INFO fs_info;
-
-        //[FieldOffset(120)]
-        //private IntPtr boot_sector_buffer_ptr;
 
         /// <summary>
         /// super block
@@ -26,7 +22,9 @@ namespace SleuthKit.Structs
 #elif Bit64
         [FieldOffset(17024)]
 #endif
-        private IntPtr sb_ptr;
+        //private IntPtr sb_ptr;
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
+        private byte[] boot_sector_buffer;
 
         internal TSK_FS_INFO tsk_fs_info
         {
@@ -36,11 +34,14 @@ namespace SleuthKit.Structs
             }
         }
 
-        internal fatfs_sb sb
+        internal FATXXFS_SB sb
         {
             get
             {
-                return ((fatfs_sb)Marshal.PtrToStructure(sb_ptr, typeof(fatfs_sb)));
+                GCHandle handle = GCHandle.Alloc(boot_sector_buffer, GCHandleType.Pinned);
+                FATXXFS_SB superblock = (FATXXFS_SB)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(FATXXFS_SB));
+                handle.Free();
+                return superblock;
             }
         }
     }
