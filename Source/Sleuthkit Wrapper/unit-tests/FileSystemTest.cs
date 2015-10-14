@@ -24,11 +24,106 @@ namespace SleuthkitSharp_UnitTests
         [Test]
         public void TestCrashingImage()
         {
-            String imagePath = @"\\philadelphia\TestShare\Sleuthkit Wrapper\DATASAFE_3-2014.E01";
+            String labels;
+            int fileCount = CountFilesInImageAndGetLabels(@"\\philadelphia\TestShare\Sleuthkit Wrapper\DATASAFE_3-2014.E01", out labels);
+
+            Assert.GreaterOrEqual(fileCount, 1000);
+            Assert.IsNotEmpty(labels);
+        }
+
+        //000
+        [TestCase(@"\\DISKMASKINEN\DiskImages\000\DSIII_disk_Ext4_Guymager_SplitSize2047MiB.000")]
+
+        //DD
+        [TestCase(@"\\DISKMASKINEN\DiskImages\DD\DSIII_disk_Ext4_Guymager.dd")]
+
+        //E01 other than EnCase
+        [TestCase(@"\\DISKMASKINEN\DiskImages\E01_OtherThanEnCase\DSIII_disk_Ext4_Guymager_Exx.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\E01_OtherThanEnCase\DSIII_disk_FAT_OSF.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\E01_OtherThanEnCase\DSIII_disk_FAT_OSF_BestCompressed.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\E01_OtherThanEnCase\DSIII_disk_NTFS_OSF.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\E01_OtherThanEnCase\DSIII_disk_NTFS_OSF_BestCompressed.E01")]
+
+        //EnCase\Evidence
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_Ext4_dd_BlockSize512_dd_EnCase_Uncompressed.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_Ext4_Guymager_dd_EnCase_Compressed.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_FAT_dd_BlockSize512_raw_EnCase_Uncompressed.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_NTFS_OSF_img_EnCase_Uncompressed.Ex01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_disks_ISO_EnCase_compressed.Ex01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Compressed.Ex01")]
+
+        //EnCase\Logical - All failing
+        /*
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Logical\DSIII_disk_Ext4_dd_BlockSize512_dd_EnCase_Compressed.Lx01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Logical\DSIII_disk_Ext4_Guymager_dd_EnCase_Uncompressed.Lx01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Logical\DSIII_disk_FAT_dd_BlockSize512_raw_EnCase_Compressed.Lx01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Logical\DSIII_disk_NTFS_OSF_img_EnCase_Compressed.L01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Logical\DSIII_DVD_ISO9660_disks_ISO_EnCase_Unompressed.L01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Logical\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Uncompressed.L01")]
+        //*/
+
+        //EnCase
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\DSIII_DVD_ISO9660_EnCase_Compressed.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\DSIII_DVD_ISO9660_EnCase_Compressed.Ex01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\DSIII_DVD_ISO9660_EnCase_Uncompressed.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\DSIII_DVD_ISO9660_EnCase_Uncompressed.Ex01")]
+
+        //IMG
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_disk_Ext2_dd_SingleBlock.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_disk_Ext4_dd_SingleBlock.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_disk_FAT_dd_BlockSize512.iso")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_disk_FAT_dd_BlockSize2048.iso")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_disk_FAT_OSF.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_disk_NTFS_dd_BlockSize512.iso")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_disk_NTFS_OSF.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_DVD_ISO9660_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_DVD_ISO9660_disks.iso")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_USB_Ext2_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_USB_Ext3_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_USB_Ext4_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_USB_FAT_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_USB_HFSplus_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_USB_NTFS_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_USB_UFS1-44BSD_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_USB_UFS2_disks.img")]
+
+        //NOK in 15.2.2 - Still not supported
+        /*
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII_disk_FAT_OSF.aff")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII_disk_NTFS_OSF.aff")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII_USB_HFS_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII_USB_HFS_disks_img_EnCase_Uncompressed.E01")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII-partly_folders_YAFFS2_YAFFEY_img_EnCase_Uncompressed.Ex01")]
+        //*/
+
+        //RAW
+        [TestCase(@"\\DISKMASKINEN\DiskImages\RAW\DSIII_disk_FAT_dd_BlockSize512.raw")]
+
+        public void AssertDS3Image(String imagePath)
+        {
+            String labels;
+            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels);
+
+            Assert.GreaterOrEqual(fileCount, 1000);
+        }
+
+        //IMG
+        [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII-partly_folders_YAFFS2_YAFFEY.img")]
+
+        public void AssertDS3PartlyImage(String imagePath)
+        {
+            String labels;
+            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels);
+
+            Assert.GreaterOrEqual(fileCount, 100);
+        }
+
+        private int CountFilesInImageAndGetLabels(String imagePath, out String labels)
+        {
             DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath));
             FileCounter counter = new FileCounter();
             int failCount = 0;
-            String labels = String.Empty;
+            labels = String.Empty;
 
             if (image.HasVolumes)
             {
@@ -64,9 +159,7 @@ namespace SleuthkitSharp_UnitTests
                 }
             }
 
-            Assert.GreaterOrEqual(counter.FileCount, 1000);
-            Assert.AreEqual(2, failCount);
-            Assert.AreNotEqual(String.Empty, labels);
+            return counter.FileCount;
         }
 
         private class FileCounter
