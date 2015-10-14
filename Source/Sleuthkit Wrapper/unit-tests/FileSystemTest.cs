@@ -2,35 +2,12 @@
 using SleuthKit;
 using SleuthKit.Structs;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SleuthkitSharp_UnitTests
 {
     [TestFixture]
     internal class FileSystemTest
     {
-        [Test]
-        public void TestExFAT()
-        {
-            String imagePath = @"\\philadelphia\TestShare\Sleuthkit Wrapper\exFAT.E01";
-            DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath));
-            List<FileSystem> fileSystems = image.GetFileSystems().ToList();
-
-            Assert.AreEqual(1, fileSystems.Count);
-            Assert.AreEqual("ExFAT", fileSystems.First().Type.ToString());
-        }
-
-        [Test]
-        public void TestCrashingImage()
-        {
-            String labels;
-            int fileCount = CountFilesInImageAndGetLabels(@"\\philadelphia\TestShare\Sleuthkit Wrapper\DATASAFE_3-2014.E01", out labels);
-
-            Assert.GreaterOrEqual(fileCount, 1000);
-            Assert.IsNotEmpty(labels);
-        }
-
         //000
         [TestCase(@"\\DISKMASKINEN\DiskImages\000\DSIII_disk_Ext4_Guymager_SplitSize2047MiB.000")]
 
