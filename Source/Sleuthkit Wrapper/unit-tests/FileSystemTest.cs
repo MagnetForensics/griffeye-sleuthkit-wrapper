@@ -90,14 +90,14 @@ namespace SleuthkitSharp_UnitTests
         [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Logical\DSIII_DVD_ISO9660_disks_ISO_EnCase_Unompressed.L01")]
         [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Logical\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Uncompressed.L01")]
 
-        //NOK in 15.2.2 - Still not supported
-        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII_disk_FAT_OSF.aff")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII_disk_NTFS_OSF.aff")]
-        [TestCase(@"\\diskmaskinen\DiskImages\NOK in 15.2.2\DSIII_USB_exFAT_OSF.aff")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII_USB_HFS_disks.img")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII_USB_HFS_disks_img_EnCase_Uncompressed.E01")]
-        [TestCase(@"\\diskmaskinen\DiskImages\NOK in 15.2.2\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.aff")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK in 15.2.2\DSIII-partly_folders_YAFFS2_YAFFEY_img_EnCase_Uncompressed.Ex01")]
+        //NOK - Still not supported
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII_disk_FAT_OSF.aff")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII_disk_NTFS_OSF.aff")]
+        [TestCase(@"\\diskmaskinen\DiskImages\NOK\DSIII_USB_exFAT_OSF.aff")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII_USB_HFS_disks.img")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII_USB_HFS_disks_img_EnCase_Uncompressed.E01")]
+        [TestCase(@"\\diskmaskinen\DiskImages\NOK\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.aff")]
+        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII-partly_folders_YAFFS2_YAFFEY_img_EnCase_Uncompressed.Ex01")]
 
         //DMG
         [TestCase(@"\\diskmaskinen\DiskImages\DMG\DSIII_USB_HFSplus_DiskUtility_Compressed.dmg")]
