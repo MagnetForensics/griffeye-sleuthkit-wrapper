@@ -54,31 +54,52 @@
 
             VolumeInfo[] volInfo = new VolumeInfo[]
             {
-                new VolumeInfo()
-                {
-                    Start = 0,
-                    Length = 1,
-                    Allocated = true
-                }
+                new VolumeInfo(){Start = 0,Length = 512,Allocated = false},
+                new VolumeInfo(){Start = 0,Length = 1048576,Allocated = false},
+                new VolumeInfo(){Start = 1048576,Length = 104857600,Allocated = true},
+                new VolumeInfo(){Start = 105906176,Length = 443089420288,Allocated = true},
+                new VolumeInfo(){Start = 443195326464,Length = 55836672000,Allocated = false},
+                new VolumeInfo(){Start = 443195326464,Length = 512,Allocated = false},
+                new VolumeInfo(){Start = 443195326464,Length = 1048576,Allocated = false},
+                new VolumeInfo(){Start = 443196375040,Length = 53687091200,Allocated = true},
+                new VolumeInfo(){Start = 496883466240,Length = 135266304,Allocated = false},
+                new VolumeInfo(){Start = 496883466240,Length = 512,Allocated = false},
+                new VolumeInfo(){Start = 496883466240,Length = 1048576,Allocated = false},
+                new VolumeInfo(){Start = 496884514816,Length = 134217728,Allocated = true},
+                new VolumeInfo(){Start = 497018732544,Length = 939524096,Allocated = false},
+                new VolumeInfo(){Start = 497018732544,Length = 512,Allocated = false},
+                new VolumeInfo(){Start = 497018732544,Length = 1048576,Allocated = false},
+                new VolumeInfo(){Start = 497019781120,Length = 938475520,Allocated = true},
+                new VolumeInfo(){Start = 497958256640,Length = 1073741824,Allocated = false},
+                new VolumeInfo(){Start = 497958256640,Length = 512,Allocated = false},
+                new VolumeInfo(){Start = 497958256640,Length = 1048576,Allocated = false},
+                new VolumeInfo(){Start = 497959305216,Length = 1072693248,Allocated = true},
+                new VolumeInfo(){Start = 499031998464,Length = 1074790400,Allocated = true},
+                new VolumeInfo(){Start = 500106788864,Length = 1073152,Allocated = false},
             };
             DiskImage diskImage = new DiskImage(file);
             using (VolumeSystem volumeSystem = diskImage.OpenVolumeSystem())
             {
                 Assert.IsNotNull(volumeSystem, "Unable to read partition table");
                 Assert.IsTrue(volumeSystem.Volumes.Any(), "Unable to read partition table");
-                //Assert.AreEqual(, volumeSystem.PartitionCount);
-                //Assert.AreEqual(, volumeSystem.AllocatedPartitionCount);
-                //Assert.AreEqual(, volumeSystem.Volumes.Count());
-                //List<Volume> volumes = volumeSystem.Volumes.ToList();
-                //for (int i = 0; i < volumes.Count; i++)
-                //{
-                //    Assert.AreEqual(volInfo[i].Start, volumes[i].Offset,
-                //        String.Format("Volume offset was not correct for volume {0}", i));
-                //    Assert.AreEqual(volInfo[i].Length, volumes[i].Length,
-                //        String.Format("Volume length was not correct for volume {0}", i));
-                //    Assert.AreEqual(volInfo[i].Allocated, volumes[i].IsAllocated,
-                //        String.Format("Volume allocation did not match for volume {0}", i));
-                //}
+                Assert.AreEqual(22, volumeSystem.PartitionCount);
+                Assert.AreEqual(22, volumeSystem.Volumes.Count());
+                Assert.AreEqual(7, volumeSystem.AllocatedPartitionCount);
+
+                List<Volume> volumes = volumeSystem.Volumes.ToList();
+                string volinf = string.Empty;
+                for (int i = 0; i < volumes.Count; i++)
+                {
+                    volinf = String.Format("new VolumeInfo(){{Start = {0},Length = {1},Allocated = {2}}},", 
+                        volumes[i].Offset, volumes[i].Length, volumes[i].IsAllocated);
+                    Assert.AreEqual(volInfo[i].Start, volumes[i].Offset,
+                        String.Format("Volume offset was not correct for volume {0}", i));
+                    Assert.AreEqual(volInfo[i].Length, volumes[i].Length,
+                        String.Format("Volume length was not correct for volume {0}", i));
+                    Assert.AreEqual(volInfo[i].Allocated, volumes[i].IsAllocated,
+                        String.Format("Volume allocation did not match for volume {0}", i));
+                }
+                Console.WriteLine(volinf);
             }
             
         }
