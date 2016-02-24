@@ -17,3 +17,4 @@ Release/
 Makefile.am
 Source/sleuthkit/win32/libewf/dpkg
 bin/
+*.user
