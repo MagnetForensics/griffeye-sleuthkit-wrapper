@@ -97,10 +97,12 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PartitionTableTest.cs" />
     <Compile Include="DiskImageTest.cs" />
     <Compile Include="FileSystemTest.cs" />
     <Compile Include="MetaDataExtractorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VolumeInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\sleuthkit-sharp.csproj">
