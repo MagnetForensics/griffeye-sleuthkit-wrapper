@@ -15,8 +15,7 @@
     <copyright></copyright>
   </metadata>
   <files>
-    <file src="..\bin\AnyCPU\Release\sleuthkit-sharp.dll" target="lib\net45" />
-    <file src="..\bin\AnyCPU\Release\sleuthkit-sharp.pdb" target="lib\net45" />
+    <file src="..\bin\AnyCPU\Release\sleuthkit-sharp.*" target="lib\net45" />
 
     <file src="..\bin\x86\Release\sleuthkit-sharp.dll" target="CopyToOutput\x86" />
     <file src="..\..\..\..\Lib\x86\ewf.net.dll" target="CopyToOutput\x86" />
