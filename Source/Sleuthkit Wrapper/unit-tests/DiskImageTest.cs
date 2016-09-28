@@ -210,7 +210,7 @@
         [SetUp]
         public void SetUpDiskImageTests()
         {
-            var file = new FileInfo(@"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\USB - disk - image - FAT.E01");
+            var file = new FileInfo(@"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\USB-disk-image-FAT.E01");
             this.diskImage = new DiskImage(file);
         }
 
