@@ -6,9 +6,9 @@
     <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann</authors>
     <owners>Safer Society Group</owners>
     <dependencies />
-    <licenseUrl>http://www.netclean.com</licenseUrl>
-    <projectUrl>http://www.netclean.com</projectUrl>
-    <iconUrl>http://www.netclean.com</iconUrl>
+    <licenseUrl>http://www.safersociety.com</licenseUrl>
+    <projectUrl>http://www.safersociety.com</projectUrl>
+    <iconUrl>http://www.safersociety.com</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
     <releaseNotes>
@@ -17,8 +17,9 @@
     <copyright></copyright>
   </metadata>
   <files>
-    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="lib\net45\x86" />
-    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="lib\net45\x64" />
+    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="lib\net45\" />
+    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="build\x86" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="build\x64" />
     
     <file src="..\..\..\..\Lib\x86\ewf.net.dll" target="CopyToOutput\x86" />
     <file src="..\..\..\..\Lib\x86\libewf.dll" target="CopyToOutput\x86" />
