@@ -1,18 +1,14 @@
 ﻿namespace SleuthkitSharp_UnitTests
 {
+    using NUnit.Framework;
+    using SleuthKit;
+    using SleuthKit.Structs;
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.IO;
     using System.Linq;
-
-    using NUnit.Framework;
-
-    using SleuthKit;
-
     using Directory = SleuthKit.Directory;
     using File = SleuthKit.File;
-    using SleuthKit.Structs;
 
     /// <summary>
     ///     This is a test class for DiskImageTest and is intended
@@ -32,7 +28,7 @@
         /// </summary>
         private static int jpgFileCount;
 
-        #endregion
+        #endregion Static Fields
 
         #region Fields
 
@@ -41,16 +37,17 @@
         /// </summary>
         private DiskImage diskImage;
 
-        #endregion
+        #endregion Fields
 
         #region Public Methods and Operators
+
         [SetUp]
         public void Init()
         {
             allFileCount = 0;
             jpgFileCount = 0;
 
-            // empty the list 
+            // empty the list
             FilePaths.Clear();
         }
 
@@ -170,7 +167,7 @@
                 }
 
                 Assert.AreEqual(30, jpgFileCount);
-                    //I think it should be 63 //Bala- Autopsy shows me that there are only 30 files
+                //I think it should be 63 //Bala- Autopsy shows me that there are only 30 files
                 Assert.AreEqual(37, allFileCount);
             }
         }
@@ -213,7 +210,7 @@
         [SetUp]
         public void SetUpDiskImageTests()
         {
-            var file = new FileInfo(@"\\philadelphia\TestShare\Sleuthkit Wrapper\USB-disk-image-FAT.E01");
+            var file = new FileInfo(@"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\USB - disk - image - FAT.E01");
             this.diskImage = new DiskImage(file);
         }
 
@@ -238,7 +235,7 @@
             }
         }
 
-        #endregion
+        #endregion Public Methods and Operators
 
         #region Methods
 
@@ -332,6 +329,6 @@
             }
         }
 
-        #endregion
+        #endregion Methods
     }
 }
