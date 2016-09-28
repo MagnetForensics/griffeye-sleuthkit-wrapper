@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>1.3.0.0</version>
+    <version>1.3.1</version>
     <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann</authors>
     <owners>NetClean Technologies</owners>
     <dependencies />
@@ -15,18 +15,19 @@
     <copyright></copyright>
   </metadata>
   <files>
-    <file src="..\bin\AnyCPU\Release\sleuthkit-sharp.*" target="lib\net45" />
-
-    <file src="..\bin\x86\Release\sleuthkit-sharp.dll" target="CopyToOutput\x86" />
+    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="lib\net45\x86" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="lib\net45\x64" />
+    
     <file src="..\..\..\..\Lib\x86\ewf.net.dll" target="CopyToOutput\x86" />
     <file src="..\..\..\..\Lib\x86\libewf.dll" target="CopyToOutput\x86" />
     <file src="..\..\..\..\Lib\x86\libtsk4.dll" target="CopyToOutput\x86" />
     <file src="..\..\..\..\Lib\x86\zlib.dll" target="CopyToOutput\x86" />
-
-    <file src="..\bin\x64\Release\sleuthkit-sharp.dll" target="CopyToOutput\x64" />
+    
     <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="CopyToOutput\x64" />
     <file src="..\..\..\..\Lib\x64\libewf.dll" target="CopyToOutput\x64" />
     <file src="..\..\..\..\Lib\x64\libtsk4.dll" target="CopyToOutput\x64" />
     <file src="..\..\..\..\Lib\x64\zlib.dll" target="CopyToOutput\x64" />
+  
+    <file src="SleuthkitSharp.targets" target="build" />
   </files>
 </package>
