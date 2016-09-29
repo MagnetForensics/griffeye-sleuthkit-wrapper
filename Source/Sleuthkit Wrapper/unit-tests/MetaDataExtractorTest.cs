@@ -1,12 +1,9 @@
 ﻿namespace SleuthkitSharp_UnitTests
 {
-    using System.Collections.Generic;
-    using System.Configuration;
-    using System.IO;
-
     using NUnit.Framework;
-
     using SleuthKit;
+    using System.Collections.Generic;
+    using System.IO;
 
     /// <summary>
     /// This is a test class for MetaDataExtractorTest and is intended
@@ -23,8 +20,8 @@
         [Test]
         public void ExtractTest()
         {
-            string fileName = @"\\philadelphia\TestShare\Sleuthkit Wrapper\USB-disk-image-FAT.E01";
-            
+            string fileName = @"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\USB-disk-image-FAT.E01";
+
             // fill up dictionary with the expected values.
             IDictionary<string, string> expected = new Dictionary<string, string>();
 
@@ -66,6 +63,6 @@
             CollectionAssert.AreEquivalent(expected, actual);
         }
 
-        #endregion
+        #endregion Public Methods and Operators
     }
 }
