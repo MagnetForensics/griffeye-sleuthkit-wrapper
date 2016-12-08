@@ -15,9 +15,9 @@ namespace SleuthkitSharp_UnitTests
             const string path = @"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\G-Recycle-2.E01";
             Dictionary<FileAllocationFlags, int> result = CountFilesPerFlagsInImage(path);
 
-            Assert.AreEqual(267, result[FileAllocationFlags.None]);
-            Assert.AreEqual(70, result[FileAllocationFlags.Deleted]);
-            Assert.AreEqual(46, result[FileAllocationFlags.Deleted | FileAllocationFlags.Overwritten]);
+            Assert.AreEqual(329, result[FileAllocationFlags.None]);
+            Assert.AreEqual(652, result[FileAllocationFlags.Deleted]);
+            Assert.AreEqual(53, result[FileAllocationFlags.Deleted | FileAllocationFlags.Overwritten]);
         }
 
         private Dictionary<FileAllocationFlags, int> CountFilesPerFlagsInImage(String imagePath)
