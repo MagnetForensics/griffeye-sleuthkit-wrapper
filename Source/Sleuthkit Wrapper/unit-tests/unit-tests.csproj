@@ -97,6 +97,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileAllocationFlagsTest.cs" />
     <Compile Include="PartitionTableTest.cs" />
     <Compile Include="DiskImageTest.cs" />
     <Compile Include="FileSystemTest.cs" />

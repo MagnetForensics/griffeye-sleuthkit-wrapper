@@ -9,12 +9,12 @@ namespace SleuthKit
     internal enum StructureMagic : uint
     {
         /// <summary>
-        /// TSK_FS_FILE_TAG 
+        /// TSK_FS_FILE_TAG
         /// </summary>
         FilesystemFileTag = 0x11212212,
 
         /// <summary>
-        /// TSK_FS_NAME_TAG 
+        /// TSK_FS_NAME_TAG
         /// </summary>
         FilesystemNameTag = 0x23147869,
 
@@ -40,7 +40,7 @@ namespace SleuthKit
     }
 
     /// <summary>
-    /// Return value from filter menus 
+    /// Return value from filter menus
     /// </summary>
     public enum FilterReturnCode
     {
@@ -127,7 +127,7 @@ namespace SleuthKit
         Corrupt = 2,
 
         /// <summary>
-        /// Stop further processing, not an error though. 
+        /// Stop further processing, not an error though.
         /// </summary>
         Stop = 3
     }
@@ -156,7 +156,7 @@ namespace SleuthKit
         CharacterDevice = 2,
 
         /// <summary>
-        /// Directory 
+        /// Directory
         /// </summary>
         /// <remarks>TSK_FS_NAME_TYPE_DIR </remarks>
         Directory = 3,
@@ -174,7 +174,7 @@ namespace SleuthKit
         Regular = 5,
 
         /// <summary>
-        /// Symbolic link 
+        /// Symbolic link
         /// </summary>
         /// <remarks>TSK_FS_NAME_TYPE_LNK</remarks>
         SymbolicLink = 6,
@@ -186,13 +186,13 @@ namespace SleuthKit
         Socket = 7,
 
         /// <summary>
-        /// Shadow inode (solaris) 
+        /// Shadow inode (solaris)
         /// </summary>
         /// <remarks>TSK_FS_NAME_TYPE_SHAD</remarks>
         ShadowInode = 8,
 
         /// <summary>
-        /// Whiteout (openbsd) 
+        /// Whiteout (openbsd)
         /// </summary>
         /// <remarks>TSK_FS_NAME_TYPE_WHT</remarks>
         Whiteout = 9,
@@ -217,7 +217,7 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_META_CONTENT_TYPE_EXT4_EXTENTS, Ext4 with extents instead of individual pointers
         /// </summary>
-        Ext4Extents = 0x1 
+        Ext4Extents = 0x1
     }
 
     /// <summary>
@@ -258,12 +258,12 @@ namespace SleuthKit
         Used = 0x04,
 
         /// <summary>
-        /// TSK_FS_META_FLAG_UNUSED, Metadata structure has never been allocated. 
+        /// TSK_FS_META_FLAG_UNUSED, Metadata structure has never been allocated.
         /// </summary>
         Unused = 0x08,
 
         /// <summary>
-        /// TSK_FS_META_FLAG_COMP, The file contents are compressed. 
+        /// TSK_FS_META_FLAG_COMP, The file contents are compressed.
         /// </summary>
         Compressed = 0x10,
 
@@ -295,7 +295,6 @@ namespace SleuthKit
         Error,
     };
 
-
     /// <summary>
     /// Managed version of TSK_FS_META_TYPE_ENUM, Values for the mode field -- which identifies the file type and permissions.
     /// </summary>
@@ -317,17 +316,17 @@ namespace SleuthKit
         Directory = 0x02,
 
         /// <summary>
-        /// TSK_FS_META_TYPE_FIFO, Named pipe (fifo) 
+        /// TSK_FS_META_TYPE_FIFO, Named pipe (fifo)
         /// </summary>
         NamedPipe = 0x03,
 
         /// <summary>
-        /// TSK_FS_META_TYPE_CHR, Character device 
+        /// TSK_FS_META_TYPE_CHR, Character device
         /// </summary>
         CharacterDevice = 0x04,
 
         /// <summary>
-        /// TSK_FS_META_TYPE_BLK, Block device 
+        /// TSK_FS_META_TYPE_BLK, Block device
         /// </summary>
         BlockDevice = 0x05,
 
@@ -337,7 +336,7 @@ namespace SleuthKit
         Symlink = 0x06,
 
         /// <summary>
-        /// TSK_FS_META_TYPE_SHAD, SOLARIS ONLY 
+        /// TSK_FS_META_TYPE_SHAD, SOLARIS ONLY
         /// </summary>
         Shadow = 0x07,
 
@@ -364,62 +363,62 @@ namespace SleuthKit
     public enum MetadataMode : int
     {
         /// <summary>
-        /// set user id on execution 
+        /// set user id on execution
         /// </summary>
         TSK_FS_META_MODE_ISUID = 0004000,
 
         /// <summary>
-        /// set group id on execution 
+        /// set group id on execution
         /// </summary>
         TSK_FS_META_MODE_ISGID = 0002000,
 
         /// <summary>
-        /// sticky bit 
+        /// sticky bit
         /// </summary>
         TSK_FS_META_MODE_ISVTX = 0001000,
 
         /// <summary>
-        /// R for owner 
+        /// R for owner
         /// </summary>
         TSK_FS_META_MODE_IRUSR = 0000400,
 
         /// <summary>
-        /// W for owner 
+        /// W for owner
         /// </summary>
         TSK_FS_META_MODE_IWUSR = 0000200,
 
         /// <summary>
-        /// X for owner 
+        /// X for owner
         /// </summary>
         TSK_FS_META_MODE_IXUSR = 0000100,
 
         /// <summary>
-        /// R for group 
+        /// R for group
         /// </summary>
         TSK_FS_META_MODE_IRGRP = 0000040,
 
         /// <summary>
-        /// W for group 
+        /// W for group
         /// </summary>
         TSK_FS_META_MODE_IWGRP = 0000020,
 
         /// <summary>
-        /// X for group 
+        /// X for group
         /// </summary>
         TSK_FS_META_MODE_IXGRP = 0000010,
 
         /// <summary>
-        /// R for other 
+        /// R for other
         /// </summary>
         TSK_FS_META_MODE_IROTH = 0000004,
 
         /// <summary>
-        /// W for other 
+        /// W for other
         /// </summary>
         TSK_FS_META_MODE_IWOTH = 0000002,
 
         /// <summary>
-        /// X for other 
+        /// X for other
         /// </summary>
         TSK_FS_META_MODE_IXOTH = 0000001
     }
@@ -446,7 +445,7 @@ namespace SleuthKit
         Unallocated = 0x02,
 
         /// <summary>
-        /// TSK_FS_DIR_WALK_FLAG_RECURSE, Recurse into sub-directories 
+        /// TSK_FS_DIR_WALK_FLAG_RECURSE, Recurse into sub-directories
         /// </summary>
         Recurse = 0x04,
 
@@ -477,7 +476,7 @@ namespace SleuthKit
         Error = 0x2,
     }
 
-    enum FilesystemInfoFlag
+    internal enum FilesystemInfoFlag
     {
         /// <summary>
         /// TSK_FS_INFO_FLAG_NONE, No Flags
@@ -488,17 +487,17 @@ namespace SleuthKit
         /// TSK_FS_INFO_FLAG_HAVE_SEQ, File system has sequence numbers in the inode addresses.
         /// </summary>
         HasSequenceNumbers = 0x01,
-        
+
         /// <summary>
         /// TSK_FS_INFO_FLAG_HAVE_NANOSEC, Nano second field in times will be set.
         /// </summary>
         HasNanoSec = 0x02
     };
 
-    enum FileReadFlag
+    internal enum FileReadFlag
     {
         /// <summary>
-        /// TSK_FS_FILE_READ_FLAG_NONE 
+        /// TSK_FS_FILE_READ_FLAG_NONE
         /// </summary>
         None = 0x00,
 
@@ -514,9 +513,9 @@ namespace SleuthKit
     }
 
     /// <summary>
-    /// Flags that are used in TSK_FS_BLOCK and in callback of file_walk. 
-    /// Note that some of these are dependent.  A block can be either TSK_FS_BLOCK_FLAG_ALLOC or TSK_FS_BLOCK_FLAG_UNALLOC.  
-    /// It can be one of TSK_FS_BLOCK_FLAG_RAW, TSK_FS_BLOCK_FLAG_BAD, TSK_FS_BLOCK_FLAG_RES, TSK_FS_BLOCK_FLAG_SPARSE, or TSK_FS_BLOCK_FLAG_COMP.  
+    /// Flags that are used in TSK_FS_BLOCK and in callback of file_walk.
+    /// Note that some of these are dependent.  A block can be either TSK_FS_BLOCK_FLAG_ALLOC or TSK_FS_BLOCK_FLAG_UNALLOC.
+    /// It can be one of TSK_FS_BLOCK_FLAG_RAW, TSK_FS_BLOCK_FLAG_BAD, TSK_FS_BLOCK_FLAG_RES, TSK_FS_BLOCK_FLAG_SPARSE, or TSK_FS_BLOCK_FLAG_COMP.
     /// Note that some of these are set only by file_walk because they are file-level details, such as compression and sparse.
     /// </summary>
     /// <remarks>TSK_FS_BLOCK_FLAG_ENUM</remarks>
@@ -593,7 +592,7 @@ namespace SleuthKit
         /// <summary>
         /// No Flag.
         /// </summary>
-        None = 0x00, 
+        None = 0x00,
 
         /// <summary>
         /// Include the file's slack space in the callback.
@@ -603,17 +602,17 @@ namespace SleuthKit
         /// <summary>
         /// Ignore the Id argument given in the API (use only the type).
         /// </summary>
-        NoId = 0x02, 
+        NoId = 0x02,
 
         /// <summary>
         /// Provide callback with only addresses and no file content.
         /// </summary>
-        AOnly = 0x04, 
+        AOnly = 0x04,
 
         /// <summary>
         /// Do not include sparse blocks in the callback.
         /// </summary>
-        NoSparse = 0x08, 
+        NoSparse = 0x08,
     }
 
     /// <summary>
@@ -669,7 +668,7 @@ namespace SleuthKit
         UFS1b = 0x00000020,
 
         /// <summary>
-        /// TSK_FS_TYPE_FFS2, UFS2 - FreeBSD, NetBSD 
+        /// TSK_FS_TYPE_FFS2, UFS2 - FreeBSD, NetBSD
         /// </summary>
         UFS2 = 0x00000040,
 
@@ -719,12 +718,12 @@ namespace SleuthKit
         /// TSK_FS_TYPE_HFS, HFS file system
         /// </summary>
         HFS = 0x00001000,
-         
+
         /// <summary>
         /// TSK_FS_TYPE_YAFFS2, YAFFS2 file system
         /// </summary>
-        Yaffs2 = 0x00004000,     
-                                                        
+        Yaffs2 = 0x00004000,
+
         /// <summary>
         /// TSK_FS_TYPE_UNSUPP, Unsupported file system
         /// </summary>
@@ -732,10 +731,10 @@ namespace SleuthKit
     }
 
     /// <summary>
-    /// Endian .. little or big .. or middle! 
+    /// Endian .. little or big .. or middle!
     /// </summary>
     /// <remarks>
-    /// The term big-endian originally comes from Jonathan Swift's satirical novel Gulliver’s Travels by way of Danny Cohen in 1980. In 1726, Swift described tensions in Lilliput and Blefuscu: whereas royal edict in Lilliput requires cracking open one's soft-boiled egg at the small end, inhabitants of the rival kingdom of Blefuscu crack theirs at the big end (giving them the moniker Big-endians). The terms little-endian and endianness have a similar intent. 
+    /// The term big-endian originally comes from Jonathan Swift's satirical novel Gulliver’s Travels by way of Danny Cohen in 1980. In 1726, Swift described tensions in Lilliput and Blefuscu: whereas royal edict in Lilliput requires cracking open one's soft-boiled egg at the small end, inhabitants of the rival kingdom of Blefuscu crack theirs at the big end (giving them the moniker Big-endians). The terms little-endian and endianness have a similar intent.
     /// http://en.wikipedia.org/wiki/Endianness
     /// </remarks>
     public enum Endianness
@@ -759,7 +758,7 @@ namespace SleuthKit
         /// <summary>
         /// TSK_IMG_TYPE_DETECT, Use autodetection methods
         /// </summary>
-        Autodetect = 0x0000,        
+        Autodetect = 0x0000,
 
         /// <summary>
         /// TSK_IMG_TYPE_RAW_SING, Raw single disk image
@@ -774,7 +773,7 @@ namespace SleuthKit
         /// <summary>
         /// TSK_IMG_TYPE_RAW_SPLIT, Raw split (backward compatibility) depreciated
         /// </summary>
-        RawSplit = Raw, 
+        RawSplit = Raw,
 
         /// <summary>
         /// TSK_IMG_TYPE_AFF_AFF, AFF AFF Format
@@ -819,7 +818,7 @@ namespace SleuthKit
         Allocated = 0x01,
 
         /// <summary>
-        ///  TSK_VS_PART_FLAG_UNALLOC, Sectors are not allocated to a volume 
+        ///  TSK_VS_PART_FLAG_UNALLOC, Sectors are not allocated to a volume
         /// </summary>
         Unallocated = 0x02,
 
@@ -829,7 +828,7 @@ namespace SleuthKit
         Metadata = 0x04,
 
         /// <summary>
-        /// TSK_VS_PART_FLAG_ALL, Show all sectors in the walk. 
+        /// TSK_VS_PART_FLAG_ALL, Show all sectors in the walk.
         /// </summary>
         All = 0x07,
     }
@@ -886,7 +885,7 @@ namespace SleuthKit
     {
         None = 0x00,       ///< No Flag
         Filler = 0x01,     ///< Entry is a filler for a run that has not been seen yet in the processing (or has been lost)
-        Sparse = 0x02      ///< Entry is a sparse run where all data in the run is zeros        
+        Sparse = 0x02      ///< Entry is a sparse run where all data in the run is zeros
     }
 
     /// <summary>
@@ -924,6 +923,14 @@ namespace SleuthKit
         HfsData = 0x1100,     // 4352 Data fork of regular files
         HfsRSRC = 0x1101,     // 4353 Resource fork of regular files
         HfsExtAttr = 0x1102, // 4354 Extended Attributes, except compression records
-        HfsCompRec = 0x1103, // 4355 Compression records        
+        HfsCompRec = 0x1103, // 4355 Compression records
+    }
+
+    [Flags]
+    public enum FileAllocationFlags
+    {
+        None = 0,
+        Deleted = 1,
+        Overwritten = 2,
     }
 }

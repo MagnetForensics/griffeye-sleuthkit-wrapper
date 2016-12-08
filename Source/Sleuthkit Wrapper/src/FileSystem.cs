@@ -1,5 +1,7 @@
 ﻿using SleuthKit.Structs;
 using System;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -15,7 +17,21 @@ namespace SleuthKit
         internal FileSystemHandle _handle;
         private TSK_FS_INFO _struct;
         private Volume _volume;
-        #endregion
+
+        private byte[] _bitmap;
+        private byte[] Bitmap
+        {
+            get
+            {
+                if (_bitmap == null)
+                {
+                    _bitmap = GetBitmap();
+                }
+
+                return _bitmap;
+            }
+        }
+        #endregion Fields
 
         #region Constructors
 
@@ -46,13 +62,13 @@ namespace SleuthKit
             this._struct = _handle.GetStruct();
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Properties
 
         public String Label
         {
-            get 
+            get
             {
                 switch (_struct.FilesystemType)
                 {
@@ -126,7 +142,7 @@ namespace SleuthKit
         }
 
         /// <summary>
-        /// 	Size of each block (in bytes) 
+        /// 	Size of each block (in bytes)
         /// </summary>
         public int BlockSize
         {
@@ -137,7 +153,7 @@ namespace SleuthKit
         }
 
         /// <summary>
-        /// Number of blocks in fs. 
+        /// Number of blocks in fs.
         /// </summary>
         public long BlockCount
         {
@@ -148,7 +164,7 @@ namespace SleuthKit
         }
 
         /// <summary>
-        /// Address of first block. 
+        /// Address of first block.
         /// </summary>
         public long FirstBlock
         {
@@ -159,7 +175,7 @@ namespace SleuthKit
         }
 
         /// <summary>
-        /// Address of last block as reported by file system (could be larger than last_block in image if end of image does not exist) 
+        /// Address of last block as reported by file system (could be larger than last_block in image if end of image does not exist)
         /// </summary>
         public long LastBlock
         {
@@ -170,7 +186,7 @@ namespace SleuthKit
         }
 
         /// <summary>
-        /// Address of last block -- adjusted so that it is equal to the last block in the image or volume (if image is not complete) 
+        /// Address of last block -- adjusted so that it is equal to the last block in the image or volume (if image is not complete)
         /// </summary>
         public long ActualLastBlock
         {
@@ -202,7 +218,7 @@ namespace SleuthKit
             }
         }
 
-        #endregion
+        #endregion Properties
 
         #region Methods
 
@@ -366,7 +382,104 @@ namespace SleuthKit
             return buf.ToString();
         }
 
-        #endregion
+        /// <summary>
+        /// Gets the FileAllocationFlags for the specified file.
+        /// </summary>
+        /// <param name="file">The file to check</param>
+        public FileAllocationFlags GetFileAllocationFlags(TSK_FS_FILE file)
+        {
+            FileAllocationFlags flags = FileAllocationFlags.None;
+
+            if ((file.Metadata.HasValue && file.Metadata.Value.MetadataFlags.HasFlag(MetadataFlags.Unallocated)) ||
+                (file.Name.HasValue && file.Name.Value.Flags == NameFlags.Unallocated))
+            {
+                flags |= FileAllocationFlags.Deleted;
+
+                if (Type == FileSystemType.NTFS)
+                {
+                    if (IsOverwrittenNTFS(Bitmap, file))
+                    {
+                        flags |= FileAllocationFlags.Overwritten;
+                    }
+                }
+            }
+
+            return flags;
+        }
+
+        private byte[] GetBitmap()
+        {
+            const long NTFS_BITMAP_ADDRESS = 6;
+
+            //TODO: Add support for more filesystems.
+            //      exFAT, HFS, HFS+, and ext3 uses bitmaps and it should be possible to read them.
+            //      ext4 uses extents, which should be possible to convert to a bitmap, or use as
+            //      is with another IsFree method.
+
+            switch (Type)
+            {
+                case FileSystemType.NTFS:
+                    using (Stream bitmapStream = new SleuthKit.FileStream(OpenFile(NTFS_BITMAP_ADDRESS)))
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        bitmapStream.CopyTo(memoryStream);
+                        return memoryStream.ToArray();
+                    }
+
+                default:
+                    return new byte[] { };
+            }
+        }
+
+        private static bool IsOverwrittenNTFS(byte[] bitmap, TSK_FS_FILE file)
+        {
+            if (bitmap.Any() && file.Metadata.HasValue && file.Metadata.Value.HasAttributeList)
+            {
+                foreach (TSK_FS_ATTR attr in file.Metadata.Value.AttributeList.List)
+                {
+                    if (attr.AttributeType == AttributeType.NtfsData &&
+                        attr.Name.Equals(String.Empty) &&
+                        attr.AttributeFlags.HasFlag(AttributeFlags.NonResident))
+                    {
+                        //This is the stream we are searching for
+                        foreach (TSK_FS_ATTR_RUN run in attr.NonResidentBlocks)
+                        {
+                            if (run.Flags == AttributeRunFlags.None && !IsFree(bitmap, run.Address, run.Length))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsFree(byte[] bitmap, ulong startCluster, ulong length)
+        {
+            int index = (int)startCluster / 8;
+            int bitmask = 1 << ((int)startCluster % 8);
+
+            for (ulong i = 0; i < length; i++)
+            {
+                if ((bitmap[index] & bitmask) != 0)
+                {
+                    return false;
+                }
+
+                bitmask = bitmask << 1;
+                if (bitmask == 256)
+                {
+                    index++;
+                    bitmask = 1;
+                }
+            }
+
+            return true;
+        }
+
+        #endregion Methods
     }
 
     /// <summary>
@@ -374,12 +487,12 @@ namespace SleuthKit
     /// </summary>
     public class FileSystemBlock : IDisposable
     {
-        #region Fields        
+        #region Fields
         private FileSystem _fs;
         private FileSystemBlockHandle _handle;
         private long _blockAddress;
         private TSK_FS_BLOCK _struct;
-        #endregion
+        #endregion Fields
 
         internal FileSystemBlock(FileSystem fileSystem, FileSystemBlockHandle fsbh, long block)
         {
