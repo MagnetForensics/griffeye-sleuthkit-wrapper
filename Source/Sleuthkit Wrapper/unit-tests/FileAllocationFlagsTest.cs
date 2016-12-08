@@ -12,12 +12,12 @@ namespace SleuthkitSharp_UnitTests
         [Test]
         public void TestFileAllocationFlags()
         {
-            const string path = @"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\USB-Disk-image-FAT.E01";
+            const string path = @"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\G-Recycle-2.E01";
             Dictionary<FileAllocationFlags, int> result = CountFilesPerFlagsInImage(path);
 
-            Assert.AreEqual(2, result[FileAllocationFlags.None]);
-            Assert.AreEqual(2, result[FileAllocationFlags.Deleted]);
-            Assert.AreEqual(2, result[FileAllocationFlags.Overwritten]);
+            Assert.AreEqual(267, result[FileAllocationFlags.None]);
+            Assert.AreEqual(70, result[FileAllocationFlags.Deleted]);
+            Assert.AreEqual(46, result[FileAllocationFlags.Deleted | FileAllocationFlags.Overwritten]);
         }
 
         private Dictionary<FileAllocationFlags, int> CountFilesPerFlagsInImage(String imagePath)
@@ -27,9 +27,6 @@ namespace SleuthkitSharp_UnitTests
             int failedFsCount = 0;
 
             Dictionary<FileAllocationFlags, int> result = new Dictionary<FileAllocationFlags, int>();
-            result.Add(FileAllocationFlags.None, 0);
-            result.Add(FileAllocationFlags.Deleted, 0);
-            result.Add(FileAllocationFlags.Overwritten, 0);
 
             if (image.HasVolumes)
             {
@@ -57,9 +54,17 @@ namespace SleuthkitSharp_UnitTests
                 FileFlagCounter counter = new FileFlagCounter(fs);
                 fs.WalkDirectories(counter.DirWalkCallback);
 
-                result[FileAllocationFlags.None] += counter.NoneCount;
-                result[FileAllocationFlags.Deleted] += counter.DeletedCount;
-                result[FileAllocationFlags.Overwritten] += counter.OverwrittenCount;
+                foreach (KeyValuePair<FileAllocationFlags, int> kvp in counter.Count)
+                {
+                    if (!result.ContainsKey(kvp.Key))
+                    {
+                        result.Add(kvp.Key, kvp.Value);
+                    }
+                    else
+                    {
+                        result[kvp.Key] += kvp.Value;
+                    }
+                }
             }
             catch (Exception)
             {
@@ -71,13 +76,12 @@ namespace SleuthkitSharp_UnitTests
         {
             private FileSystem fileSystem;
 
-            public int NoneCount { get; private set; }
-            public int DeletedCount { get; private set; }
-            public int OverwrittenCount { get; private set; }
+            public Dictionary<FileAllocationFlags, int> Count;
 
             internal FileFlagCounter(FileSystem fileSystem)
             {
                 this.fileSystem = fileSystem;
+                Count = new Dictionary<FileAllocationFlags, int>();
             }
 
             public WalkReturnEnum DirWalkCallback(ref TSK_FS_FILE file, string path, IntPtr some_ptr)
@@ -86,11 +90,13 @@ namespace SleuthkitSharp_UnitTests
                 {
                     FileAllocationFlags flags = fileSystem.GetFileAllocationFlags(file);
 
-                    switch (flags)
+                    if (!Count.ContainsKey(flags))
                     {
-                        case FileAllocationFlags.None: NoneCount++; break;
-                        case FileAllocationFlags.Deleted: DeletedCount++; break;
-                        case FileAllocationFlags.Overwritten: OverwrittenCount++; break;
+                        Count.Add(flags, 1);
+                    }
+                    else
+                    {
+                        Count[flags]++;
                     }
                 }
 
