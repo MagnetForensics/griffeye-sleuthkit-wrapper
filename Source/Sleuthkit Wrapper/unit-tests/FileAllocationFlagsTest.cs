@@ -22,29 +22,30 @@ namespace SleuthkitSharp_UnitTests
 
         private Dictionary<FileAllocationFlags, int> CountFilesPerFlagsInImage(String imagePath)
         {
-            DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath));
-
-            int failedFsCount = 0;
-
-            Dictionary<FileAllocationFlags, int> result = new Dictionary<FileAllocationFlags, int>();
-
-            if (image.HasVolumes)
+            using (DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath)))
             {
-                VolumeSystem vs = image.OpenVolumeSystem();
-                foreach (Volume v in vs.Volumes)
-                {
-                    CountInFileSystem(v.OpenFileSystem(), result, ref failedFsCount);
-                }
-            }
-            else
-            {
-                foreach (FileSystem fs in image.GetFileSystems())
-                {
-                    CountInFileSystem(fs, result, ref failedFsCount);
-                }
-            }
+                int failedFsCount = 0;
 
-            return result;
+                Dictionary<FileAllocationFlags, int> result = new Dictionary<FileAllocationFlags, int>();
+
+                if (image.HasVolumes)
+                {
+                    VolumeSystem vs = image.OpenVolumeSystem();
+                    foreach (Volume v in vs.Volumes)
+                    {
+                        CountInFileSystem(v.OpenFileSystem(), result, ref failedFsCount);
+                    }
+                }
+                else
+                {
+                    foreach (FileSystem fs in image.GetFileSystems())
+                    {
+                        CountInFileSystem(fs, result, ref failedFsCount);
+                    }
+                }
+
+                return result;
+            }
         }
 
         private void CountInFileSystem(FileSystem fs, Dictionary<FileAllocationFlags, int> result, ref int failedFsCount)
