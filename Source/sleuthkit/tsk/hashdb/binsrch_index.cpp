@@ -23,7 +23,11 @@
 // the hash, so there are 2 ^ 12 or 4096 possible entries.
 static const size_t IDX_IDX_ENTRY_COUNT = 4096;
 static const size_t IDX_IDX_SIZE = IDX_IDX_ENTRY_COUNT * sizeof(uint64_t);
-static const uint64_t IDX_IDX_ENTRY_NOT_SET = 0xFFFFFFFFFFFFFFFF;
+#if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
+static const uint64_t IDX_IDX_ENTRY_NOT_SET = 0xFFFFFFFFFFFFFFFFUL;
+#else
+static const uint64_t IDX_IDX_ENTRY_NOT_SET = 0xFFFFFFFFFFFFFFFFULL;
+#endif
 
 
 /**
@@ -205,7 +209,7 @@ static uint8_t
                 tsk_error_reset();
                 tsk_error_set_errno(TSK_ERR_HDB_OPEN);
                 tsk_error_set_errstr(
-                    "%s: error opening index of index: %"PRIttocTSK" - %d",
+                    "%s: error opening index of index: %" PRIttocTSK" - %d",
                     func_name, hdb_binsrch_info->idx_idx_fname, (int)GetLastError());
                 return 1;
         }
@@ -215,7 +219,7 @@ static uint8_t
             tsk_error_reset();
             tsk_error_set_errno(TSK_ERR_HDB_OPEN);
             tsk_error_set_errstr(
-                "%s: error converting file handle from Windows to C for: %"PRIttocTSK, 
+                "%s: error converting file handle from Windows to C for: %" PRIttocTSK, 
                 func_name, hdb_binsrch_info->idx_idx_fname);
             return 1;
         }
@@ -226,7 +230,7 @@ static uint8_t
             tsk_error_reset();
             tsk_error_set_errno(TSK_ERR_HDB_OPEN);
             tsk_error_set_errstr(
-                "%s: error getting size of index of index file: %"PRIttocTSK" - %d",
+                "%s: error getting size of index of index file: %" PRIttocTSK" - %d",
                 func_name, hdb_binsrch_info->idx_idx_fname, (int)GetLastError());
             return 1;
         }
@@ -245,7 +249,7 @@ static uint8_t
             tsk_error_reset();
             tsk_error_set_errno(TSK_ERR_HDB_OPEN);
             tsk_error_set_errstr(
-                "%s: error opening index of index: %"PRIttocTSK,
+                "%s: error opening index of index: %" PRIttocTSK,
                 func_name, hdb_binsrch_info->idx_idx_fname);
             return 1;
         }
@@ -321,7 +325,7 @@ static uint8_t
             tsk_error_reset();
             tsk_error_set_errno(TSK_ERR_HDB_MISSING);
             tsk_error_set_errstr(
-                "hdb_binsrch_open_idx_file: Error finding index file: %"PRIttocTSK,
+                "hdb_binsrch_open_idx_file: Error finding index file: %" PRIttocTSK,
                 hdb_binsrch_info->idx_fname);
             return 1;
         }
@@ -333,7 +337,7 @@ static uint8_t
                 tsk_error_reset();
                 tsk_error_set_errno(TSK_ERR_HDB_OPEN);
                 tsk_error_set_errstr(
-                    "hdb_binsrch_open_idx: Error opening index file: %"PRIttocTSK,
+                    "hdb_binsrch_open_idx: Error opening index file: %" PRIttocTSK,
                     hdb_binsrch_info->idx_fname);
                 return 1;
         }
@@ -354,7 +358,7 @@ static uint8_t
             tsk_error_reset();
             tsk_error_set_errno(TSK_ERR_HDB_OPEN);
             tsk_error_set_errstr(
-                "hdb_binsrch_open_idx_file: Error getting size of index file: %"PRIttocTSK" - %d",
+                "hdb_binsrch_open_idx_file: Error getting size of index file: %" PRIttocTSK" - %d",
                 hdb_binsrch_info->idx_fname, (int)GetLastError());
             return 1;
         }
@@ -680,7 +684,7 @@ uint8_t
                 tsk_error_reset();
                 tsk_error_set_errno(TSK_ERR_HDB_CREATE);
                 tsk_error_set_errstr(
-                    "%s: %"PRIttocTSK" GetFileSize: %d",
+                    "%s: %" PRIttocTSK" GetFileSize: %d",
                     func_name, hdb_binsrch_info->uns_fname, (int)GetLastError());
                 return 1;
         }
@@ -827,7 +831,7 @@ static uint8_t
                 tsk_error_reset();
                 tsk_error_set_errno(TSK_ERR_HDB_CREATE);
                 tsk_error_set_errstr(
-                    "%s: error creating index of index file %"PRIttocTSK" - %d)",
+                    "%s: error creating index of index file %" PRIttocTSK" - %d)",
                     func_name, hdb_binsrch_info->idx_idx_fname, winErrNo);
                 return 1;
         }
@@ -838,7 +842,7 @@ static uint8_t
             tsk_error_reset();
             tsk_error_set_errno(TSK_ERR_HDB_OPEN);
             tsk_error_set_errstr(
-                "%s: error converting file handle from Windows to C for: %"PRIttocTSK, 
+                "%s: error converting file handle from Windows to C for: %" PRIttocTSK, 
                 func_name, hdb_binsrch_info->idx_idx_fname);
             return 1;
         }
@@ -848,7 +852,7 @@ static uint8_t
         tsk_error_reset();
         tsk_error_set_errno(TSK_ERR_HDB_CREATE);
         tsk_error_set_errstr(
-            "%s: error creating index of index file %"PRIttocTSK,
+            "%s: error creating index of index file %" PRIttocTSK,
             func_name, hdb_binsrch_info->idx_idx_fname);
         return 1;
     }
