@@ -20,11 +20,13 @@
  */
 
 #include <common.h>
-#include <file_stream.h>
 #include <types.h>
 
-#include "libewf_error.h"
 #include "libewf_libcerror.h"
+
+#include <stdio.h>
+
+#include "libewf_error.h"
 
 #if !defined( HAVE_LOCAL_LIBEWF )
 

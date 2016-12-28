@@ -380,11 +380,11 @@ void cue_scanner_error(
 	{
 	        fprintf(
         	 stderr,
-	         "%s at token: %s (offset: %" PRIzd " size: %d)\n",
+	         "%s at token: %s (offset: %" PRIzd " size: %" PRIzd ")\n",
         	 error_string,
 	         cue_scanner_text,
 	         cue_scanner_buffer_offset - (size_t) cue_scanner_leng,
-	         cue_scanner_leng );
+	         (size_t) cue_scanner_leng );
 	}
 }
 

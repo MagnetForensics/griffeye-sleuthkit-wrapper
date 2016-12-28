@@ -25,6 +25,8 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_libcerror.h"
+
 #if defined( TIME_WITH_SYS_TIME )
 #include <sys/time.h>
 #include <time.h>
@@ -33,8 +35,6 @@
 #else
 #include <time.h>
 #endif
-
-#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {

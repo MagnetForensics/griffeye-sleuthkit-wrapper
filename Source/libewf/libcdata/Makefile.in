@@ -61,22 +61,22 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/bzip2.m4 \
 	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libbfio.m4 \
 	$(top_srcdir)/m4/libcaes.m4 $(top_srcdir)/m4/libcdata.m4 \
 	$(top_srcdir)/m4/libcerror.m4 $(top_srcdir)/m4/libcfile.m4 \
-	$(top_srcdir)/m4/libclocale.m4 $(top_srcdir)/m4/libcmulti.m4 \
-	$(top_srcdir)/m4/libcnotify.m4 $(top_srcdir)/m4/libcpath.m4 \
-	$(top_srcdir)/m4/libcrypto.m4 $(top_srcdir)/m4/libcsplit.m4 \
-	$(top_srcdir)/m4/libcstring.m4 $(top_srcdir)/m4/libcsystem.m4 \
-	$(top_srcdir)/m4/libfcache.m4 $(top_srcdir)/m4/libfuse.m4 \
-	$(top_srcdir)/m4/libfvalue.m4 $(top_srcdir)/m4/libhmac.m4 \
-	$(top_srcdir)/m4/libmfdata.m4 $(top_srcdir)/m4/libodraw.m4 \
-	$(top_srcdir)/m4/libsmdev.m4 $(top_srcdir)/m4/libsmraw.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/libuna.m4 \
-	$(top_srcdir)/m4/libuuid.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
-	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
-	$(top_srcdir)/m4/python.m4 $(top_srcdir)/m4/types.m4 \
-	$(top_srcdir)/m4/wincrypt.m4 $(top_srcdir)/m4/zlib.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/libclocale.m4 $(top_srcdir)/m4/libcnotify.m4 \
+	$(top_srcdir)/m4/libcpath.m4 $(top_srcdir)/m4/libcrypto.m4 \
+	$(top_srcdir)/m4/libcsplit.m4 $(top_srcdir)/m4/libcstring.m4 \
+	$(top_srcdir)/m4/libcsystem.m4 $(top_srcdir)/m4/libfcache.m4 \
+	$(top_srcdir)/m4/libfuse.m4 $(top_srcdir)/m4/libfvalue.m4 \
+	$(top_srcdir)/m4/libhmac.m4 $(top_srcdir)/m4/libmfdata.m4 \
+	$(top_srcdir)/m4/libodraw.m4 $(top_srcdir)/m4/libsmdev.m4 \
+	$(top_srcdir)/m4/libsmraw.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/libuna.m4 $(top_srcdir)/m4/libuuid.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
+	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/python.m4 \
+	$(top_srcdir)/m4/types.m4 $(top_srcdir)/m4/wincrypt.m4 \
+	$(top_srcdir)/m4/zlib.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -153,7 +153,6 @@ HAVE_LIBCDATA = @HAVE_LIBCDATA@
 HAVE_LIBCERROR = @HAVE_LIBCERROR@
 HAVE_LIBCFILE = @HAVE_LIBCFILE@
 HAVE_LIBCLOCALE = @HAVE_LIBCLOCALE@
-HAVE_LIBCMULTI = @HAVE_LIBCMULTI@
 HAVE_LIBCNOTIFY = @HAVE_LIBCNOTIFY@
 HAVE_LIBCPATH = @HAVE_LIBCPATH@
 HAVE_LIBCSPLIT = @HAVE_LIBCSPLIT@
@@ -175,7 +174,6 @@ HAVE_LOCAL_LIBCDATA = @HAVE_LOCAL_LIBCDATA@
 HAVE_LOCAL_LIBCERROR = @HAVE_LOCAL_LIBCERROR@
 HAVE_LOCAL_LIBCFILE = @HAVE_LOCAL_LIBCFILE@
 HAVE_LOCAL_LIBCLOCALE = @HAVE_LOCAL_LIBCLOCALE@
-HAVE_LOCAL_LIBCMULTI = @HAVE_LOCAL_LIBCMULTI@
 HAVE_LOCAL_LIBCNOTIFY = @HAVE_LOCAL_LIBCNOTIFY@
 HAVE_LOCAL_LIBCPATH = @HAVE_LOCAL_LIBCPATH@
 HAVE_LOCAL_LIBCSPLIT = @HAVE_LOCAL_LIBCSPLIT@
@@ -225,8 +223,6 @@ LIBCFILE_CPPFLAGS = @LIBCFILE_CPPFLAGS@
 LIBCFILE_LIBADD = @LIBCFILE_LIBADD@
 LIBCLOCALE_CPPFLAGS = @LIBCLOCALE_CPPFLAGS@
 LIBCLOCALE_LIBADD = @LIBCLOCALE_LIBADD@
-LIBCMULTI_CPPFLAGS = @LIBCMULTI_CPPFLAGS@
-LIBCMULTI_LIBADD = @LIBCMULTI_LIBADD@
 LIBCNOTIFY_CPPFLAGS = @LIBCNOTIFY_CPPFLAGS@
 LIBCNOTIFY_LIBADD = @LIBCNOTIFY_LIBADD@
 LIBCPATH_CPPFLAGS = @LIBCPATH_CPPFLAGS@
@@ -357,9 +353,6 @@ ax_libcfile_spec_requires = @ax_libcfile_spec_requires@
 ax_libclocale_pc_libs_private = @ax_libclocale_pc_libs_private@
 ax_libclocale_spec_build_requires = @ax_libclocale_spec_build_requires@
 ax_libclocale_spec_requires = @ax_libclocale_spec_requires@
-ax_libcmulti_pc_libs_private = @ax_libcmulti_pc_libs_private@
-ax_libcmulti_spec_build_requires = @ax_libcmulti_spec_build_requires@
-ax_libcmulti_spec_requires = @ax_libcmulti_spec_requires@
 ax_libcnotify_pc_libs_private = @ax_libcnotify_pc_libs_private@
 ax_libcnotify_spec_build_requires = @ax_libcnotify_spec_build_requires@
 ax_libcnotify_spec_requires = @ax_libcnotify_spec_requires@
@@ -449,8 +442,6 @@ libcfile_CFLAGS = @libcfile_CFLAGS@
 libcfile_LIBS = @libcfile_LIBS@
 libclocale_CFLAGS = @libclocale_CFLAGS@
 libclocale_LIBS = @libclocale_LIBS@
-libcmulti_CFLAGS = @libcmulti_CFLAGS@
-libcmulti_LIBS = @libcmulti_LIBS@
 libcnotify_CFLAGS = @libcnotify_CFLAGS@
 libcnotify_LIBS = @libcnotify_LIBS@
 libcpath_CFLAGS = @libcpath_CFLAGS@

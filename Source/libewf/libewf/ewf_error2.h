@@ -1,5 +1,5 @@
 /*
- * Restart data functions
+ * EWF error2 section
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,22 +19,60 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_RESTART_DATA_H )
-#define _LIBEWF_RESTART_DATA_H
+#if !defined( _EWF_ERROR2_H )
+#define _EWF_ERROR2_H
 
 #include <common.h>
 #include <types.h>
-
-#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libewf_restart_data_parse(
-     const uint8_t *restart_data,
-     size_t restart_data_size,
-     libcerror_error_t **error );
+typedef struct ewf_error2_header ewf_error2_header_t;
+
+struct ewf_error2_header
+{
+	/* The number of errors
+	 * consists of 4 bytes (32 bits)
+	 */
+	uint8_t number_of_errors[ 4 ];
+
+	/* Unknown
+	 * consists of 512 bytes
+	 * value should be 0x00
+	 */
+	uint8_t unknown[ 512 ];
+
+	/* The section checksum of all (previous) error2 data
+	 * consists of 4 bytes
+	 * starts with sector 76
+	 */
+	uint8_t checksum[ 4 ];
+
+	/* The sector array
+	 * consists of 8 bytes per sector
+	 * as long as necessary
+	 */
+
+	/* The last sector is followed by a 4 byte checksum
+	 */
+};
+
+typedef struct ewf_error2_sector ewf_error2_sector_t;
+
+struct ewf_error2_sector
+{
+	/* The start error2 sector
+	 * consists of 4 bytes (32 bits)
+	 */
+	uint8_t start_sector[ 4 ];
+
+	/* The number of sectors
+	 * consists of 4 bytes (32 bits)
+	 */
+	uint8_t number_of_sectors[ 4 ];
+};
 
 #if defined( __cplusplus )
 }

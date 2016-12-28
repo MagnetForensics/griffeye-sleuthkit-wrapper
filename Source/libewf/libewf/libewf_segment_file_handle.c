@@ -24,6 +24,7 @@
 #include <types.h>
 
 #include "libewf_libcerror.h"
+
 #include "libewf_segment_file_handle.h"
 
 /* Initialize the segment file handle

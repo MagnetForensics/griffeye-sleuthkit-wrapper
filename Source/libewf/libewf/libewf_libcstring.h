@@ -43,7 +43,7 @@
 #define LIBCSTRING_DLL_IMPORT
 #endif
 
-#include <libcstring.h>
+#include "libewf_libcstring.h"
 
 #endif
 

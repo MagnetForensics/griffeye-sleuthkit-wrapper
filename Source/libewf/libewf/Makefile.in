@@ -62,22 +62,22 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/bzip2.m4 \
 	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/libbfio.m4 \
 	$(top_srcdir)/m4/libcaes.m4 $(top_srcdir)/m4/libcdata.m4 \
 	$(top_srcdir)/m4/libcerror.m4 $(top_srcdir)/m4/libcfile.m4 \
-	$(top_srcdir)/m4/libclocale.m4 $(top_srcdir)/m4/libcmulti.m4 \
-	$(top_srcdir)/m4/libcnotify.m4 $(top_srcdir)/m4/libcpath.m4 \
-	$(top_srcdir)/m4/libcrypto.m4 $(top_srcdir)/m4/libcsplit.m4 \
-	$(top_srcdir)/m4/libcstring.m4 $(top_srcdir)/m4/libcsystem.m4 \
-	$(top_srcdir)/m4/libfcache.m4 $(top_srcdir)/m4/libfuse.m4 \
-	$(top_srcdir)/m4/libfvalue.m4 $(top_srcdir)/m4/libhmac.m4 \
-	$(top_srcdir)/m4/libmfdata.m4 $(top_srcdir)/m4/libodraw.m4 \
-	$(top_srcdir)/m4/libsmdev.m4 $(top_srcdir)/m4/libsmraw.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/libuna.m4 \
-	$(top_srcdir)/m4/libuuid.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
-	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
-	$(top_srcdir)/m4/python.m4 $(top_srcdir)/m4/types.m4 \
-	$(top_srcdir)/m4/wincrypt.m4 $(top_srcdir)/m4/zlib.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/libclocale.m4 $(top_srcdir)/m4/libcnotify.m4 \
+	$(top_srcdir)/m4/libcpath.m4 $(top_srcdir)/m4/libcrypto.m4 \
+	$(top_srcdir)/m4/libcsplit.m4 $(top_srcdir)/m4/libcstring.m4 \
+	$(top_srcdir)/m4/libcsystem.m4 $(top_srcdir)/m4/libfcache.m4 \
+	$(top_srcdir)/m4/libfuse.m4 $(top_srcdir)/m4/libfvalue.m4 \
+	$(top_srcdir)/m4/libhmac.m4 $(top_srcdir)/m4/libmfdata.m4 \
+	$(top_srcdir)/m4/libodraw.m4 $(top_srcdir)/m4/libsmdev.m4 \
+	$(top_srcdir)/m4/libsmraw.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/libuna.m4 $(top_srcdir)/m4/libuuid.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
+	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/python.m4 \
+	$(top_srcdir)/m4/types.m4 $(top_srcdir)/m4/wincrypt.m4 \
+	$(top_srcdir)/m4/zlib.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -114,17 +114,15 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libewf_la_DEPENDENCIES =
-am_libewf_la_OBJECTS = libewf.lo libewf_analytical_data.lo \
-	libewf_case_data.lo libewf_checksum.lo libewf_chunk_data.lo \
+am_libewf_la_OBJECTS = libewf.lo libewf_chunk_data.lo \
 	libewf_chunk_table.lo libewf_compression.lo \
 	libewf_date_time.lo libewf_date_time_values.lo libewf_debug.lo \
-	libewf_device_information.lo libewf_error.lo \
-	libewf_filename.lo libewf_file_entry.lo libewf_handle.lo \
-	libewf_hash_sections.lo libewf_hash_values.lo \
-	libewf_header_sections.lo libewf_header_values.lo \
-	libewf_io_handle.lo libewf_legacy.lo libewf_media_values.lo \
-	libewf_metadata.lo libewf_notify.lo libewf_read_io_handle.lo \
-	libewf_restart_data.lo libewf_section.lo \
+	libewf_empty_block.lo libewf_error.lo libewf_filename.lo \
+	libewf_file_entry.lo libewf_handle.lo libewf_hash_sections.lo \
+	libewf_hash_values.lo libewf_header_sections.lo \
+	libewf_header_values.lo libewf_io_handle.lo libewf_legacy.lo \
+	libewf_media_values.lo libewf_metadata.lo libewf_notify.lo \
+	libewf_read_io_handle.lo libewf_section.lo \
 	libewf_sector_range.lo libewf_segment_file.lo \
 	libewf_segment_file_handle.lo libewf_segment_table.lo \
 	libewf_single_files.lo libewf_single_file_entry.lo \
@@ -197,7 +195,6 @@ HAVE_LIBCDATA = @HAVE_LIBCDATA@
 HAVE_LIBCERROR = @HAVE_LIBCERROR@
 HAVE_LIBCFILE = @HAVE_LIBCFILE@
 HAVE_LIBCLOCALE = @HAVE_LIBCLOCALE@
-HAVE_LIBCMULTI = @HAVE_LIBCMULTI@
 HAVE_LIBCNOTIFY = @HAVE_LIBCNOTIFY@
 HAVE_LIBCPATH = @HAVE_LIBCPATH@
 HAVE_LIBCSPLIT = @HAVE_LIBCSPLIT@
@@ -219,7 +216,6 @@ HAVE_LOCAL_LIBCDATA = @HAVE_LOCAL_LIBCDATA@
 HAVE_LOCAL_LIBCERROR = @HAVE_LOCAL_LIBCERROR@
 HAVE_LOCAL_LIBCFILE = @HAVE_LOCAL_LIBCFILE@
 HAVE_LOCAL_LIBCLOCALE = @HAVE_LOCAL_LIBCLOCALE@
-HAVE_LOCAL_LIBCMULTI = @HAVE_LOCAL_LIBCMULTI@
 HAVE_LOCAL_LIBCNOTIFY = @HAVE_LOCAL_LIBCNOTIFY@
 HAVE_LOCAL_LIBCPATH = @HAVE_LOCAL_LIBCPATH@
 HAVE_LOCAL_LIBCSPLIT = @HAVE_LOCAL_LIBCSPLIT@
@@ -269,8 +265,6 @@ LIBCFILE_CPPFLAGS = @LIBCFILE_CPPFLAGS@
 LIBCFILE_LIBADD = @LIBCFILE_LIBADD@
 LIBCLOCALE_CPPFLAGS = @LIBCLOCALE_CPPFLAGS@
 LIBCLOCALE_LIBADD = @LIBCLOCALE_LIBADD@
-LIBCMULTI_CPPFLAGS = @LIBCMULTI_CPPFLAGS@
-LIBCMULTI_LIBADD = @LIBCMULTI_LIBADD@
 LIBCNOTIFY_CPPFLAGS = @LIBCNOTIFY_CPPFLAGS@
 LIBCNOTIFY_LIBADD = @LIBCNOTIFY_LIBADD@
 LIBCPATH_CPPFLAGS = @LIBCPATH_CPPFLAGS@
@@ -401,9 +395,6 @@ ax_libcfile_spec_requires = @ax_libcfile_spec_requires@
 ax_libclocale_pc_libs_private = @ax_libclocale_pc_libs_private@
 ax_libclocale_spec_build_requires = @ax_libclocale_spec_build_requires@
 ax_libclocale_spec_requires = @ax_libclocale_spec_requires@
-ax_libcmulti_pc_libs_private = @ax_libcmulti_pc_libs_private@
-ax_libcmulti_spec_build_requires = @ax_libcmulti_spec_build_requires@
-ax_libcmulti_spec_requires = @ax_libcmulti_spec_requires@
 ax_libcnotify_pc_libs_private = @ax_libcnotify_pc_libs_private@
 ax_libcnotify_spec_build_requires = @ax_libcnotify_spec_build_requires@
 ax_libcnotify_spec_requires = @ax_libcnotify_spec_requires@
@@ -493,8 +484,6 @@ libcfile_CFLAGS = @libcfile_CFLAGS@
 libcfile_LIBS = @libcfile_LIBS@
 libclocale_CFLAGS = @libclocale_CFLAGS@
 libclocale_LIBS = @libclocale_LIBS@
-libcmulti_CFLAGS = @libcmulti_CFLAGS@
-libcmulti_LIBS = @libcmulti_LIBS@
 libcnotify_CFLAGS = @libcnotify_CFLAGS@
 libcnotify_LIBS = @libcnotify_LIBS@
 libcpath_CFLAGS = @libcpath_CFLAGS@
@@ -555,6 +544,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
@@ -574,10 +564,11 @@ AM_CPPFLAGS = \
 
 lib_LTLIBRARIES = libewf.la
 libewf_la_SOURCES = \
+	ewf_checksum.h \
 	ewf_data.h \
 	ewf_definitions.h \
 	ewf_digest.h \
-	ewf_error.h \
+	ewf_error2.h \
 	ewf_file_header.h \
 	ewf_hash.h \
 	ewf_ltree.h \
@@ -585,11 +576,9 @@ libewf_la_SOURCES = \
 	ewf_session.h \
 	ewf_table.h \
 	ewf_volume.h \
+	ewf_volume_smart.h \
 	ewfx_delta_chunk.h \
 	libewf.c \
-	libewf_analytical_data.c libewf_analytical_data.h \
-	libewf_case_data.c libewf_case_data.h \
-	libewf_checksum.c libewf_checksum.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
 	libewf_chunk_table.c libewf_chunk_table.h \
 	libewf_codepage.h \
@@ -598,7 +587,7 @@ libewf_la_SOURCES = \
 	libewf_date_time_values.c libewf_date_time_values.h \
 	libewf_debug.c libewf_debug.h \
 	libewf_definitions.h \
-	libewf_device_information.c libewf_device_information.h \
+	libewf_empty_block.c libewf_empty_block.h \
 	libewf_error.c libewf_error.h \
 	libewf_extern.h \
 	libewf_filename.c libewf_filename.h \
@@ -610,14 +599,12 @@ libewf_la_SOURCES = \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_io_handle.c libewf_io_handle.h \
 	libewf_legacy.c libewf_legacy.h \
-	libewf_libbfio.h \
-	libewf_libcaes.h \
 	libewf_libcdata.h \
 	libewf_libcerror.h \
 	libewf_libclocale.h \
 	libewf_libcnotify.h \
 	libewf_libcstring.h \
-	libewf_libhmac.h \
+	libewf_libbfio.h \
 	libewf_libfcache.h \
 	libewf_libmfdata.h \
 	libewf_libfvalue.h \
@@ -626,7 +613,6 @@ libewf_la_SOURCES = \
 	libewf_metadata.c libewf_metadata.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
-	libewf_restart_data.c libewf_restart_data.h \
 	libewf_section.c libewf_section.h \
 	libewf_sector_range.c libewf_sector_range.h \
 	libewf_segment_file.c libewf_segment_file.h \
@@ -655,13 +641,9 @@ libewf_la_LIBADD = \
 	@LIBFVALUE_LIBADD@ \
 	@LIBMFDATA_LIBADD@ \
 	@ZLIB_LIBADD@ \
-	@BZIP2_LIBADD@ \
-	@LIBHMAC_LIBADD@ \
-	@LIBCAES_LIBADD@ \
-	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@
 
-libewf_la_LDFLAGS = -no-undefined -version-info 3:0:1
+libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0
 EXTRA_DIST = \
 	libewf_definitions.h.in \
 	libewf.rc \
@@ -752,16 +734,13 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_analytical_data.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_case_data.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_checksum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_chunk_data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_chunk_table.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_compression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_date_time.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_date_time_values.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_debug.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_device_information.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_empty_block.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_file_entry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_filename.Plo@am__quote@
@@ -776,7 +755,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_metadata.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_notify.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_read_io_handle.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_restart_data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_section.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_sector_range.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libewf_segment_file.Plo@am__quote@

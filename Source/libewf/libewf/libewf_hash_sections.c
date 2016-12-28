@@ -22,7 +22,6 @@
 #include <common.h>
 #include <memory.h>
 
-#include "libewf_libcerror.h"
 #include "libewf_hash_sections.h"
 
 /* Initialize the hash sections

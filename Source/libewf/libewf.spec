@@ -1,5 +1,5 @@
 Name: libewf
-Version: 20130331
+Version: 20130416
 Release: 1
 Summary: Library to access the Expert Witness Compression Format (EWF)
 Group: System Environment/Libraries
@@ -7,8 +7,8 @@ License: LGPL
 Source: %{name}-%{version}.tar.gz
 URL: http://code.google.com/p/libewf/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Requires: bzip2-libs          openssl        zlib
-BuildRequires: bzip2-devel          openssl-devel        zlib-devel
+Requires: bzip2-libs         openssl        zlib
+BuildRequires: bzip2-devel         openssl-devel        zlib-devel
 
 %description
 libewf is a library to access the Expert Witness Compression Format (EWF).
@@ -19,8 +19,8 @@ Supports files created by EnCase 1 to 7, linen 5 to 7 and FTK Imager.
 %package static
 Summary: Library to access the Expert Witness Compression Format (EWF)
 Group: Development/Libraries
-Requires: bzip2-libs          openssl        zlib-static
-BuildRequires: bzip2-devel          openssl-devel        zlib-devel
+Requires: bzip2-libs         openssl        zlib-static
+BuildRequires: bzip2-devel         openssl-devel        zlib-devel
 
 %description static
 Static library version of libewf
@@ -82,7 +82,7 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files devel
 %defattr(644,root,root,755)
-%doc AUTHORS COPYING NEWS README README.dll README.macosx README.mingw README.static ChangeLog
+%doc AUTHORS COPYING NEWS README README.dll README.macosx ChangeLog
 %{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libewf.pc
@@ -112,6 +112,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %exclude %{_bindir}/ewfdebug
 
 %changelog
-* Sun Mar 31 2013 Joachim Metz <joachim.metz@gmail.com> 20130331-1
+* Tue Apr 16 2013 Joachim Metz <joachim.metz@gmail.com> 20130416-1
 - Auto-generated
 

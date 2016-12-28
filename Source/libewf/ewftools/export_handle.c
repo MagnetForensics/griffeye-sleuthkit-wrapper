@@ -2065,14 +2065,18 @@ int export_handle_prompt_for_compression_method(
 
 		return( -1 );
 	}
+/* experimental version only
 	if( export_handle->ewf_format != LIBEWF_FORMAT_V2_ENCASE7 )
+*/
 	{
 		compression_methods_amount = 1;
 	}
+/* experimental version only
 	else
 	{
 		compression_methods_amount = EWFINPUT_COMPRESSION_METHODS_AMOUNT;
 	}
+*/
 	result = ewfinput_get_fixed_string_variable(
 	          export_handle->notify_stream,
 	          export_handle->input_buffer,
@@ -2819,7 +2823,9 @@ int export_handle_set_compression_values(
 
 			goto on_error;
 		}
+/* experimental version only
 		if( export_handle->ewf_format != LIBEWF_FORMAT_V2_ENCASE7 )
+*/
 		{
 			if( export_handle->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
 			{
@@ -3889,6 +3895,7 @@ int export_handle_set_output_values(
 		}
 		if( copy_input_values != 0 )
 		{
+/* experimental version only
 			if( libewf_handle_get_compression_method(
 			     export_handle->input_handle,
 			     &( export_handle->compression_method ),
@@ -3903,6 +3910,7 @@ int export_handle_set_output_values(
 
 				return( -1 );
 			}
+*/
 			if( libewf_handle_get_compression_values(
 			     export_handle->input_handle,
 			     &( export_handle->compression_level ),
@@ -3919,6 +3927,7 @@ int export_handle_set_output_values(
 				return( -1 );
 			}
 		}
+/* experimental version only
 		if( export_handle->ewf_format != LIBEWF_FORMAT_V2_ENCASE7 )
 		{
 			if( export_handle->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
@@ -3940,6 +3949,7 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
+*/
 		if( libewf_handle_set_compression_values(
 		     export_handle->ewf_output_handle,
 		     export_handle->compression_level,

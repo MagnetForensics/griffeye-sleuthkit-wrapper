@@ -23,8 +23,9 @@
 #define _LIBEWF_SUPPORT_H
 
 #include <common.h>
-#include <file_stream.h>
 #include <types.h>
+
+#include <stdio.h>
 
 #include "libewf_extern.h"
 #include "libewf_libbfio.h"

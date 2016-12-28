@@ -38,10 +38,10 @@ struct ewfx_delta_chunk_header
 	 */
 	uint8_t chunk[ 4 ];
 
-	/* The size of the chunk data
+	/* The size of the chunk
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t chunk_data_size[ 4 ];
+	uint8_t chunk_size[ 4 ];
 
 	/* Padding
 	 * some padding reserved for future use
@@ -50,8 +50,9 @@ struct ewfx_delta_chunk_header
 	 */
 	uint8_t padding[ 6 ];
 
-	/* The section checksum of all (previous) data
+	/* The section checksum of all (previous) delta chunk section data
 	 * consists of 4 bytes
+	 * starts with offset 76
 	 */
 	uint8_t checksum[ 4 ];
 

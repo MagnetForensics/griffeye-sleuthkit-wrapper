@@ -23,13 +23,13 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_libcstring.h"
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
+
 #include "libewf_definitions.h"
 #include "libewf_file_entry.h"
 #include "libewf_handle.h"
-#include "libewf_legacy.h"
-#include "libewf_libcerror.h"
-#include "libewf_libcnotify.h"
-#include "libewf_libcstring.h"
 #include "libewf_metadata.h"
 #include "libewf_notify.h"
 #include "libewf_types.h"
@@ -150,68 +150,6 @@ int libewf_handle_get_amount_of_sectors(
 	         handle,
 	         amount_of_sectors,
 	         error ) );
-}
-
-/* Retrieves the number of chunks written
- * Returns 1 if successful or -1 on error
- */
-int libewf_handle_get_number_of_chunks_written(
-     libewf_handle_t *handle,
-     uint32_t *number_of_chunks,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_number_of_chunks_written";
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->write_io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.",
-		 function );
-
-		return( -1 );
-	}
-	if( number_of_chunks == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of chunks.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write_io_handle->number_of_chunks_written > (uint64_t) UINT32_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of chunks written value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	*number_of_chunks = (uint32_t) internal_handle->write_io_handle->number_of_chunks_written;
-
-	return( 1 );
 }
 
 /* Retrieves the amount of chunks written
@@ -874,7 +812,7 @@ ssize_t libewf_raw_read_prepare_buffer(
          size_t *uncompressed_buffer_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
-         int8_t chunk_io_flags )
+         int8_t read_checksum )
 {
 	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_raw_read_prepare_buffer";
@@ -888,7 +826,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 	                   uncompressed_buffer_size,
 	                   is_compressed,
 	                   chunk_checksum,
-	                   chunk_io_flags,
+	                   read_checksum,
 	                   &error );
 
 	if( chunk_data_size == -1 )
@@ -921,7 +859,7 @@ ssize_t libewf_raw_read_buffer(
          size_t buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags )
+         int8_t *read_checksum )
 {
 	uint8_t checksum_buffer[ 4 ];
 
@@ -936,7 +874,7 @@ ssize_t libewf_raw_read_buffer(
 	              is_compressed,
 	              checksum_buffer,
 	              chunk_checksum,
-	              chunk_io_flags,
+	              read_checksum,
 	              &error );
 
 	if( read_count == -1 )
@@ -1048,7 +986,7 @@ ssize_t libewf_raw_write_prepare_buffer(
          size_t *compressed_buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags )
+         int8_t *write_checksum )
 {
 	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_raw_write_prepare_buffer";
@@ -1062,7 +1000,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 	                   compressed_buffer_size,
 	                   is_compressed,
 	                   chunk_checksum,
-	                   chunk_io_flags,
+	                   write_checksum,
 	                   &error );
 
 	if( chunk_data_size == -1 )
@@ -1098,7 +1036,7 @@ ssize_t libewf_raw_write_buffer(
          size_t data_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
-         int8_t chunk_io_flags )
+         int8_t write_checksum )
 {
 	uint8_t checksum_buffer[ 4 ];
 
@@ -1114,7 +1052,7 @@ ssize_t libewf_raw_write_buffer(
 	               is_compressed,
 	               checksum_buffer,
 	               chunk_checksum,
-	               chunk_io_flags,
+	               write_checksum,
 	               &error );
 
 	if( write_count == -1 )
@@ -1997,7 +1935,7 @@ int libewf_get_compression_values(
 
 		return( -1 );
 	}
-	if( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
+	if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
 	{
 		*compress_empty_block = 1;
 	}
@@ -2022,7 +1960,7 @@ int libewf_set_compression_values(
 
 	if( compress_empty_block != 0 )
 	{
-		compression_flags = LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
+		compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
 	}
 	if( libewf_handle_set_compression_values(
 	     handle,
@@ -2595,7 +2533,7 @@ int libewf_handle_get_guid(
 	}
 	if( memory_copy(
 	     guid,
-	     internal_handle->media_values->set_identifier,
+	     internal_handle->media_values->guid,
 	     16 ) == NULL )
 	{
 		libcerror_error_set(
@@ -2682,7 +2620,7 @@ int libewf_handle_set_guid(
 		return( -1 );
 	}
 	if( memory_copy(
-	     internal_handle->media_values->set_identifier,
+	     internal_handle->media_values->guid,
 	     guid,
 	     16 ) == NULL )
 	{
@@ -3751,8 +3689,9 @@ int libewf_parse_header_values(
      libewf_handle_t *handle,
      uint8_t date_format )
 {
-	libcerror_error_t *error = NULL;
-	static char *function    = "libewf_parse_header_values";
+	libewf_internal_handle_t *internal_handle = NULL;
+	libcerror_error_t *error                   = NULL;
+	static char *function                     = "libewf_parse_header_values";
 
 	if( handle == NULL )
 	{
@@ -3770,6 +3709,8 @@ int libewf_parse_header_values(
 
 		return( -1 );
 	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
 	if( ( date_format != LIBEWF_DATE_FORMAT_CTIME )
 	 && ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
@@ -3789,7 +3730,32 @@ int libewf_parse_header_values(
 
 		return( -1 );
 	}
-	return( 0 );
+	if( internal_handle->header_values_parsed != 0 )
+	{
+		return( 0 );
+	}
+	if( libewf_handle_parse_header_values(
+	     internal_handle,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse header values.",
+		 function );
+
+		libcnotify_print_error_backtrace(
+		 error );
+		libcerror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	internal_handle->header_values_parsed = 1;
+	internal_handle->date_format          = date_format;
+
+	return( 1 );
 }
 
 /* Retrieves the amount of hash values

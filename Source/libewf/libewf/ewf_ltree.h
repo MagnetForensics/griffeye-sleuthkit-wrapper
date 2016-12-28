@@ -33,33 +33,33 @@ typedef struct ewf_ltree_header ewf_ltree_header_t;
 
 struct ewf_ltree_header
 {
-	/* The MD5 hash of the ltree data
-	 * Consists of 16 bytes
+	/* Unknown
+	 * consists of 16 bytes
 	 */
-	uint8_t integrity_hash[ 16 ];
+	uint8_t unknown1[ 16 ];
 
-	/* The size of the data in bytes
+	/* The size of the tree in bytes
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t data_size[ 4 ];
+	uint8_t tree_size[ 4 ];
 
 	/* Unknown
 	 * consists of 4 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown1[ 4 ];
+	uint8_t unknown2[ 4 ];
 
-	/* The section checksum of all data in the header
-	 * where the checksum value itself is zeroed out
-	 * consists of 4 bytes (32 bits)
+	/* Unknown
+	 * consists of 4 bytes
+	 * possible checksum?
 	 */
-	uint8_t checksum[ 4 ];
+	uint8_t unknown3[ 4 ];
 
 	/* Unknown
 	 * consists of 20 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown2[ 20 ];
+	uint8_t unknown4[ 20 ];
 };
 
 #if defined( __cplusplus )

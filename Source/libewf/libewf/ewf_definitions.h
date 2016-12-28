@@ -25,17 +25,40 @@
 #include <common.h>
 #include <types.h>
 
-/* The minimum chunk size is 32k or ( 64 sectors * 512 )
+/* The minimum chunk size is 32k (32 * 1024)
+ * 64 * 512 (64 sectors)
  */
 #define EWF_MINIMUM_CHUNK_SIZE			32768
 
-/* The maximum number of table entries for EWF
+/* The possible EWF file formats
  */
-#define EWF_MAXIMUM_TABLE_ENTRIES		16375
+#define EWF_FORMAT_UNKNOWN			(uint8_t) 'u'
+#define EWF_FORMAT_D01				(uint8_t) 'd'
+#define EWF_FORMAT_E01				(uint8_t) 'e'
+#define EWF_FORMAT_L01				(uint8_t) 'l'
+#define EWF_FORMAT_S01				(uint8_t) 's'
 
-/* The maximum number of table entries for EWF as of EnCase 6
+/* The EWF compression levels
  */
-#define EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6	65534
+#define EWF_COMPRESSION_UNKNOWN 		-2
+#define EWF_COMPRESSION_DEFAULT			-1
+#define EWF_COMPRESSION_NONE			 0
+#define EWF_COMPRESSION_FAST			 1
+#define EWF_COMPRESSION_BEST			 2
+
+/* The EWF offset masks
+ */
+#define EWF_OFFSET_COMPRESSED_READ_MASK 	0x7fffffff
+#define EWF_OFFSET_COMPRESSED_WRITE_MASK 	0x80000000
+
+/* EWF the initial maximum number of offsets in a table section
+ */
+#define EWF_MAXIMUM_OFFSETS_IN_TABLE		16375
+
+/* EWF maximum number of offsets in a table section
+ * as of EnCase 6
+ */
+#define EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6	65534
 
 #endif
 

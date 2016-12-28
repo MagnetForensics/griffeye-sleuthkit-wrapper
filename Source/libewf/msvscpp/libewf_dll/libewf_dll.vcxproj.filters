@@ -18,15 +18,6 @@
     <ClCompile Include="..\..\libewf\libewf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libewf\libewf_analytical_data.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libewf\libewf_case_data.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libewf\libewf_checksum.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libewf\libewf_chunk_data.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,7 +36,7 @@
     <ClCompile Include="..\..\libewf\libewf_debug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libewf\libewf_device_information.c">
+    <ClCompile Include="..\..\libewf\libewf_empty_block.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libewf\libewf_error.c">
@@ -90,9 +81,6 @@
     <ClCompile Include="..\..\libewf\libewf_read_io_handle.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libewf\libewf_restart_data.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libewf\libewf_section.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -125,6 +113,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\libewf\ewf_checksum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\libewf\ewf_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -134,7 +125,7 @@
     <ClInclude Include="..\..\libewf\ewf_digest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libewf\ewf_error.h">
+    <ClInclude Include="..\..\libewf\ewf_error2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libewf\ewf_file_header.h">
@@ -158,16 +149,10 @@
     <ClInclude Include="..\..\libewf\ewf_volume.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libewf\ewf_volume_smart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\libewf\ewfx_delta_chunk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libewf\libewf_analytical_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libewf\libewf_case_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libewf\libewf_checksum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libewf\libewf_chunk_data.h">
@@ -194,7 +179,7 @@
     <ClInclude Include="..\..\libewf\libewf_definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libewf\libewf_device_information.h">
+    <ClInclude Include="..\..\libewf\libewf_empty_block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libewf\libewf_error.h">
@@ -233,9 +218,6 @@
     <ClInclude Include="..\..\libewf\libewf_libbfio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libewf\libewf_libcaes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libewf\libewf_libcdata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -251,13 +233,10 @@
     <ClInclude Include="..\..\libewf\libewf_libcstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libewf\libewf_libfvalue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libewf\libewf_libhmac.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libewf\libewf_libfcache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libewf\libewf_libfvalue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libewf\libewf_libmfdata.h">
@@ -276,9 +255,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libewf\libewf_read_io_handle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libewf\libewf_restart_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libewf\libewf_section.h">

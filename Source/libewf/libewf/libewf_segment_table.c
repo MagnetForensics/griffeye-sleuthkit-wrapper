@@ -23,11 +23,12 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libewf_libbfio.h"
-#include "libewf_libcdata.h"
+#include "libewf_libcstring.h"
 #include "libewf_libcerror.h"
 #include "libewf_libclocale.h"
-#include "libewf_libcstring.h"
+
+#include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libmfdata.h"
 #include "libewf_libuna.h"
 #include "libewf_segment_file.h"

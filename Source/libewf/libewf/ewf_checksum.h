@@ -1,7 +1,7 @@
 /*
- * The internal libhmac header
+ * EWF Adler-32 checksum handling
  *
- * Copyright (C) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,33 +19,25 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_LIBHMAC_H )
-#define _LIBEWF_LIBHMAC_H
+#if !defined( _EWF_CHECKSUM_H )
+#define _EWF_CHECKSUM_H
 
 #include <common.h>
+#include <types.h>
 
-/* Define HAVE_LOCAL_LIBHMAC for local use of libhmac
- */
-#if defined( HAVE_LOCAL_LIBHMAC )
-
-#include <libhmac_definitions.h>
-#include <libhmac_md5.h>
-#include <libhmac_sha1.h>
-#include <libhmac_sha256.h>
-#include <libhmac_support.h>
-#include <libhmac_types.h>
-
-#else
-
-/* If libtool DLL support is enabled set LIBHMAC_DLL_IMPORT
- * before including libhmac.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBHMAC_DLL_IMPORT
+#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+#include <zlib.h>
 #endif
 
-#include <libhmac.h>
+#if defined( __cplusplus )
+extern "C" {
+#endif
 
+#define ewf_checksum_calculate( buffer, size, previous_key ) \
+	(uint32_t) adler32( (uLong) previous_key, (const Bytef *) buffer, (uInt) size );
+
+#if defined( __cplusplus )
+}
 #endif
 
 #endif

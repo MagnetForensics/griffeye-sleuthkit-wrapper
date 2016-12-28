@@ -20,15 +20,17 @@
  */
 
 #include <common.h>
-#include <file_stream.h>
 #include <types.h>
+
+#include "libewf_libcerror.h"
+#include "libewf_libcnotify.h"
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include "libewf_libcerror.h"
-#include "libewf_libcnotify.h"
+#include <stdio.h>
+
 #include "libewf_notify.h"
 
 #if !defined( HAVE_LOCAL_LIBEWF )

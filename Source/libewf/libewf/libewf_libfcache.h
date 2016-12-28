@@ -33,7 +33,7 @@
 #include <libfcache_definitions.h>
 #include <libfcache_types.h>
 
-#else
+#elif defined( HAVE_LIBFCACHE_H )
 
 /* If libtool DLL support is enabled set LIBFCACHE_DLL_IMPORT
  * before including libfcache.h
@@ -44,6 +44,8 @@
 
 #include <libfcache.h>
 
+#else
+#error Missing libfcache.h
 #endif
 
 #endif

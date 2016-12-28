@@ -1,5 +1,5 @@
 /*
- * EWF degest section
+ * EWF SMART volume section (EWF-S01)
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWF_DIGEST_H )
-#define _EWF_DIGEST_H
+#if !defined( _EWF_VOLUME_SMART_H )
+#define _EWF_VOLUME_SMART_H
 
 #include <common.h>
 #include <types.h>
@@ -29,27 +29,56 @@
 extern "C" {
 #endif
 
-typedef struct ewf_digest ewf_digest_t;
+typedef struct ewf_volume_smart ewf_volume_smart_t;
 
-struct ewf_digest
+struct ewf_volume_smart
 {
-	/* The MD5 hash of the aquired data
-	 * consists of 16 bytes
+	/* Reserved (The media type)
+	 * consists of 4 bytes (32 bits)
+	 * contains 0x01
 	 */
-	uint8_t md5_hash[ 16 ];
+	uint8_t unknown1[ 4 ];
 
-	/* The SHA1 hash of the aquired data
+	/* The number of chunks
+	 * consists of 4 bytes (32 bits)
+	 */
+	uint8_t number_of_chunks[ 4 ];
+
+	/* The number of sectors per chunks
+	 * consists of 4 bytes (32 bits)
+	 * value should be 64
+	 */
+	uint8_t sectors_per_chunk[ 4 ];
+
+	/* The number of bytes per chunks
+	 * consists of 4 bytes (32 bits)
+	 * value should be 512
+	 */
+	uint8_t bytes_per_sector[ 4 ];
+
+	/* The number of sectors
+	 * consists of 4 bytes (32 bits)
+	 */
+	uint8_t number_of_sectors[ 4 ];
+
+	/* Unknown - reserved
 	 * consists of 20 bytes
+	 * contains 0x00
 	 */
-	uint8_t sha1_hash[ 20 ];
+	uint8_t unknown2[ 20 ];
 
-	/* Padding
-	 * consists of 40 bytes
-	 * value should be 0x00
+	/* Unknown - padding
+	 * consists of 45 bytes
+	 * contains 0x00
 	 */
-	uint8_t padding1[ 40 ];
+	uint8_t unknown3[ 45 ];
 
-	/* The section checksum of all (previous) digest data
+	/* Reserved (signature)
+	 * consists of 5 bytes
+	 */
+	uint8_t signature[ 5 ];
+
+	/* The section checksum of all (previous) volume data
 	 * consists of 4 bytes (32 bits)
 	 * starts with offset 76
 	 */

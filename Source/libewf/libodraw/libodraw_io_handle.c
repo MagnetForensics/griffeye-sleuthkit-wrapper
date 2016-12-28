@@ -304,9 +304,11 @@ ssize_t libodraw_io_handle_copy_sector_data_to_buffer(
 				 sector_data[ sector_data_offset + 2 ],
 				 sector_lba );
 
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) || defined( HAVE_VERBOSE_OUTPUT )
 				sector_mode = sector_data[ sector_data_offset + 3 ] & 0x03;
+#endif
 
+#if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(

@@ -5,18 +5,18 @@ When upgrading libewf and sleuthkit, just replace the contents of their folder w
 After that some changes are necessary to get the builds working.
 
 LIBEWF:
+Use the version here: https://github.com/sleuthkit/libewf_64bit
 
-1. Open the solution in the latest Visual Studio version that is supported by the builders (currently 2013)
+1. Open the solution in the latest Visual Studio version that is supported by the builders
 2. Disable build of pyewf project (and dokan and ewfmount if they exist in the solution)
 3. Add signing of ewf.net under Properties->Linker->Advanced
-	Set LinkerKeyFile to ..\ncpub.snk
+	Set LinkerKeyFile to ..\..\..\ncpub.snk
 	Set LinkDellaySign to Yes
 4. Change build output of bzip2 project to static library 
-5. Add x64 build configuration
 
 SLEUTHKIT:
 
-1. Open the solution in the latest Visual Studio version that is supported by the builders (currently 2013)
+1. Open the solution in the latest Visual Studio version that is supported by the builders
 2. Disable build of libtsk_jni project
 3. Replace $(LIBEWF_HOME) with $(ProjectDir)\..\..\..\libewf in all .vcxproj files 
 	(For example by opening all files in  notepad++ and doing a find and replace in all opened documents)

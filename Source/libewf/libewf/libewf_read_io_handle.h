@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "libewf_chunk_data.h"
-#include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
@@ -49,22 +48,6 @@ struct libewf_read_io_handle
 	/* A value to indicate if the chunk data should be zeroed on error
 	 */
 	uint8_t zero_on_error;
-
-	/* Cached version of the case data
-	 */
-	uint8_t *case_data;
-
-	/* Size of the cached version of the case data
-	 */
-	size_t case_data_size;
-
-	/* Cached version of the device information
-	 */
-	uint8_t *device_information;
-
-	/* Size of the cached version of the device information
-	 */
-	size_t device_information_size;
 };
 
 int libewf_read_io_handle_initialize(
@@ -82,7 +65,6 @@ int libewf_read_io_handle_clone(
 
 int libewf_read_io_handle_read_chunk_data(
      libewf_read_io_handle_t *read_io_handle,
-     libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libmfdata_list_t *chunk_table_list,

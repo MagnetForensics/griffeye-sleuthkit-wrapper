@@ -37,7 +37,7 @@
 #include <libmfdata_segment_table.h>
 #include <libmfdata_types.h>
 
-#else
+#elif defined( HAVE_LIBMFDATA_H )
 
 /* If libtool DLL support is enabled set LIBMFDATA_DLL_IMPORT
  * before including libmfdata.h
@@ -48,6 +48,8 @@
 
 #include <libmfdata.h>
 
+#else
+#error Missing libmfdata.h
 #endif
 
 #endif

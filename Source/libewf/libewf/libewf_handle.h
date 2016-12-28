@@ -35,6 +35,7 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libfcache.h"
 #include "libewf_libmfdata.h"
+#include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
@@ -131,13 +132,17 @@ struct libewf_internal_handle
 	 */
 	libfcache_cache_t *chunk_table_cache;
 
+	/* The stored header sections
+	 */
+	libewf_header_sections_t *header_sections;
+
+	/* The stored hash sections
+	 */
+	libewf_hash_sections_t *hash_sections;
+
 	/* The date format for certain header values
 	 */
 	int date_format;
-
-	/* The hash sections
-	 */
-	libewf_hash_sections_t *hash_sections;
 
 	/* The header values
 	 */
@@ -231,7 +236,7 @@ ssize_t libewf_handle_prepare_read_chunk(
          size_t *uncompressed_chunk_buffer_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
+         int8_t read_checksum,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -242,7 +247,7 @@ ssize_t libewf_handle_read_chunk(
          int8_t *is_compressed,
          void *checksum_buffer,
          uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
+         int8_t *read_checksum,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -269,7 +274,7 @@ ssize_t libewf_handle_prepare_write_chunk(
          size_t *compressed_chunk_buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
+         int8_t *write_checksum,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -281,7 +286,7 @@ ssize_t libewf_handle_write_chunk(
          int8_t is_compressed,
          void *checksum_buffer,
          uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
+         int8_t write_checksum,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -325,11 +330,6 @@ int libewf_handle_set_maximum_number_of_open_handles(
 
 LIBEWF_EXTERN \
 int libewf_handle_segment_files_corrupted(
-     libewf_handle_t *handle,
-     libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-int libewf_handle_segment_files_encrypted(
      libewf_handle_t *handle,
      libcerror_error_t **error );
 
@@ -475,6 +475,11 @@ int libewf_handle_get_file_io_handle(
      libbfio_handle_t **file_io_handle,
      libcerror_error_t **error );
 
+int libewf_internal_handle_get_write_maximum_number_of_segments(
+     uint8_t ewf_format,
+     uint16_t *maximum_number_of_segments,
+     libcerror_error_t **error );
+
 int libewf_internal_handle_get_media_values(
      libewf_internal_handle_t *internal_handle,
      size64_t *media_size,
@@ -485,6 +490,11 @@ int libewf_internal_handle_set_media_values(
      uint32_t sectors_per_chunk,
      uint32_t bytes_per_sector,
      size64_t media_size,
+     libcerror_error_t **error );
+
+int libewf_internal_handle_set_format(
+     libewf_internal_handle_t *internal_handle,
+     uint8_t format,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \

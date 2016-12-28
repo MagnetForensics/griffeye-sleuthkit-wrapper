@@ -1,7 +1,7 @@
 /*
- * The internal extern definition
+ * Empty block test functions
  *
- * Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,27 +19,25 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCMULTI_INTERNAL_EXTERN_H )
-#define _LIBCMULTI_INTERNAL_EXTERN_H
+#if !defined( _LIBEWF_EMPTY_BLOCK_H )
+#define _LIBEWF_EMPTY_BLOCK_H
 
 #include <common.h>
+#include <types.h>
 
-/* Define HAVE_LOCAL_LIBCMULTI for local use of libcmulti
- */
-#if !defined( HAVE_LOCAL_LIBCMULTI )
+#include "libewf_libcerror.h"
 
-/* If libtool DLL support is enabled set LIBCMULTI_DLL_EXPORT
- * before including libcmulti/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBCMULTI_DLL_EXPORT
+#if defined( __cplusplus )
+extern "C" {
 #endif
 
-#include <libcmulti/extern.h>
+int libewf_empty_block_test(
+     const uint8_t *block_buffer,
+     size_t block_size,
+     libcerror_error_t **error );
 
-#else
-#define LIBCMULTI_EXTERN	extern
-
+#if defined( __cplusplus )
+}
 #endif
 
 #endif

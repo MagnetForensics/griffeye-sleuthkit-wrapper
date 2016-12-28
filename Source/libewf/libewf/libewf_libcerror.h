@@ -42,7 +42,7 @@
 #define LIBCERROR_DLL_IMPORT
 #endif
 
-#include <libcerror.h>
+#include "libewf_libcerror.h"
 
 #endif
 
