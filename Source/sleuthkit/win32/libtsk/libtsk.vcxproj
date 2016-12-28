@@ -377,6 +377,7 @@ copy "$(SolutionDir)\PostgreSQL_CRT\win32\msvcr120.dll" "$(OutDir)" </Command>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)\..\..\..\libewf\msvscpp\x64\release\libewf.dll" "$(OutDir)"
