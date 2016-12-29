@@ -1,18 +1,11 @@
 ﻿namespace SleuthkitSharp_UnitTests
 {
+    using NUnit.Framework;
+    using SleuthKit;
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.IO;
     using System.Linq;
-
-    using NUnit.Framework;
-
-    using SleuthKit;
-
-    using Directory = SleuthKit.Directory;
-    using File = SleuthKit.File;
-    using SleuthKit.Structs;
 
     /// <summary>
     ///     This is a test class intended
@@ -77,7 +70,9 @@
                 new VolumeInfo(){Start = 499031998464,Length = 1074790400,Allocated = true},
                 new VolumeInfo(){Start = 500106788864,Length = 1073152,Allocated = false},
             };
+
             DiskImage diskImage = new DiskImage(file);
+
             using (VolumeSystem volumeSystem = diskImage.OpenVolumeSystem())
             {
                 Assert.IsNotNull(volumeSystem, "Unable to read partition table");
@@ -90,7 +85,7 @@
                 string volinf = string.Empty;
                 for (int i = 0; i < volumes.Count; i++)
                 {
-                    volinf = String.Format("new VolumeInfo(){{Start = {0},Length = {1},Allocated = {2}}},", 
+                    volinf = String.Format("new VolumeInfo(){{Start = {0},Length = {1},Allocated = {2}}},",
                         volumes[i].Offset, volumes[i].Length, volumes[i].IsAllocated);
                     Assert.AreEqual(volInfo[i].Start, volumes[i].Offset,
                         String.Format("Volume offset was not correct for volume {0}", i));
@@ -101,7 +96,6 @@
                 }
                 Console.WriteLine(volinf);
             }
-            
         }
     }
 }
