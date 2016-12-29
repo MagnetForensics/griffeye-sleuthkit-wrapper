@@ -120,7 +120,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libewf.lib;libtsk.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libtsk.lib;zlib.lib;libewf.lib;libvhdi.lib;libvmdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>src\Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -164,7 +164,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>src\Exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>libtsk.lib;zlib.lib;libewf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libtsk.lib;zlib.lib;libewf.lib;libvhdi.lib;libvmdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
