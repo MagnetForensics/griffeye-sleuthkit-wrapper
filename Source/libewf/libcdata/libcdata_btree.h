@@ -1,7 +1,7 @@
 /*
- * B-tree type functions
+ * Balanced tree type functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-/* The B-tree uses the list and tree node
+/* The balanced tree uses the list and tree node
  * The value of a tree node contains a list where each value in the list corresponds with either a sub node or a leaf value
  * The values array is used for sequential access to the leaf values
  */

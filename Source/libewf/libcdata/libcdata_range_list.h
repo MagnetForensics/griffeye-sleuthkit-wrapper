@@ -1,7 +1,7 @@
 /*
  * Range list
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -27,28 +27,12 @@
 
 #include "libcdata_extern.h"
 #include "libcdata_libcerror.h"
+#include "libcdata_range_list_value.h"
 #include "libcdata_types.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-
-typedef struct libcdata_range_list_value libcdata_range_list_value_t;
-
-struct libcdata_range_list_value
-{
-	/* The (range) start value
-	 */
-	uint64_t start;
-
-	/* The (range) end
-	 */
-	uint64_t end;
-
-	/* The (range) size
-	 */
-	uint64_t size;
-};
 
 typedef struct libcdata_internal_range_list libcdata_internal_range_list_t;
 
@@ -75,19 +59,6 @@ struct libcdata_internal_range_list
 	int current_element_index;
 };
 
-int libcdata_range_list_value_initialize(
-     libcdata_range_list_value_t **range_list_value,
-     libcerror_error_t **error );
-
-int libcdata_range_list_value_free(
-     libcdata_range_list_value_t **range_list_value,
-     libcerror_error_t **error );
-
-int libcdata_range_list_value_clone(
-     libcdata_range_list_value_t **destination_range_list_value,
-     libcdata_range_list_value_t *source_range_list_value,
-     libcerror_error_t **error );
-
 LIBCDATA_EXTERN \
 int libcdata_range_list_initialize(
      libcdata_range_list_t **range_list,
@@ -96,17 +67,30 @@ int libcdata_range_list_initialize(
 LIBCDATA_EXTERN \
 int libcdata_range_list_free(
      libcdata_range_list_t **range_list,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcerror_error_t **error ),
      libcerror_error_t **error );
 
 LIBCDATA_EXTERN \
 int libcdata_range_list_empty(
      libcdata_range_list_t *range_list,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcerror_error_t **error ),
      libcerror_error_t **error );
 
 LIBCDATA_EXTERN \
 int libcdata_range_list_clone(
      libcdata_range_list_t **destination_range_list,
      libcdata_range_list_t *source_range_list,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcerror_error_t **error ),
+     int (*value_clone_function)(
+            intptr_t **destination_value,
+            intptr_t *source_value,
+            libcerror_error_t **error ),
      libcerror_error_t **error );
 
 LIBCDATA_EXTERN \
@@ -136,16 +120,31 @@ int libcdata_range_list_append_value(
      libcerror_error_t **error );
 
 LIBCDATA_EXTERN \
-int libcdata_range_list_append_range(
+int libcdata_range_list_insert_range(
      libcdata_range_list_t *range_list,
      uint64_t range_start,
      uint64_t range_size,
+     intptr_t *value,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcerror_error_t **error ),
+     int (*value_merge_function)(
+            intptr_t *destination_value,
+            intptr_t *source_value,
+            libcerror_error_t **error ),
      libcerror_error_t **error );
 
 LIBCDATA_EXTERN \
-int libcdata_range_list_append_range_list(
+int libcdata_range_list_insert_range_list(
      libcdata_range_list_t *range_list,
      libcdata_range_list_t *source_range_list,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcerror_error_t **error ),
+     int (*value_merge_function)(
+            intptr_t *destination_value,
+            intptr_t *source_value,
+            libcerror_error_t **error ),
      libcerror_error_t **error );
 
 int libcdata_range_list_insert_element(
@@ -170,6 +169,14 @@ int libcdata_range_list_remove_range(
      libcdata_range_list_t *range_list,
      uint64_t range_start,
      uint64_t range_size,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcerror_error_t **error ),
+     int (*value_split_function)(
+            intptr_t **destination_value,
+            intptr_t *source_value,
+            uint64_t split_range_offset,
+            libcerror_error_t **error ),
      libcerror_error_t **error );
 
 int libcdata_range_list_get_element_by_index(
@@ -178,9 +185,9 @@ int libcdata_range_list_get_element_by_index(
      libcdata_list_element_t **element,
      libcerror_error_t **error );
 
-int libcdata_range_list_get_element_by_range_value(
+int libcdata_range_list_get_element_at_offset(
      libcdata_range_list_t *range_list,
-     uint64_t range_value,
+     uint64_t range_offset,
      libcdata_list_element_t **element,
      libcerror_error_t **error );
 
@@ -190,26 +197,28 @@ int libcdata_range_list_get_value_by_index(
      libcdata_range_list_value_t **range_list_value,
      libcerror_error_t **error );
 
-int libcdata_range_list_get_value_by_range_value(
+int libcdata_range_list_get_value_at_offset(
      libcdata_range_list_t *range_list,
-     uint64_t range_value,
+     uint64_t range_offset,
      libcdata_range_list_value_t **range_list_value,
      libcerror_error_t **error );
 
 LIBCDATA_EXTERN \
-int libcdata_range_list_get_range(
+int libcdata_range_list_get_range_by_index(
      libcdata_range_list_t *range_list,
      int element_index,
      uint64_t *range_start,
      uint64_t *range_size,
+     intptr_t **value,
      libcerror_error_t **error );
 
 LIBCDATA_EXTERN \
-int libcdata_range_list_get_range_by_range_value(
+int libcdata_range_list_get_range_at_offset(
      libcdata_range_list_t *range_list,
-     uint64_t range_value,
+     uint64_t range_offset,
      uint64_t *range_start,
      uint64_t *range_size,
+     intptr_t **value,
      libcerror_error_t **error );
 
 LIBCDATA_EXTERN \
@@ -217,6 +226,13 @@ int libcdata_range_list_range_is_present(
      libcdata_range_list_t *range_list,
      uint64_t range_start,
      uint64_t range_size,
+     libcerror_error_t **error );
+
+LIBCDATA_EXTERN \
+int libcdata_range_list_get_spanning_range(
+     libcdata_range_list_t *range_list,
+     uint64_t *range_start,
+     uint64_t *range_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -1,7 +1,6 @@
 ﻿using SleuthKit.Structs;
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace SleuthKit
 {
@@ -37,7 +36,7 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern DiskImageHandle tsk_img_open_utf8_sing([MarshalAs(UnmanagedType.LPWStr)] string image, ImageType imageType, uint sectorSize);
 
-        #endregion
+        #endregion open functions
 
         //ssize_t tsk_img_read(TSK_IMG_INFO * a_img_info, TSK_OFF_T a_off, char *a_buf, size_t a_len)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
@@ -47,7 +46,7 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void tsk_img_close(IntPtr img);
 
-        #endregion
+        #endregion disk image functions
 
         #region volume system functions
 
@@ -59,11 +58,11 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void tsk_vs_close(IntPtr handle);
 
-        //ssize_t tsk_vs_part_read(const TSK_VS_PART_INFO * a_vs_part, TSK_OFF_T a_off, char *a_buf, size_t a_len)        
+        //ssize_t tsk_vs_part_read(const TSK_VS_PART_INFO * a_vs_part, TSK_OFF_T a_off, char *a_buf, size_t a_len)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int tsk_vs_part_read(IntPtr handle, long offset, byte[] buffer, UIntPtr length);
 
-        #endregion
+        #endregion volume system functions
 
         #region filesystem functions
 
@@ -93,7 +92,7 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void tsk_fs_block_free(IntPtr fsblockptr);
 
-        #endregion
+        #endregion block stuff
 
         #region file stuff
 
@@ -125,7 +124,7 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern byte hfs_cat_file_lookup(IntPtr hfs, ulong inum, IntPtr entry, byte follow_hard_link);
 
-        #endregion
+        #endregion file stuff
 
         #region dir stuff
 
@@ -156,8 +155,7 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tsk_fs_dir_walk")]
         internal static extern byte tsk_fs_dir_walk_ptr(FileSystemHandle fs, long directory_address, DirWalkFlags walk_flags, DirWalkPtrDelegate callback, IntPtr a_ptr);
 
-        
-        #endregion
+        #endregion dir stuff
 
         #region meta
 
@@ -165,7 +163,7 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern byte tsk_fs_meta_walk(FileSystemHandle fs, long start_address, long end_address, MetadataFlags walk_flags, MetaWalkDelegate callback, IntPtr a_ptr);
 
-        #endregion
+        #endregion meta
 
         #region error stuff
 
@@ -177,24 +175,24 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr tsk_error_get_errstr();
 
-        #endregion
+        #endregion error stuff
 
-        #endregion
+        #endregion filesystem functions
 
-        #endregion
+        #endregion pinvoke
     }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct FILE
     {
-        IntPtr _ptr;
-        int _cnt;
-        IntPtr _base;
-        int _flag;
-        int _file;
-        int _charbuf;
-        int _bufsiz;
-        IntPtr _tmpfname;
+        private IntPtr _ptr;
+        private int _cnt;
+        private IntPtr _base;
+        private int _flag;
+        private int _file;
+        private int _charbuf;
+        private int _bufsiz;
+        private IntPtr _tmpfname;
     };
 
     /// <summary>
@@ -249,7 +247,14 @@ namespace SleuthKit
         /// <returns></returns>
         internal VolumeSystemHandle OpenVolumeSystemHandle(VolumeSystemType vstype = VolumeSystemType.Autodetect, long offset = 0)
         {
-            return NativeMethods.tsk_vs_open(this, offset, vstype);
+            VolumeSystemHandle handle = NativeMethods.tsk_vs_open(this, offset, vstype); ;
+
+            uint errorCode = NativeMethods.tsk_error_get_errno();
+            IntPtr ptrToMessage = NativeMethods.tsk_error_get_errstr();
+            String errorMessage = Marshal.PtrToStringAnsi(ptrToMessage);
+            String ioExceptionMessage = String.Format("{0} (0x{1,8:X8})", errorMessage, errorCode);
+
+            return handle;
         }
 
         /// <summary>
@@ -361,7 +366,7 @@ namespace SleuthKit
 
         internal EXT2FS_INFO GetStructExt2()
         {
-            return ((EXT2FS_INFO)Marshal.PtrToStructure(this.handle, typeof(EXT2FS_INFO)));            
+            return ((EXT2FS_INFO)Marshal.PtrToStructure(this.handle, typeof(EXT2FS_INFO)));
         }
 
         internal FATFS_INFO GetStructFat()

@@ -1,7 +1,7 @@
 /*
  * Verification handle
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,11 +26,14 @@
 #include <types.h>
 
 #include "digest_hash.h"
+#include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
+#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "log_handle.h"
+#include "process_status.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -54,10 +57,6 @@ struct verification_handle
 	/* The header codepage
 	 */
 	int header_codepage;
-
-	/* Value to indicate if the chunk should be zeroed on error
-	 */
-	uint8_t zero_chunk_on_error;
 
 	/* Value to indicate if the MD5 digest hash should be calculated
 	 */
@@ -131,9 +130,45 @@ struct verification_handle
 	 */
 	libcstring_system_character_t *stored_sha256_hash_string;
 
+	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
+	 */
+	uint8_t use_chunk_data_functions;
+
+	/* The process buffer size
+	 */
+	size_t process_buffer_size;
+
+	/* The number of threads in the process thread pool
+	 */
+	int number_of_threads;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+	/* The process thread pool
+	 */
+	libcthreads_thread_pool_t *process_thread_pool;
+
+	/* The output thread pool
+	 */
+	libcthreads_thread_pool_t *output_thread_pool;
+
+	/* The output list
+	 */
+	libcdata_list_t *output_list;
+
+	/* The storage media buffer queue
+	 */
+	libcthreads_queue_t *storage_media_buffer_queue;
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
+
+	/* The media size
+	 */
+	size64_t media_size;
 
 	/* The chunk size
 	 */
@@ -143,17 +178,17 @@ struct verification_handle
 	 */
 	uint32_t bytes_per_sector;
 
-	/* The last offset read
+	/* The last offset hashed
 	 */
-	off64_t last_offset_read;
+	off64_t last_offset_hashed;
 
-	/* The process buffer size
-	 */
-	size_t process_buffer_size;
-
-	/* The nofication output stream
+	/* The notification output stream
 	 */
 	FILE *notify_stream;
+
+	/* The process status information
+	 */
+	process_status_t *process_status;
 
 	/* Value to indicate if abort was signalled
 	 */
@@ -163,6 +198,7 @@ struct verification_handle
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
+     uint8_t use_chunk_data_functions,
      libcerror_error_t **error );
 
 int verification_handle_free(
@@ -188,15 +224,9 @@ int verification_handle_close(
      verification_handle_t *verification_handle,
      libcerror_error_t **error );
 
-ssize_t verification_handle_prepare_read_buffer(
+ssize_t verification_handle_process_storage_media_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
-         libcerror_error_t **error );
-
-ssize_t verification_handle_read_buffer(
-         verification_handle_t *verification_handle,
-         storage_media_buffer_t *storage_media_buffer,
-         size_t read_size,
          libcerror_error_t **error );
 
 int verification_handle_initialize_integrity_hash(
@@ -205,13 +235,29 @@ int verification_handle_initialize_integrity_hash(
 
 int verification_handle_update_integrity_hash(
      verification_handle_t *verification_handle,
-     uint8_t *buffer,
+     const uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error );
 
 int verification_handle_finalize_integrity_hash(
      verification_handle_t *verification_handle,
      libcerror_error_t **error );
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+int verification_handle_process_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     verification_handle_t *verification_handle );
+
+int verification_handle_output_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     verification_handle_t *verification_handle );
+
+int verification_handle_empty_output_list(
+     verification_handle_t *verification_handle,
+     libcerror_error_t **error );
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 int verification_handle_verify_input(
      verification_handle_t *verification_handle,
@@ -261,6 +307,11 @@ int verification_handle_set_format(
      libcerror_error_t **error );
 
 int verification_handle_set_process_buffer_size(
+     verification_handle_t *verification_handle,
+     const libcstring_system_character_t *string,
+     libcerror_error_t **error );
+
+int verification_handle_set_number_of_threads(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
      libcerror_error_t **error );

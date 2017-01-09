@@ -145,7 +145,6 @@
     <ClCompile Include="..\..\libbfio\libbfio_file_pool.c" />
     <ClCompile Include="..\..\libbfio\libbfio_file_range.c" />
     <ClCompile Include="..\..\libbfio\libbfio_handle.c" />
-    <ClCompile Include="..\..\libbfio\libbfio_legacy.c" />
     <ClCompile Include="..\..\libbfio\libbfio_memory_range.c" />
     <ClCompile Include="..\..\libbfio\libbfio_pool.c" />
     <ClCompile Include="..\..\libbfio\libbfio_support.c" />
@@ -159,7 +158,6 @@
     <ClInclude Include="..\..\libbfio\libbfio_file_pool.h" />
     <ClInclude Include="..\..\libbfio\libbfio_file_range.h" />
     <ClInclude Include="..\..\libbfio\libbfio_handle.h" />
-    <ClInclude Include="..\..\libbfio\libbfio_legacy.h" />
     <ClInclude Include="..\..\libbfio\libbfio_libcdata.h" />
     <ClInclude Include="..\..\libbfio\libbfio_libcerror.h" />
     <ClInclude Include="..\..\libbfio\libbfio_libcfile.h" />

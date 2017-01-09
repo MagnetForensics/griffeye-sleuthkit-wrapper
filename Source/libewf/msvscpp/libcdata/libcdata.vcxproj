@@ -146,11 +146,14 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\libcdata\libcdata.c" />
     <ClCompile Include="..\..\libcdata\libcdata_array.c" />
     <ClCompile Include="..\..\libcdata\libcdata_btree.c" />
+    <ClCompile Include="..\..\libcdata\libcdata_error.c" />
     <ClCompile Include="..\..\libcdata\libcdata_list.c" />
     <ClCompile Include="..\..\libcdata\libcdata_list_element.c" />
     <ClCompile Include="..\..\libcdata\libcdata_range_list.c" />
+    <ClCompile Include="..\..\libcdata\libcdata_range_list_value.c" />
     <ClCompile Include="..\..\libcdata\libcdata_support.c" />
     <ClCompile Include="..\..\libcdata\libcdata_tree_node.c" />
   </ItemGroup>
@@ -158,12 +161,15 @@
     <ClInclude Include="..\..\libcdata\libcdata_array.h" />
     <ClInclude Include="..\..\libcdata\libcdata_btree.h" />
     <ClInclude Include="..\..\libcdata\libcdata_definitions.h" />
+    <ClInclude Include="..\..\libcdata\libcdata_error.h" />
     <ClInclude Include="..\..\libcdata\libcdata_extern.h" />
     <ClInclude Include="..\..\libcdata\libcdata_libcerror.h" />
     <ClInclude Include="..\..\libcdata\libcdata_libcstring.h" />
+    <ClInclude Include="..\..\libcdata\libcdata_libcthreads.h" />
     <ClInclude Include="..\..\libcdata\libcdata_list.h" />
     <ClInclude Include="..\..\libcdata\libcdata_list_element.h" />
     <ClInclude Include="..\..\libcdata\libcdata_range_list.h" />
+    <ClInclude Include="..\..\libcdata\libcdata_range_list_value.h" />
     <ClInclude Include="..\..\libcdata\libcdata_support.h" />
     <ClInclude Include="..\..\libcdata\libcdata_tree_node.h" />
     <ClInclude Include="..\..\libcdata\libcdata_types.h" />

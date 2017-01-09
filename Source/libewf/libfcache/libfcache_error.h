@@ -1,7 +1,7 @@
 /*
  * Error functions
  *
- * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,9 +23,8 @@
 #define _LIBFCACHE_INTERNAL_ERROR_H
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
-
-#include <stdio.h>
 
 #if !defined( HAVE_LOCAL_LIBFCACHE )
 #include <libfcache/error.h>
@@ -71,5 +70,5 @@ int libfcache_error_backtrace_sprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFCACHE_INTERNAL_ERROR_H ) */
 

@@ -1,7 +1,7 @@
 /*
  * The internal type definitions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,15 +19,15 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCDATA_TYPES_H )
-#define _LIBCDATA_TYPES_H
+#if !defined( _LIBCDATA_INTERNAL_TYPES_H )
+#define _LIBCDATA_INTERNAL_TYPES_H
 
 #include <common.h>
 #include <types.h>
 
-/* Define HAVE_LOCAL_LIBCDATA for local use of libcstring
- * The definitions in <libcstring/types.h> are copied here
- * for local use of libcstring
+/* Define HAVE_LOCAL_LIBCDATA for local use of libcdata
+ * The definitions in <libcdata/types.h> are copied here
+ * for local use of libcdata
  */
 #if defined( HAVE_LOCAL_LIBCDATA )
 
@@ -51,9 +51,9 @@ typedef intptr_t libcdata_range_list_t;
 typedef intptr_t libcdata_tree_t;
 typedef intptr_t libcdata_tree_node_t;
 
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI ) */
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBCDATA ) */
 
-#endif
+#endif /* !defined( _LIBCDATA_INTERNAL_TYPES_H ) */
 

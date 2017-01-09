@@ -1,7 +1,7 @@
 /*
  * Tree functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,7 +30,7 @@
 #include "libcdata_types.h"
 
 /* Creates a tree node
- * Make sure the value node is pointing to is set to NULL
+ * Make sure the value node is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libcdata_tree_node_initialize(
@@ -195,7 +195,7 @@ int libcdata_tree_node_free(
 			{
 				internal_node->last_sub_node = next_node;
 			}
-			internal_node->number_of_sub_nodes -= 1;
+			internal_node->number_of_sub_nodes--;
 
 			if( next_node != NULL )
 			{
@@ -354,7 +354,7 @@ int libcdata_tree_node_empty(
 		{
 			internal_node->last_sub_node = next_node;
 		}
-		internal_node->number_of_sub_nodes -= 1;
+		internal_node->number_of_sub_nodes--;
 
 		if( next_node != NULL )
 		{
@@ -425,8 +425,8 @@ int libcdata_tree_node_clone(
             intptr_t **value,
             libcerror_error_t **error ),
      int (*value_clone_function)(
-            intptr_t **destination,
-            intptr_t *source,
+            intptr_t **destination_value,
+            intptr_t *source_value,
             libcerror_error_t **error ),
      libcerror_error_t **error )
 {
@@ -524,7 +524,7 @@ int libcdata_tree_node_clone(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to clone tree node value.",
+		 "%s: unable to create destination tree node value.",
 		 function );
 
 		goto on_error;
@@ -560,7 +560,7 @@ int libcdata_tree_node_clone(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to clone sub node: %d.",
+			 "%s: unable to create destination sub node: %d.",
 			 function,
 			 sub_node_index );
 
@@ -1115,7 +1115,7 @@ int libcdata_tree_node_append_node(
 		internal_node->previous_node        = internal_parent_node->last_sub_node;
 		internal_parent_node->last_sub_node = node;
 	}
-	internal_parent_node->number_of_sub_nodes += 1;
+	internal_parent_node->number_of_sub_nodes++;
 
 	return( 1 );
 }
@@ -1498,7 +1498,7 @@ int libcdata_tree_node_insert_node(
 	}
 	internal_node->parent_node = parent_node;
 
-	internal_parent_node->number_of_sub_nodes += 1;
+	internal_parent_node->number_of_sub_nodes++;
 
 	return( 1 );
 }
@@ -1856,7 +1856,7 @@ int libcdata_tree_node_remove_node(
 	internal_node->previous_node = NULL;
 	internal_node->next_node     = NULL;
 
-	internal_parent_node->number_of_sub_nodes -= 1;
+	internal_parent_node->number_of_sub_nodes--;
 
 	return( 1 );
 }

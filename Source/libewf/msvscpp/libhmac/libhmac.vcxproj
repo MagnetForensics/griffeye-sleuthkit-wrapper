@@ -140,10 +140,13 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\libhmac\libhmac.c" />
     <ClCompile Include="..\..\libhmac\libhmac_error.c" />
     <ClCompile Include="..\..\libhmac\libhmac_md5.c" />
     <ClCompile Include="..\..\libhmac\libhmac_sha1.c" />
+    <ClCompile Include="..\..\libhmac\libhmac_sha224.c" />
     <ClCompile Include="..\..\libhmac\libhmac_sha256.c" />
+    <ClCompile Include="..\..\libhmac\libhmac_sha512.c" />
     <ClCompile Include="..\..\libhmac\libhmac_support.c" />
   </ItemGroup>
   <ItemGroup>
@@ -154,7 +157,9 @@
     <ClInclude Include="..\..\libhmac\libhmac_libcerror.h" />
     <ClInclude Include="..\..\libhmac\libhmac_md5.h" />
     <ClInclude Include="..\..\libhmac\libhmac_sha1.h" />
+    <ClInclude Include="..\..\libhmac\libhmac_sha224.h" />
     <ClInclude Include="..\..\libhmac\libhmac_sha256.h" />
+    <ClInclude Include="..\..\libhmac\libhmac_sha512.h" />
     <ClInclude Include="..\..\libhmac\libhmac_support.h" />
     <ClInclude Include="..\..\libhmac\libhmac_types.h" />
     <ClInclude Include="..\..\libhmac\libhmac_unused.h" />

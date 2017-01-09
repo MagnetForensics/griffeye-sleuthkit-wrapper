@@ -27,6 +27,12 @@
     <ClCompile Include="..\..\libfcache\libfcache_support.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libfcache\libfcache.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libfcache\libfcache_date_time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libfcache\libfcache_cache.h">

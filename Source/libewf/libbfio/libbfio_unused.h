@@ -1,7 +1,7 @@
 /*
  * The internal unused definition
  *
- * Copyright (c) 2009-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -40,5 +40,5 @@
 	/* parameter */
 #endif
 
-#endif
+#endif /* !defined( _LIBBFIO_INTERNAL_UNUSED_H ) */
 

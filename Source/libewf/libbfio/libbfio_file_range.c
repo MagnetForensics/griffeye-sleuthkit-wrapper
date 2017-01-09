@@ -1,7 +1,7 @@
 /*
  * File range functions
  *
- * Copyright (c) 2009-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,6 +23,10 @@
 #include <memory.h>
 #include <types.h>
 
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
+
 #include "libbfio_definitions.h"
 #include "libbfio_file.h"
 #include "libbfio_file_range.h"
@@ -30,7 +34,8 @@
 #include "libbfio_libcerror.h"
 #include "libbfio_types.h"
 
-/* Initializes the file range IO handle
+/* Creates a file range IO handle
+ * Make sure the value file_range_io_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libbfio_file_range_io_handle_initialize(
@@ -115,7 +120,8 @@ on_error:
 	return( -1 );
 }
 
-/* Initializes the file range handle
+/* Creates a file range handle
+ * Make sure the value handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libbfio_file_range_initialize(
@@ -197,7 +203,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the file range IO handle and its attributes
+/* Frees a file range IO handle
  * Returns 1 if succesful or -1 on error
  */
 int libbfio_file_range_io_handle_free(
@@ -1127,6 +1133,7 @@ off64_t libbfio_file_range_seek_offset(
 {
 	static char *function = "libbfio_file_range_seek_offset";
 	off64_t file_offset   = 0;
+	off64_t seek_offset   = 0;
 
 	if( file_range_io_handle == NULL )
 	{
@@ -1200,37 +1207,39 @@ off64_t libbfio_file_range_seek_offset(
 			return( -1 );
 		}
 	}
-	offset = libbfio_file_seek_offset(
-	          file_range_io_handle->file_io_handle,
-	          offset,
-	          whence,
-	          error );
+	seek_offset = libbfio_file_seek_offset(
+	               file_range_io_handle->file_io_handle,
+	               offset,
+	               whence,
+	               error );
 
-	if( offset == -1 )
+	if( seek_offset == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in file IO handle.",
-		 function );
+		 "%s: unable to seek offset: %" PRIi64 " in file IO handle.",
+		 function,
+		 offset );
 
 		return( -1 );
 	}
-	if( offset < file_range_io_handle->range_offset )
+	if( seek_offset < file_range_io_handle->range_offset )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid offset value out of bounds.",
-		 function );
+		 "%s: invalid offset: %" PRIi64 " value out of bounds.",
+		 function,
+		 seek_offset );
 
 		return( -1 );
 	}
-	offset -= file_range_io_handle->range_offset;
+	seek_offset -= file_range_io_handle->range_offset;
 
-	return( offset );
+	return( seek_offset );
 }
 
 /* Function to determine if a file range exists

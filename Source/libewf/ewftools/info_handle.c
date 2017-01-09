@@ -1,7 +1,7 @@
 /*
  * Info handle
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -48,7 +48,8 @@
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
 #endif
 
-/* Initializes the info handle
+/* Creates an info handle
+ * Make sure the value info_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int info_handle_initialize(
@@ -138,7 +139,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the info handle and its elements
+/* Frees an info handle
  * Returns 1 if successful or -1 on error
  */
 int info_handle_free(
@@ -1027,34 +1028,14 @@ int info_handle_section_value_size_fprint(
 
 		return( -1 );
 	}
-	result = byte_size_string_create(
-	          value_size_string,
-	          16,
-	          value_size,
-	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-	          NULL );
-
 	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{
-		if( result == 1 )
-		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "\t\t\t<%s>%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)</%s>\n",
-			 identifier,
-			 value_size_string,
-			 value_size,
-			 identifier );
-		}
-		else
-		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "\t\t\t<%s>%" PRIu64 " bytes</%s>\n",
-			 identifier,
-			 value_size,
-			 identifier );
-		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t<%s>%" PRIu64 "</%s>\n",
+		 identifier,
+		 value_size,
+		 identifier );
 	}
 	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 	{
@@ -1073,6 +1054,13 @@ int info_handle_section_value_size_fprint(
 
 			description_length += 8;
 		}
+		result = byte_size_string_create(
+		          value_size_string,
+		          16,
+		          value_size,
+		          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+		          NULL );
+
 		if( result == 1 )
 		{
 			fprintf(
@@ -1307,7 +1295,7 @@ int info_handle_header_values_fprint(
 	if( libewf_handle_get_number_of_header_values(
 	     info_handle->input_handle,
 	     &number_of_values,
-	     error ) == -1 )
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2142,26 +2130,23 @@ int info_handle_media_information_fprint(
         libcstring_system_character_t guid_string[ 48 ];
         uint8_t guid[ GUID_SIZE ];
 
+	libcstring_system_character_t segment_file_version[ 4 ] = { '0', '.', '0', 0 };
 	const libcstring_system_character_t *value_string       = NULL;
 	static char *function                                   = "info_handle_media_information_fprint";
 	size64_t media_size                                     = 0;
 	uint64_t value_64bit                                    = 0;
 	uint32_t value_32bit                                    = 0;
+	uint16_t compression_method                             = 0;
 	uint8_t compression_flags                               = 0;
 	uint8_t format                                          = 0;
+	uint8_t major_version                                   = 0;
 	uint8_t media_type                                      = 0;
 	uint8_t media_flags                                     = 0;
+	uint8_t minor_version                                   = 0;
 	int8_t compression_level                                = 0;
 	int is_corrupted                                        = 0;
 	int is_encrypted                                        = 0;
 	int result                                              = 1;
-
-/* experimental version only
-	libcstring_system_character_t segment_file_version[ 4 ] = { '0', '.', '0', 0 };
-	uint16_t compression_method                             = 0;
-	uint8_t major_version                                   = 0;
-	uint8_t minor_version                                   = 0;
-*/
 
 	if( info_handle == NULL )
 	{
@@ -2185,7 +2170,6 @@ int info_handle_media_information_fprint(
 
 		return( -1 );
 	}
-/* experimental version only
 	is_encrypted = libewf_handle_segment_files_encrypted(
 	                info_handle->input_handle,
 	                error );
@@ -2201,7 +2185,6 @@ int info_handle_media_information_fprint(
 
 		result = -1;
 	}
-*/
 	if( info_handle_section_header_fprint(
 	     info_handle,
 	     "ewf_information",
@@ -2241,7 +2224,7 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "SMART" );
 			break;
 
-		case LIBEWF_FORMAT_FTK:
+		case LIBEWF_FORMAT_FTK_IMAGER:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "FTK Imager" );
 			break;
 
@@ -2269,11 +2252,9 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 6" );
 			break;
 
-/* experimental version only
 		case LIBEWF_FORMAT_ENCASE7:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 7" );
 			break;
-*/
 
 		case LIBEWF_FORMAT_LINEN5:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "linen 5" );
@@ -2283,11 +2264,9 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "linen 6" );
 			break;
 
-/* experimental version only
 		case LIBEWF_FORMAT_LINEN7:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "linen 7" );
 			break;
-*/
 
 		case LIBEWF_FORMAT_EWFX:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "EWFX (extended EWF)" );
@@ -2305,7 +2284,6 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF) EnCase 7" );
 			break;
 
-/* experimental version only
 		case LIBEWF_FORMAT_V2_ENCASE7:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 7 (version 2)" );
 			break;
@@ -2313,7 +2291,6 @@ int info_handle_media_information_fprint(
 		case LIBEWF_FORMAT_V2_LOGICAL_ENCASE7:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF) EnCase 7 (version 2)" );
 			break;
-*/
 
 		case LIBEWF_FORMAT_UNKNOWN:
 		default:
@@ -2339,7 +2316,6 @@ int info_handle_media_information_fprint(
 
 		result = -1;
 	}
-/* experimental version only
 	if( ( format == LIBEWF_FORMAT_V2_ENCASE7 )
 	 || ( format == LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 ) )
 	{
@@ -2360,6 +2336,7 @@ int info_handle_media_information_fprint(
 		}
 		else
 		{
+/* TODO improve this */
 			if( major_version <= 9 )
 			{
 				segment_file_version[ 0 ] += major_version;
@@ -2388,7 +2365,6 @@ int info_handle_media_information_fprint(
 			}
 		}
 	}
-*/
 	if( is_encrypted == 0 )
 	{
 		if( libewf_handle_get_sectors_per_chunk(
@@ -2460,7 +2436,6 @@ int info_handle_media_information_fprint(
 			}
 		}
 	}
-/* experimental version only
 	if( libewf_handle_get_compression_method(
 	     info_handle->input_handle,
 	     &compression_method,
@@ -2476,20 +2451,15 @@ int info_handle_media_information_fprint(
 		result = -1;
 	}
 	else
-*/
 	{
-/* experimental version only
 		if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
-*/
 		{
 			value_string = _LIBCSTRING_SYSTEM_STRING( "deflate" );
 		}
-/* experimental version only
 		else if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
 		{
 			value_string = _LIBCSTRING_SYSTEM_STRING( "bzip2" );
 		}
-*/
 		if( info_handle_section_value_string_fprint(
 		     info_handle,
 		     "compression_method",
@@ -2872,7 +2842,7 @@ int info_handle_media_information_fprint(
 			}
 		}
 	}
-	if( format != LIBEWF_FORMAT_LVF )
+	if( format != LIBEWF_FORMAT_LOGICAL_ENCASE5 )
 	{
 		if( libewf_handle_get_bytes_per_sector(
 		     info_handle->input_handle,
@@ -3268,7 +3238,7 @@ int info_handle_hash_values_fprint(
 	if( libewf_handle_get_number_of_hash_values(
 	     info_handle->input_handle,
 	     &number_of_values,
-	     error ) == -1 )
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,

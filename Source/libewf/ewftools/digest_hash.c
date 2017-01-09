@@ -1,7 +1,7 @@
 /*
  * Crypographic digest hash
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,7 +26,7 @@
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
 
-/* Converts the EWF digest hash to a printable string
+/* Converts the digest hash to a printable string
  * Returns 1 if successful or -1 on error
  */
 int digest_hash_copy_to_string(

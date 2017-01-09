@@ -1,7 +1,7 @@
 /*
  * Cache value functions
  *
- * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -71,6 +71,11 @@ int libfcache_cache_value_initialize(
 
 int libfcache_cache_value_free(
      libfcache_cache_value_t **cache_value,
+     libcerror_error_t **error );
+
+LIBFCACHE_EXTERN \
+int libfcache_cache_value_clear(
+     libfcache_cache_value_t *cache_value,
      libcerror_error_t **error );
 
 LIBFCACHE_EXTERN \

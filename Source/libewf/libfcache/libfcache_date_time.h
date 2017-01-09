@@ -1,7 +1,7 @@
 /*
  * Date and time functions
  *
- * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,12 +33,18 @@
 #include <time.h>
 #endif
 
+#include "libfcache_extern.h"
+#include "libfcache_libcerror.h"
+#include "libfcache_types.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define libfcache_date_time_get_timestamp() \
-	time( NULL )
+LIBFCACHE_EXTERN \
+int libfcache_date_time_get_timestamp(
+     time_t *timestamp,
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

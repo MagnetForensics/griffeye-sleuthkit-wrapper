@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,11 +35,11 @@
 
 #else
 
-#define LIBSMDEV_VERSION				20130331
+#define LIBSMDEV_VERSION				20160424
 
 /* The version string
  */
-#define LIBSMDEV_VERSION_STRING				"20130331"
+#define LIBSMDEV_VERSION_STRING				"20160424"
 
 /* The access flags definitions
  * bit 1        set to 1 for read access

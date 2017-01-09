@@ -1,7 +1,7 @@
 /*
  * Header sections functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,9 +31,8 @@
 #include "libewf_libcnotify.h"
 #include "libewf_libfvalue.h"
 
-#include "ewf_definitions.h"
-
-/* Initialize the header sections
+/* Creates header sections
+ * Make sure the value header_sections is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_sections_initialize(
@@ -105,7 +104,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the header sections including elements
+/* Frees header sections
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_sections_free(

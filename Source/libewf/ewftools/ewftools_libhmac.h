@@ -1,7 +1,7 @@
 /*
  * The internal libhmac header
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -29,10 +29,11 @@
 #include <libhmac_md5.h>
 #include <libhmac_sha1.h>
 #include <libhmac_sha256.h>
+#include <libhmac_sha512.h>
 #include <libhmac_support.h>
 #include <libhmac_types.h>
 
-#elif defined( HAVE_LIBHMAC_H )
+#else
 #include <libhmac.h>
 
 #endif

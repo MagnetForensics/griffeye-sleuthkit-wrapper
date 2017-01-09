@@ -1,7 +1,7 @@
 /*
  * Single file entries functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,7 +33,8 @@
 #include "libewf_single_file_entry.h"
 #include "libewf_single_files.h"
 
-/* Initialize the single files
+/* Creates single files
+ * Make sure the value single_files is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_initialize(
@@ -105,7 +106,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the single files including elements
+/* Frees single files
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_free(
@@ -582,7 +583,7 @@ int libewf_single_files_parse_file_entries(
 
 				goto on_error;
 			}
-			/* The single files entries should be followed by an emtpy line
+			/* The single files entries should be followed by an empty line
 			 */
 			if( libfvalue_split_utf8_string_get_segment_by_index(
 			     lines,
@@ -1677,7 +1678,7 @@ int libewf_single_files_parse_file_entry(
 			if( type_string[ 0 ] == (uint8_t) 'p' )
 			{
 				/* p = 1 if directory
-				 * p = emtpy if file
+				 * p = empty if file
 				 */
 				if( value_string == NULL )
 				{

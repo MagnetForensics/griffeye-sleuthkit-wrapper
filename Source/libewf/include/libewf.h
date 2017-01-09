@@ -421,6 +421,17 @@ ssize_t libewf_handle_read_buffer(
          libewf_error_t **error );
 
 /* Reads (media) data at a specific offset
+* Returns the number of bytes read, 0 when no longer data can be read or -1 on error
+*/
+LIBEWF_EXTERN \
+ssize_t libewf_handle_read_buffer_at_offset(
+	libewf_handle_t *handle,
+	void *buffer,
+	size_t buffer_size,
+	off64_t offset,
+	libewf_error_t **error);
+
+/* Reads (media) data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN \
@@ -479,6 +490,19 @@ ssize_t libewf_handle_write_buffer(
          const void *buffer,
          size_t buffer_size,
          libewf_error_t **error );
+
+/* Writes (media) data at a specific offset,
+* the necessary settings of the write values must have been made
+* Will initialize write if necessary
+* Returns the number of bytes written, 0 when no longer data can be written or -1 on error
+*/
+LIBEWF_EXTERN \
+ssize_t libewf_handle_write_buffer_at_offset(
+	libewf_handle_t *handle,
+	const void *buffer,
+	size_t buffer_size,
+	off64_t offset,
+	libewf_error_t **error);
 
 /* Writes (media) data at a specific offset,
  * the necessary settings of the write values must have been made
@@ -2309,6 +2333,17 @@ ssize_t libewf_file_entry_read_buffer(
          void *buffer,
          size_t buffer_size,
          libewf_error_t **error );
+
+/* Reads data at a specific offset
+* Returns the number of bytes read or -1 on error
+*/
+LIBEWF_EXTERN \
+ssize_t libewf_file_entry_read_buffer_at_offset(
+	libewf_file_entry_t *file_entry,
+	void *buffer,
+	size_t buffer_size,
+	off64_t offset,
+	libewf_error_t **error);
 
 /* Reads data at a specific offset
  * Returns the number of bytes read or -1 on error

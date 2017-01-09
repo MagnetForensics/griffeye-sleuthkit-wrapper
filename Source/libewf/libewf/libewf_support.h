@@ -1,7 +1,7 @@
 /*
  * Support functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,9 +23,8 @@
 #define _LIBEWF_SUPPORT_H
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
-
-#include <stdio.h>
 
 #include "libewf_extern.h"
 #include "libewf_libbfio.h"
@@ -74,11 +73,13 @@ int libewf_check_file_signature(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBEWF_EXTERN \
 int libewf_check_file_signature_wide(
      const wchar_t *filename,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 LIBEWF_EXTERN \
 int libewf_check_file_signature_file_io_handle(
@@ -101,6 +102,7 @@ int libewf_glob_free(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBEWF_EXTERN \
 int libewf_glob_wide(
      const wchar_t *filename,
@@ -115,7 +117,8 @@ int libewf_glob_wide_free(
      wchar_t *filenames[],
      int number_of_filenames,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( __cplusplus )
 }

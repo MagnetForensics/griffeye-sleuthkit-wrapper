@@ -140,8 +140,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\libfcache\libfcache.c" />
     <ClCompile Include="..\..\libfcache\libfcache_cache.c" />
     <ClCompile Include="..\..\libfcache\libfcache_cache_value.c" />
+    <ClCompile Include="..\..\libfcache\libfcache_date_time.c" />
     <ClCompile Include="..\..\libfcache\libfcache_error.c" />
     <ClCompile Include="..\..\libfcache\libfcache_support.c" />
   </ItemGroup>
