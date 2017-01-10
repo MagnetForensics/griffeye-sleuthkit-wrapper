@@ -1,7 +1,7 @@
 /*
  * Support functions
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,12 +25,22 @@
 #include <common.h>
 #include <types.h>
 
+#include "libcsystem_extern.h"
 #include "libcsystem_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBCSYSTEM )
+
+LIBCSYSTEM_EXTERN \
+const char *libcsystem_get_version(
+             void );
+
+#endif /* !defined( HAVE_LOCAL_LIBCSYSTEM ) */
+
+LIBCSYSTEM_EXTERN \
 int libcsystem_initialize(
      int stdio_mode,
      libcerror_error_t **error );
@@ -39,5 +49,5 @@ int libcsystem_initialize(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCSYSTEM_SUPPORT_H ) */
 

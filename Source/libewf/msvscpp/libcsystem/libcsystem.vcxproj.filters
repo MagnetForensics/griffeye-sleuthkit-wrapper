@@ -38,9 +38,6 @@
     <ClInclude Include="..\..\libcsystem\libcsystem_file_io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libcsystem\libcsystem_file_stream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libcsystem\libcsystem_find.h">
       <Filter>Header Files</Filter>
     </ClInclude>

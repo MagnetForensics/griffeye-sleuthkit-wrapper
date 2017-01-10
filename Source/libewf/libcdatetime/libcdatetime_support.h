@@ -1,7 +1,7 @@
 /*
- * Features of libewf
+ * Support functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2013-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,29 +19,29 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_FEATURES_H )
-#define _LIBEWF_FEATURES_H
+#if !defined( _LIBCDATETIME_SUPPORT_H )
+#define _LIBCDATETIME_SUPPORT_H
 
-#if defined( WINAPI ) || @HAVE_WIDE_CHARACTER_TYPE@
-#define LIBEWF_HAVE_WIDE_CHARACTER_TYPE		1
+#include <common.h>
+#include <types.h>
 
-/* Old definition kept for compatibility (for now)
- */
-#define LIBEWF_WIDE_CHARACTER_TYPE		1
+#include "libcdatetime_extern.h"
+#include "libcdatetime_libcerror.h"
+
+#if defined( __cplusplus )
+extern "C" {
 #endif
 
-#if defined( HAVE_LIBBFIO ) || ( !defined( WINAPI ) && @HAVE_LIBBFIO@ )
-#define LIBEWF_HAVE_BFIO			1
-#endif
+#if !defined( HAVE_LOCAL_LIBCDATETIME )
 
-#if !defined( LIBEWF_DEPRECATED )
-#if defined( __GNUC__ ) && __GNUC__ >= 3
-#define LIBEWF_DEPRECATED	__attribute__ ((__deprecated__))
-#elif defined( _MSC_VER )
-#define LIBEWF_DEPRECATED	__declspec(deprecated)
-#else
-#define LIBEWF_DEPRECATED
-#endif
+LIBCDATETIME_EXTERN \
+const char *libcdatetime_get_version(
+             void );
+
+#endif /* !defined( HAVE_LOCAL_LIBCDATETIME ) */
+
+#if defined( __cplusplus )
+}
 #endif
 
 #endif
