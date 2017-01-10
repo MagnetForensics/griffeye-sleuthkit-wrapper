@@ -19,7 +19,7 @@
     <copyright></copyright>
   </metadata>
   <files>
-    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="lib\net45\" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="lib\net45\" />
     <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="build\x64" />
         
     <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="CopyToOutput\x64" />
