@@ -33,8 +33,8 @@
             expected.Add("evidence_number", "UNKNOWN");
             expected.Add("notes", "UNKNOWN");
             // acquiry_date and system_date are not extracted with libewf v2013, but are extracted with >= v2015
-            //expected.Add("acquiry_date", "Tue Oct  1 08:47:26 2013");
-            //expected.Add("system_date", "Mon Sep 30 14:43:12 2013");
+            expected.Add("acquiry_date", "Tue Oct  1 08:47:26 2013");
+            expected.Add("system_date", "Mon Sep 30 14:43:12 2013");
             expected.Add("acquiry_operating_system", "Windows 2008 Server R2");
             expected.Add("acquiry_software_version", "7.06.02");
             expected.Add("password", "UNKNOWN");
