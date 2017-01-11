@@ -247,14 +247,7 @@ namespace SleuthKit
         /// <returns></returns>
         internal VolumeSystemHandle OpenVolumeSystemHandle(VolumeSystemType vstype = VolumeSystemType.Autodetect, long offset = 0)
         {
-            VolumeSystemHandle handle = NativeMethods.tsk_vs_open(this, offset, vstype); ;
-
-            uint errorCode = NativeMethods.tsk_error_get_errno();
-            IntPtr ptrToMessage = NativeMethods.tsk_error_get_errstr();
-            String errorMessage = Marshal.PtrToStringAnsi(ptrToMessage);
-            String ioExceptionMessage = String.Format("{0} (0x{1,8:X8})", errorMessage, errorCode);
-
-            return handle;
+            return NativeMethods.tsk_vs_open(this, offset, vstype);
         }
 
         /// <summary>
