@@ -6,7 +6,7 @@
   </Target>
 
   <Target Name="InjectReference" BeforeTargets="ResolveAssemblyReferences">
-    <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <ItemGroup Condition="'$(Platform)' == 'x86' or '$(Platform)' == 'x64'">
       <Reference Include="sleuthkit-sharp">
         <HintPath>$(MSBuildThisFileDirectory)$(Platform)\sleuthkit-sharp.dll</HintPath>
       </Reference>
