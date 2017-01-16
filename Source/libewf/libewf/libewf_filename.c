@@ -1,7 +1,7 @@
 /*
  * Filename functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -27,8 +27,6 @@
 #include "libewf_filename.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcstring.h"
-
-#include "ewf_definitions.h"
 
 /* Sets the extension for a certain segment file
  * Using the format specific naming schema
@@ -129,11 +127,6 @@ int libewf_filename_set_extension(
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
 		first_character       = 's';
-		additional_characters = 'a';
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
-	{
-		first_character       = 'd';
 		additional_characters = 'a';
 	}
 	else
@@ -344,11 +337,6 @@ int libewf_filename_set_extension_wide(
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
 		first_character       = (wchar_t) 's';
-		additional_characters = (wchar_t) 'a';
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
-	{
-		first_character       = (wchar_t) 'd';
 		additional_characters = (wchar_t) 'a';
 	}
 	else

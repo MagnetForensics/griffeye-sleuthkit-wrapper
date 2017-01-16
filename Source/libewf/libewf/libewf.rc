@@ -22,13 +22,13 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "FileDescription",		"Library to access the Expert Witness Compression Format (EWF)\0"
-      VALUE "FileVersion",		"20130331" "\0"
+      VALUE "FileVersion",		"20160424" "\0"
       VALUE "InternalName",		"libewf.dll\0"
-      VALUE "LegalCopyright",		"(c) 2006-2013 Joachim Metz <joachim.metz@gmail.com>\0"
+      VALUE "LegalCopyright",		"(C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>\0"
       VALUE "OriginalFilename",		"libewf.dll\0"
       VALUE "ProductName",		"libewf\0"
-      VALUE "ProductVersion",		"20130331" "\0"
-      VALUE "Comments",			"For more information visit http://code.google.com/p/libewf/\0"
+      VALUE "ProductVersion",		"20160424" "\0"
+      VALUE "Comments",			"For more information visit https://github.com/libyal/libewf/\0"
     END
   END
   BLOCK "VarFileInfo"

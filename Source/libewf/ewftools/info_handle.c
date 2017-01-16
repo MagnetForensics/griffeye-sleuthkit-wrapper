@@ -1,7 +1,7 @@
 /*
  * Info handle
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -48,7 +48,8 @@
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
 #endif
 
-/* Initializes the info handle
+/* Creates an info handle
+ * Make sure the value info_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int info_handle_initialize(
@@ -138,7 +139,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the info handle and its elements
+/* Frees an info handle
  * Returns 1 if successful or -1 on error
  */
 int info_handle_free(
@@ -1027,34 +1028,14 @@ int info_handle_section_value_size_fprint(
 
 		return( -1 );
 	}
-	result = byte_size_string_create(
-	          value_size_string,
-	          16,
-	          value_size,
-	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-	          NULL );
-
 	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{
-		if( result == 1 )
-		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "\t\t\t<%s>%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)</%s>\n",
-			 identifier,
-			 value_size_string,
-			 value_size,
-			 identifier );
-		}
-		else
-		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "\t\t\t<%s>%" PRIu64 " bytes</%s>\n",
-			 identifier,
-			 value_size,
-			 identifier );
-		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t<%s>%" PRIu64 "</%s>\n",
+		 identifier,
+		 value_size,
+		 identifier );
 	}
 	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 	{
@@ -1073,6 +1054,13 @@ int info_handle_section_value_size_fprint(
 
 			description_length += 8;
 		}
+		result = byte_size_string_create(
+		          value_size_string,
+		          16,
+		          value_size,
+		          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+		          NULL );
+
 		if( result == 1 )
 		{
 			fprintf(
@@ -1307,7 +1295,7 @@ int info_handle_header_values_fprint(
 	if( libewf_handle_get_number_of_header_values(
 	     info_handle->input_handle,
 	     &number_of_values,
-	     error ) == -1 )
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2236,7 +2224,7 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "SMART" );
 			break;
 
-		case LIBEWF_FORMAT_FTK:
+		case LIBEWF_FORMAT_FTK_IMAGER:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "FTK Imager" );
 			break;
 
@@ -2854,7 +2842,7 @@ int info_handle_media_information_fprint(
 			}
 		}
 	}
-	if( format != LIBEWF_FORMAT_LVF )
+	if( format != LIBEWF_FORMAT_LOGICAL_ENCASE5 )
 	{
 		if( libewf_handle_get_bytes_per_sector(
 		     info_handle->input_handle,
@@ -3250,7 +3238,7 @@ int info_handle_hash_values_fprint(
 	if( libewf_handle_get_number_of_hash_values(
 	     info_handle->input_handle,
 	     &number_of_values,
-	     error ) == -1 )
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,

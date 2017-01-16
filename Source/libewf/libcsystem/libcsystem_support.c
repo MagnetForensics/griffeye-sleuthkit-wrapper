@@ -1,7 +1,7 @@
 /*
  * Support functions
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -22,9 +22,24 @@
 #include <common.h>
 #include <types.h>
 
+#include <stdio.h>
+
+#include "libcsystem_definitions.h"
 #include "libcsystem_libcerror.h"
 #include "libcsystem_libcstring.h"
 #include "libcsystem_support.h"
+
+#if !defined( HAVE_LOCAL_LIBCSYSTEM )
+
+/* Returns the library version as a string
+ */
+const char *libcsystem_get_version(
+             void )
+{
+	return( (const char *) LIBCSYSTEM_VERSION_STRING );
+}
+
+#endif /* !defined( HAVE_LOCAL_LIBCSYSTEM ) */
 
 /* Initializes the system values
  * Returns 1 if successful or -1 on error

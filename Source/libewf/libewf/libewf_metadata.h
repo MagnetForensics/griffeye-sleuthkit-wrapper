@@ -1,7 +1,7 @@
 /*
  * Metadata functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -246,7 +246,7 @@ int libewf_handle_get_number_of_checksum_errors(
 LIBEWF_EXTERN \
 int libewf_handle_get_checksum_error(
      libewf_handle_t *handle,
-     uint32_t index,
+     uint32_t error_index,
      uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error );
@@ -403,6 +403,10 @@ int libewf_handle_copy_header_values(
      libewf_handle_t *source_handle,
      libcerror_error_t **error );
 
+int libewf_internal_handle_parse_hash_values(
+     libewf_internal_handle_t *internal_handle,
+     libcerror_error_t **error );
+
 LIBEWF_EXTERN \
 int libewf_handle_get_number_of_hash_values(
      libewf_handle_t *handle,
@@ -474,10 +478,6 @@ int libewf_handle_set_utf16_hash_value(
      size_t identifier_length,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libcerror_error_t **error );
-
-int libewf_handle_parse_hash_values(
-     libewf_internal_handle_t *internal_handle,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

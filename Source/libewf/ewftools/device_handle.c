@@ -1,7 +1,7 @@
 /*
  * Device handle
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -84,7 +84,8 @@ const char *device_handle_get_track_type(
 	return( "UNKNOWN" );
 }
 
-/* Initializes the device handle
+/* Creates a device handle
+ * Make sure the value device_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int device_handle_initialize(
@@ -197,7 +198,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the device handle and its elements
+/* Frees a device handle
  * Returns 1 if successful or -1 on error
  */
 int device_handle_free(
@@ -981,16 +982,17 @@ int device_handle_close(
 	return( 0 );
 }
 
-/* Reads a buffer from the input of the device handle
+/* Reads a storage media buffer from the input of the device handle
  * Returns the number of bytes written or -1 on error
  */
-ssize_t device_handle_read_buffer(
+ssize_t device_handle_read_storage_media_buffer(
          device_handle_t *device_handle,
-         uint8_t *buffer,
+         storage_media_buffer_t *storage_media_buffer,
+         off64_t storage_media_offset,
          size_t read_size,
          libcerror_error_t **error )
 {
-	static char *function = "device_handle_read_buffer";
+	static char *function = "device_handle_read_storage_media_buffer";
 	ssize_t read_count    = 0;
 
 	if( device_handle == NULL )
@@ -1004,13 +1006,13 @@ ssize_t device_handle_read_buffer(
 
 		return( -1 );
 	}
-	if( buffer == NULL )
+	if( storage_media_buffer == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.",
+		 "%s: invalid storage media buffer.",
 		 function );
 
 		return( -1 );
@@ -1019,7 +1021,7 @@ ssize_t device_handle_read_buffer(
 	{
 		read_count = libsmdev_handle_read_buffer(
 			      device_handle->smdev_input_handle,
-			      buffer,
+			      storage_media_buffer->raw_buffer,
 			      read_size,
 		              error );
 
@@ -1039,7 +1041,7 @@ ssize_t device_handle_read_buffer(
 	{
 		read_count = libodraw_handle_read_buffer(
 			      device_handle->odraw_input_handle,
-			      buffer,
+			      storage_media_buffer->raw_buffer,
 			      read_size,
 		              error );
 
@@ -1059,7 +1061,7 @@ ssize_t device_handle_read_buffer(
 	{
 		read_count = libsmraw_handle_read_buffer(
 			      device_handle->smraw_input_handle,
-			      buffer,
+			      storage_media_buffer->raw_buffer,
 			      read_size,
 		              error );
 
@@ -1075,6 +1077,21 @@ ssize_t device_handle_read_buffer(
 			return( -1 );
 		}
 	}
+	if( read_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	storage_media_buffer->storage_media_offset = storage_media_offset;
+	storage_media_buffer->requested_size       = read_size;
+	storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
+
 	return( read_count );
 }
 
@@ -1193,7 +1210,7 @@ int device_handle_prompt_for_string(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -1204,7 +1221,7 @@ int device_handle_prompt_for_string(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal string size.",
+		 "%s: invalid string size.",
 		 function );
 
 		return( -1 );
@@ -1586,7 +1603,7 @@ int device_handle_get_media_type(
 }
 
 /* Retrieves the number of bytes per sector
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int device_handle_get_bytes_per_sector(
      device_handle_t *device_handle,
@@ -1594,6 +1611,7 @@ int device_handle_get_bytes_per_sector(
      libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_bytes_per_sector";
+	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1608,10 +1626,12 @@ int device_handle_get_bytes_per_sector(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->smdev_input_handle,
-		     bytes_per_sector,
-		     error ) != 1 )
+		result = libsmdev_handle_get_bytes_per_sector(
+		          device_handle->smdev_input_handle,
+		          bytes_per_sector,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1625,10 +1645,12 @@ int device_handle_get_bytes_per_sector(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		if( libodraw_handle_get_bytes_per_sector(
-		     device_handle->odraw_input_handle,
-		     bytes_per_sector,
-		     error ) != 1 )
+		result = libodraw_handle_get_bytes_per_sector(
+		          device_handle->odraw_input_handle,
+		          bytes_per_sector,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1642,10 +1664,12 @@ int device_handle_get_bytes_per_sector(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( libsmraw_handle_get_bytes_per_sector(
-		     device_handle->smraw_input_handle,
-		     bytes_per_sector,
-		     error ) != 1 )
+		result = libsmraw_handle_get_bytes_per_sector(
+		          device_handle->smraw_input_handle,
+		          bytes_per_sector,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1661,7 +1685,7 @@ int device_handle_get_bytes_per_sector(
 			*bytes_per_sector = 512;
 		}
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the information value by identifier
@@ -2108,7 +2132,7 @@ int device_handle_set_string(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal string.",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -2119,7 +2143,7 @@ int device_handle_set_string(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal string size.",
+		 "%s: invalid string size.",
 		 function );
 
 		return( -1 );
@@ -2722,32 +2746,51 @@ int device_handle_media_information_fprint(
 
 		return( -1 );
 	}
-	result = byte_size_string_create(
-		  byte_size_string,
-		  16,
-		  media_size,
-		  BYTE_SIZE_STRING_UNIT_MEGABYTE,
-		  NULL );
+	fprintf(
+	 stream,
+	 "Media size:\t\t\t\t" );
 
-	if( result == 1 )
+	if( media_size == 0 )
 	{
 		fprintf(
 		 stream,
-		 "Media size:\t\t\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
-		 byte_size_string,
-		 media_size );
+		 "N/A" );
 	}
 	else
 	{
-		fprintf(
-		 stream,
-		 "Media size:\t\t\t\t%" PRIu64 " bytes\n",
-		 media_size );
+		result = byte_size_string_create(
+			  byte_size_string,
+			  16,
+			  media_size,
+			  BYTE_SIZE_STRING_UNIT_MEGABYTE,
+			  NULL );
+
+		if( result == 1 )
+		{
+			fprintf(
+			 stream,
+			 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
+			 byte_size_string,
+			 media_size );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 "%" PRIu64 " bytes",
+			 media_size );
+		}
 	}
-	if( device_handle_get_bytes_per_sector(
-	     device_handle,
-	     &bytes_per_sector,
-	     error ) != 1 )
+	fprintf(
+	 stream,
+	 "\n" );
+
+	result = device_handle_get_bytes_per_sector(
+	          device_handle,
+	          &bytes_per_sector,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2760,8 +2803,24 @@ int device_handle_media_information_fprint(
 	}
 	fprintf(
 	 stream,
-	 "Bytes per sector:\t\t\t%" PRIu32 "\n",
-	 bytes_per_sector );
+	 "Bytes per sector:\t\t\t" );
+
+	if( result == 0 )
+	{
+		fprintf(
+		 stream,
+		 "N/A" );
+	}
+	else
+	{
+		fprintf(
+		 stream,
+		 "%" PRIu32 "",
+		 bytes_per_sector );
+	}
+	fprintf(
+	 stream,
+	 "\n" );
 
 	if( media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )
 	{
@@ -2841,31 +2900,6 @@ int device_handle_read_errors_fprint(
 
 		return( -1 );
 	}
-	if( device_handle_get_bytes_per_sector(
-	     device_handle,
-	     &bytes_per_sector,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve bytes per sector.",
-		 function );
-
-		return( -1 );
-	}
-	if( bytes_per_sector == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid bytes per sector returned.",
-		 function );
-
-		return( -1 );
-	}
 	if( device_handle_get_number_of_read_errors(
 	     device_handle,
 	     &number_of_read_errors,
@@ -2882,6 +2916,31 @@ int device_handle_read_errors_fprint(
 	}
 	if( number_of_read_errors > 0 )
 	{
+		if( device_handle_get_bytes_per_sector(
+		     device_handle,
+		     &bytes_per_sector,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
+			 function );
+
+			return( -1 );
+		}
+		if( bytes_per_sector == 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid bytes per sector returned.",
+			 function );
+
+			return( -1 );
+		}
 		fprintf(
 		 stream,
 		 "Errors reading device:\n" );

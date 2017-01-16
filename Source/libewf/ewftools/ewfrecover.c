@@ -1,7 +1,7 @@
 /*
  * Exports corrupt EWF files to new files
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,6 +31,10 @@
 #include <sys/resource.h>
 #endif
 
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
+#endif
+
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
@@ -43,7 +47,6 @@
 #include "export_handle.h"
 #include "log_handle.h"
 #include "platform.h"
-#include "storage_media_buffer.h"
 
 #define EWFRECOVER_INPUT_BUFFER_SIZE		64
 
@@ -65,7 +68,7 @@ void usage_fprint(
 	fprintf( stream, "Usage: ewfrecover [ -A codepage ]\n"
 	                 "                  [ -l log_filename ]\n"
 	                 "                  [ -p process_buffer_size ]\n"
-	                 "                  [ -t target ] [ -hquvV ] ewf_files\n\n" );
+	                 "                  [ -t target ] [ -hquvVx ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
@@ -80,9 +83,10 @@ void usage_fprint(
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q:        quiet shows minimal status information\n" );
 	fprintf( stream, "\t-t:        specify the target file to recover to (default is recover)\n" );
-	fprintf( stream, "\t-u:        unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
+	fprintf( stream, "\t-x:        use the chunk data instead of the buffered read and write\n"
+	                 "\t           functions.\n" );
 }
 
 /* Signal handler for ewfrecover
@@ -137,29 +141,30 @@ int main( int argc, char * const argv[] )
 #endif
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
 
-	libcstring_system_character_t * const *argv_filenames      = NULL;
+	libcstring_system_character_t * const *source_filenames   = NULL;
 
-	libcerror_error_t *error                                   = NULL;
+	libcerror_error_t *error                                  = NULL;
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
-	libcsystem_glob_t *glob                                    = NULL;
+#if !defined( HAVE_GLOB_H )
+	libcsystem_glob_t *glob                                   = NULL;
 #endif
 
-	libcstring_system_character_t *acquiry_software_version    = NULL;
-	libcstring_system_character_t *log_filename                = NULL;
-	libcstring_system_character_t *option_header_codepage      = NULL;
-	libcstring_system_character_t *option_process_buffer_size  = NULL;
-	libcstring_system_character_t *option_target_path          = NULL;
-	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfrecover" );
+	libcstring_system_character_t *acquiry_software_version   = NULL;
+	libcstring_system_character_t *log_filename               = NULL;
+	libcstring_system_character_t *option_header_codepage     = NULL;
+	libcstring_system_character_t *option_process_buffer_size = NULL;
+	libcstring_system_character_t *option_target_path         = NULL;
+	libcstring_system_character_t *program                    = _LIBCSTRING_SYSTEM_STRING( "ewfrecover" );
 
-	log_handle_t *log_handle                                   = NULL;
+	log_handle_t *log_handle                                  = NULL;
 
-	libcstring_system_integer_t option                         = 0;
-	uint8_t calculate_md5                                      = 1;
-	uint8_t print_status_information                           = 1;
-	uint8_t verbose                                            = 0;
-	int number_of_filenames                                    = 0;
-	int result                                                 = 1;
+	libcstring_system_integer_t option                        = 0;
+	uint8_t calculate_md5                                     = 1;
+	uint8_t print_status_information                          = 1;
+	uint8_t use_chunk_data_functions                          = 0;
+	uint8_t verbose                                           = 0;
+	int number_of_filenames                                   = 0;
+	int result                                                = 1;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -221,7 +226,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:f:hl:p:qt:uvV" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:f:hl:p:qt:vVx" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -234,7 +239,7 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
-				 argv[ optind - 1 ] );
+				 argv[ optind ] );
 
 				usage_fprint(
 				 stderr );
@@ -290,6 +295,11 @@ int main( int argc, char * const argv[] )
 				 stderr );
 
 				return( EXIT_SUCCESS );
+
+			case (libcstring_system_integer_t) 'x':
+				use_chunk_data_functions = 1;
+
+				break;
 		}
 	}
 	if( optind == argc )
@@ -322,7 +332,7 @@ int main( int argc, char * const argv[] )
 	 NULL );
 #endif
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
@@ -345,16 +355,27 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	argv_filenames      = glob->result;
-	number_of_filenames = glob->number_of_results;
+	if( libcsystem_glob_get_results(
+	     glob,
+	     &number_of_filenames,
+	     (libcstring_system_character_t ***) &source_filenames,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve glob results.\n" );
+
+		goto on_error;
+	}
 #else
-	argv_filenames      = &( argv[ optind ] );
+	source_filenames    = &( argv[ optind ] );
 	number_of_filenames = argc - optind;
 #endif
 
 	if( export_handle_initialize(
 	     &ewfrecover_export_handle,
 	     calculate_md5,
+	     use_chunk_data_functions,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -407,7 +428,7 @@ int main( int argc, char * const argv[] )
 	}
 	result = export_handle_open_input(
 	          ewfrecover_export_handle,
-	          argv_filenames,
+	          source_filenames,
 	          number_of_filenames,
 	          &error );
 
@@ -423,7 +444,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
@@ -498,7 +519,7 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		/* Make sure the target filename is set in unattended mode
+		/* Make sure the target filename is set
 		 */
 		if( export_handle_set_string(
 		     ewfrecover_export_handle,
@@ -513,6 +534,26 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
+	}
+	/* Make sure we can write the target file
+	 */
+	if( export_handle_check_write_access(
+	     ewfrecover_export_handle,
+	     ewfrecover_export_handle->target_path,
+	     &error ) != 1 )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		libcnotify_print_error_backtrace(
+		 error );
+#endif
+		libcerror_error_free(
+		 &error );
+
+		fprintf(
+		 stdout,
+		 "Unable to write target file.\n" );
+
+		goto on_error;
 	}
 	if( option_process_buffer_size != NULL )
 	{
@@ -736,7 +777,7 @@ on_error:
 		 &ewfrecover_export_handle,
 		 NULL );
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( glob != NULL )
 	{
 		libcsystem_glob_free(

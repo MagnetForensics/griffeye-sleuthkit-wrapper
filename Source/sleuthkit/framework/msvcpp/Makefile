@@ -4,7 +4,7 @@ MORE	= cat
 MSBUILD	= msbuild.exe
 
 TSK_SOLN = "$(TSK_HOME)\win32\tsk-win.sln"
-EWF_SOLN = "$(LIBEWF_HOME)\msvscpp\libewf.sln"
+EWF_SOLN = "$(ProjectDir)\..\..\..\libewf\msvscpp\libewf.sln"
 FRMWK_SOLN = "$(TSK_HOME)\framework\msvcpp\framework\framework.sln"
 POCO_SOLN = "$(POCO_HOME)\Foundation\Foundation_vs100.sln"
 POCO_UTIL_SOLN = "$(POCO_HOME)\Util\Util_vs100.sln"

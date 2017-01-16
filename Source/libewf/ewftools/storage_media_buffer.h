@@ -1,7 +1,7 @@
 /*
  * Storage media buffer
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,15 +26,30 @@
 #include <types.h>
 
 #include "ewftools_libcerror.h"
+#include "ewftools_libewf.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
+enum STORAGE_MEDIA_BUFFER_MODES
+{
+	STORAGE_MEDIA_BUFFER_MODE_BUFFERED	= 0,
+	STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA	= 1
+};
+
 typedef struct storage_media_buffer storage_media_buffer_t;
 
 struct storage_media_buffer
 {
+	/* The mode
+	 */
+	uint8_t mode;
+
+	/* The storage media offset
+	 */
+	off64_t storage_media_offset;
+
 	/* The raw buffer
 	 */
 	uint8_t *raw_buffer;
@@ -47,55 +62,28 @@ struct storage_media_buffer
 	 */
 	size_t raw_buffer_data_size;
 
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-        /* Value to indicate if the compression buffer
-	 * contains uncompressed data
+	/* The data chunk
 	 */
-        int8_t data_in_compression_buffer;
+	libewf_data_chunk_t *data_chunk;
 
-	/* Value to indicate if the data is compressed
+	/* The requested size
 	 */
-	int8_t is_compressed;
+	size_t requested_size;
 
-	/* The compression buffer
+	/* The processed size
 	 */
-	uint8_t *compression_buffer;
-
-	/* The compression buffer size
-	 */
-	size_t compression_buffer_size;
-
-	/* The size of the data in the compression buffer
-	 */
-	size_t compression_buffer_data_size;
-
-	/* The checksum buffer
-	 */
-	uint8_t *checksum_buffer;
-
-	/* Value to indicate if the checksum should be processed
-	 * read or written
-	 */
-	int8_t process_checksum;
-
-	/* The checksum of the data within the buffer
-	 */
-	uint32_t checksum;
-#endif
+	size_t processed_size;
 };
 
 int storage_media_buffer_initialize(
      storage_media_buffer_t **buffer,
+     libewf_handle_t *handle,
+     uint8_t mode,
      size_t size,
      libcerror_error_t **error );
 
 int storage_media_buffer_free(
      storage_media_buffer_t **buffer,
-     libcerror_error_t **error );
-
-int storage_media_buffer_resize(
-     storage_media_buffer_t *buffer,
-     size_t size,
      libcerror_error_t **error );
 
 int storage_media_buffer_get_data(
@@ -104,9 +92,34 @@ int storage_media_buffer_get_data(
      size_t *data_size,
      libcerror_error_t **error );
 
+int storage_media_buffer_compare(
+     storage_media_buffer_t *first_buffer,
+     storage_media_buffer_t *second_buffer,
+     libcerror_error_t **error );
+
+ssize_t storage_media_buffer_read_from_handle(
+         storage_media_buffer_t *storage_media_buffer,
+         libewf_handle_t *handle,
+         size_t read_size,
+         libcerror_error_t **error );
+
+ssize_t storage_media_buffer_read_process(
+         storage_media_buffer_t *storage_media_buffer,
+         libcerror_error_t **error );
+
+ssize_t storage_media_buffer_write_process(
+         storage_media_buffer_t *storage_media_buffer,
+         libcerror_error_t **error );
+
+ssize_t storage_media_buffer_write_to_handle(
+         storage_media_buffer_t *storage_media_buffer,
+         libewf_handle_t *handle,
+         size_t write_size,
+         libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _STORAGE_MEDIA_BUFFER_H ) */
 

@@ -1,7 +1,7 @@
 /*
  * MD5 functions
  *
- * Copyright (c) 2011-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2011-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,6 +31,7 @@
 #include <openssl/md5.h>
 
 #elif defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+#include <openssl/err.h>
 #include <openssl/evp.h>
 
 #endif
@@ -419,8 +420,8 @@ on_error:
 
 #endif /* !defined( LIBHMAC_HAVE_MD5_SUPPORT ) */
 
-/* Initializes the MD5 context
- * The context must point to a NULL pointer to be allocated
+/* Creates a MD5 context
+ * Make sure the value context is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libhmac_md5_initialize(
@@ -574,6 +575,8 @@ int libhmac_md5_initialize(
 
 		EVP_MD_CTX_cleanup(
 		 &( internal_context->evp_md_context ) );
+		ERR_remove_thread_state(
+		 NULL );
 
 		goto on_error;
 	}
@@ -607,7 +610,7 @@ on_error:
 	return( -1 );
 }
 
-/* Free the MD5 context and its values
+/* Frees a MD5 context
  * Returns 1 if successful or -1 on error
  */
 int libhmac_md5_free(
@@ -661,6 +664,10 @@ int libhmac_md5_free(
 			 "%s: unable to clean up context.",
 			 function );
 		}
+		/* Make sure the error state is removed otherwise openssl will leak memory
+		 */
+		ERR_remove_thread_state(
+		 NULL );
 
 #else
 		/* No additional clean up necessary
@@ -1253,7 +1260,7 @@ int libhmac_md5_calculate(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable initialize context.",
+		 "%s: unable to initialize context.",
 		 function );
 
 		goto on_error;
@@ -1268,7 +1275,7 @@ int libhmac_md5_calculate(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable update context.",
+		 "%s: unable to update context.",
 		 function );
 
 		goto on_error;
@@ -1283,7 +1290,7 @@ int libhmac_md5_calculate(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable finalize context.",
+		 "%s: unable to finalize context.",
 		 function );
 
 		goto on_error;
@@ -1296,7 +1303,7 @@ int libhmac_md5_calculate(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable finalize context.",
+		 "%s: unable to free context.",
 		 function );
 
 		goto on_error;
@@ -1424,7 +1431,7 @@ int libhmac_md5_calculate_hmac(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable initialize context.",
+			 "%s: unable to initialize context.",
 			 function );
 
 			goto on_error;
@@ -1439,7 +1446,7 @@ int libhmac_md5_calculate_hmac(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable update context.",
+			 "%s: unable to update context.",
 			 function );
 
 			goto on_error;
@@ -1454,7 +1461,7 @@ int libhmac_md5_calculate_hmac(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable finalize context.",
+			 "%s: unable to finalize context.",
 			 function );
 
 			goto on_error;
@@ -1467,27 +1474,13 @@ int libhmac_md5_calculate_hmac(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable finalize context.",
+			 "%s: unable to free context.",
 			 function );
 
 			goto on_error;
 		}
-		if( block_size <= LIBHMAC_MD5_HASH_SIZE )
+		if( block_size > LIBHMAC_MD5_HASH_SIZE )
 		{
-			if( memory_copy(
-			     key_data,
-			     key_hash,
-			     LIBHMAC_MD5_HASH_SIZE ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy key hash data.",
-				 function );
-
-				goto on_error;
-			}
 			if( memory_set(
 			     &( key_data[ LIBHMAC_MD5_HASH_SIZE ] ),
 			     0,
@@ -1503,22 +1496,19 @@ int libhmac_md5_calculate_hmac(
 				goto on_error;
 			}
 		}
-		else
+		if( memory_copy(
+		     key_data,
+		     key_hash,
+		     LIBHMAC_MD5_HASH_SIZE ) == NULL )
 		{
-			if( memory_copy(
-			     key_data,
-			     key_hash,
-			     block_size ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy key hash data.",
-				 function );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy key hash data.",
+			 function );
 
-				goto on_error;
-			}
+			goto on_error;
 		}
 	}
 	inner_padding = (uint8_t *) memory_allocate(
@@ -1592,7 +1582,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable initialize context.",
+		 "%s: unable to initialize context.",
 		 function );
 
 		goto on_error;
@@ -1607,7 +1597,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable update context.",
+		 "%s: unable to update context.",
 		 function );
 
 		goto on_error;
@@ -1622,7 +1612,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable update context.",
+		 "%s: unable to update context.",
 		 function );
 
 		goto on_error;
@@ -1637,7 +1627,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable finalize context.",
+		 "%s: unable to finalize context.",
 		 function );
 
 		goto on_error;
@@ -1650,7 +1640,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable finalize context.",
+		 "%s: unable to free context.",
 		 function );
 
 		goto on_error;
@@ -1663,7 +1653,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable initialize context.",
+		 "%s: unable to initialize context.",
 		 function );
 
 		goto on_error;
@@ -1678,7 +1668,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable update context.",
+		 "%s: unable to update context.",
 		 function );
 
 		goto on_error;
@@ -1693,7 +1683,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable update context.",
+		 "%s: unable to update context.",
 		 function );
 
 		goto on_error;
@@ -1708,7 +1698,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable finalize context.",
+		 "%s: unable to finalize context.",
 		 function );
 
 		goto on_error;
@@ -1721,7 +1711,7 @@ int libhmac_md5_calculate_hmac(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable finalize context.",
+		 "%s: unable to free context.",
 		 function );
 
 		goto on_error;

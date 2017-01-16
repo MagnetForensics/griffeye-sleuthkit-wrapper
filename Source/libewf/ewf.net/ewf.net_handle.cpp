@@ -1,7 +1,7 @@
 /*
  * Handle class of libewf .net managed wrapper
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -524,16 +524,16 @@ int Handle::ReadBuffer( array<System::Byte>^ buffer,
 	return( (int) read_count );
 }
 
-int Handle::ReadRandom( array<System::Byte>^ buffer,
-                        int size,
-                        System::Int64 offset )
+int Handle::ReadBufferAtOffset( array<System::Byte>^ buffer,
+                                int size,
+                                System::Int64 offset )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
 	libewf_error_t *error        = NULL;
 	libewf_handle_t *handle      = NULL;
 	System::String^ error_string = nullptr;
-	System::String^ function     = "Handle::ReadRandom";
+	System::String^ function     = "Handle::ReadBufferAtOffset";
 	pin_ptr<uint8_t> ewf_buffer  = nullptr;
 	off64_t ewf_offset           = 0;
 	size_t read_count            = 0;
@@ -562,7 +562,7 @@ int Handle::ReadRandom( array<System::Byte>^ buffer,
 
 	ewf_buffer = &( buffer[ 0 ] );
 
-	read_count = libewf_handle_read_random(
+	read_count = libewf_handle_read_buffer_at_offset(
 	              handle,
 	              ewf_buffer,
 	              (size_t) size,
@@ -572,7 +572,7 @@ int Handle::ReadRandom( array<System::Byte>^ buffer,
 	if( read_count == -1 )
 	{
 		error_string = gcnew System::String(
-		                      "ewf.net " + function + ": unable to read random from ewf handle." );
+		                      "ewf.net " + function + ": unable to read buffer at offset from ewf handle." );
 
 		if( libewf_error_backtrace_sprint(
 		     error,
@@ -659,16 +659,16 @@ int Handle::WriteBuffer( array<System::Byte>^ buffer,
 	return( (int) write_count );
 }
 
-int Handle::WriteRandom( array<System::Byte>^ buffer,
-                         int size,
-                         System::Int64 offset )
+int Handle::WriteBufferAtOffset( array<System::Byte>^ buffer,
+                                 int size,
+                                 System::Int64 offset )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
 	libewf_error_t *error             = NULL;
 	libewf_handle_t *handle           = NULL;
 	System::String^ error_string      = nullptr;
-	System::String^ function          = "Handle::WriteRandom";
+	System::String^ function          = "Handle::WriteBufferAtOffset";
 	pin_ptr<const uint8_t> ewf_buffer = nullptr;
 	off64_t ewf_offset                = 0;
 	size_t write_count                = 0;
@@ -697,7 +697,7 @@ int Handle::WriteRandom( array<System::Byte>^ buffer,
 
 	ewf_buffer = &( buffer[ 0 ] );
 
-	write_count = libewf_handle_write_random(
+	write_count = libewf_handle_write_buffer_at_offset(
 	               handle,
 	               ewf_buffer,
 	               (size_t) size,
@@ -707,7 +707,7 @@ int Handle::WriteRandom( array<System::Byte>^ buffer,
 	if( write_count == -1 )
 	{
 		error_string = gcnew System::String(
-		                      "ewf.net " + function + ": unable to write random to ewf handle." );
+		                      "ewf.net " + function + ": unable to write buffer at offset to ewf handle." );
 
 		if( libewf_error_backtrace_sprint(
 		     error,
@@ -1584,7 +1584,7 @@ int Handle::GetNumberOfAcquiryErrors( void )
 	          &ewf_number_of_acquiry_errors,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of acquiry errors from ewf handle." );
@@ -1755,7 +1755,7 @@ int Handle::GetNumberOfChecksumErrors( void )
 	          &ewf_number_of_checksum_errors,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of checksum errors from ewf handle." );
@@ -1926,7 +1926,7 @@ int Handle::GetNumberOfSessions( void )
 	          &number_of_sessions,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of sessions from ewf handle." );
@@ -2097,7 +2097,7 @@ int Handle::GetNumberOfTracks( void )
 	          &number_of_tracks,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of tracks from ewf handle." );
@@ -2270,7 +2270,7 @@ int Handle::GetNumberOfHeaderValues( void )
 	          &number_of_header_values,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of header values from ewf handle." );
@@ -2345,6 +2345,20 @@ System::String^ Handle::GetHeaderValueIdentifier( int index )
 		throw gcnew System::Exception(
 			     error_string );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( ewf_header_value_identifier_size > (size_t) INT_MAX )
+#else
+	if( ewf_header_value_identifier_size > (size_t) SSIZE_MAX )
+#endif
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": invalid header value identifier size value exceeds maximum." );
+	}
+	if( ewf_header_value_identifier_size == 0 )
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": invalid header value identifier size value out of bounds." );
+	}
 	ewf_header_value_identifier = (uint8_t *) memory_allocate(
 	                                           sizeof( uint8_t ) * ewf_header_value_identifier_size );
 
@@ -2393,7 +2407,7 @@ System::String^ Handle::GetHeaderValueIdentifier( int index )
 		header_value_identifier = gcnew System::String(
 		                                 (char *) ewf_header_value_identifier,
 		                                 0,
-		                                 ewf_header_value_identifier_size - 1,
+		                                 (int) ( ewf_header_value_identifier_size - 1 ),
 	        	                         encoding );
 	}
 	catch( System::Exception^ exception )
@@ -2626,7 +2640,7 @@ int Handle::GetNumberOfHashValues( void )
 	          &number_of_hash_values,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of hash values from ewf handle." );
@@ -2701,6 +2715,20 @@ System::String^ Handle::GetHashValueIdentifier( int index )
 		throw gcnew System::Exception(
 			     error_string );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( ewf_hash_value_identifier_size > (size_t) INT_MAX )
+#else
+	if( ewf_hash_value_identifier_size > (size_t) SSIZE_MAX )
+#endif
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": invalid hash value identifier size value exceeds maximum." );
+	}
+	if( ewf_hash_value_identifier_size == 0 )
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": invalid hash value identifier size value out of bounds." );
+	}
 	ewf_hash_value_identifier = (uint8_t *) memory_allocate(
 	                                         sizeof( uint8_t ) * ewf_hash_value_identifier_size );
 
@@ -2749,7 +2777,7 @@ System::String^ Handle::GetHashValueIdentifier( int index )
 		hash_value_identifier = gcnew System::String(
 		                               (char *) ewf_hash_value_identifier,
 		                               0,
-		                               ewf_hash_value_identifier_size - 1,
+		                               (int) ( ewf_hash_value_identifier_size - 1 ),
 	        	                       encoding );
 	}
 	catch( System::Exception^ exception )

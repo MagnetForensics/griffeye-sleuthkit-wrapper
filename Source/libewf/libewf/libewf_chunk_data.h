@@ -1,7 +1,7 @@
 /*
  * Chunk data functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,11 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_io_handle.h"
+#include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
+#include "libewf_libfcache.h"
+#include "libewf_libfdata.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -35,13 +39,13 @@ typedef struct libewf_chunk_data libewf_chunk_data_t;
 
 struct libewf_chunk_data
 {
+	/* The chunk size
+	 */
+	size32_t chunk_size;
+
 	/* The allocated data size
 	 */
 	size_t allocated_data_size;
-
-	/* The unpacked data size
-	 */
-	size_t unpacked_data_size;
 
 	/* The data
 	 */
@@ -71,15 +75,15 @@ struct libewf_chunk_data
 	 */
 	uint32_t range_flags;
 
+	/* The checksum
+	 */
+	uint32_t checksum;
+
 	/* The flags
 	 */
 	uint8_t flags;
 
 /* TODO chunk data rewrite */
-	/* Reference to the checksum buffer
-	 */
-	uint8_t *checksum_buffer;
-
 	/* The chunk IO flags
 	 */
 	int8_t chunk_io_flags;
@@ -87,19 +91,34 @@ struct libewf_chunk_data
 
 int libewf_chunk_data_initialize(
      libewf_chunk_data_t **chunk_data,
-     size_t data_size,
+     size32_t chunk_size,
+     uint8_t clear_data,
      libcerror_error_t **error );
 
 int libewf_chunk_data_free(
      libewf_chunk_data_t **chunk_data,
      libcerror_error_t **error );
 
+int libewf_chunk_data_clone(
+     libewf_chunk_data_t **destination_chunk_data,
+     libewf_chunk_data_t *source_chunk_data,
+     libcerror_error_t **error );
+
+ssize_t libewf_chunk_data_read_buffer(
+         libewf_chunk_data_t *chunk_data,
+         uint8_t *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error );
+
+ssize_t libewf_chunk_data_write_buffer(
+         libewf_chunk_data_t *chunk_data,
+         const uint8_t *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error );
+
 int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
-     uint32_t chunk_size,
-     uint16_t compression_method,
-     int8_t compression_level,
-     uint8_t compression_flags,
+     libewf_io_handle_t *io_handle,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
      uint8_t pack_flags,
@@ -126,8 +145,7 @@ int libewf_chunk_data_pack_buffer(
 
 int libewf_chunk_data_unpack(
      libewf_chunk_data_t *chunk_data,
-     uint32_t chunk_size,
-     uint16_t compression_method,
+     libewf_io_handle_t *io_handle,
      libcerror_error_t **error );
 
 int libewf_chunk_data_unpack_buffer(
@@ -151,6 +169,44 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
      const uint8_t *data,
      size_t data_size,
      uint64_t *pattern,
+     libcerror_error_t **error );
+
+ssize_t libewf_chunk_data_write(
+         libewf_chunk_data_t *chunk_data,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         libcerror_error_t **error );
+
+int libewf_chunk_data_get_write_size(
+     libewf_chunk_data_t *chunk_data,
+     uint32_t *write_size,
+     libcerror_error_t **error );
+
+int libewf_chunk_data_get_checksum(
+     libewf_chunk_data_t *chunk_data,
+     uint16_t compression_method,
+     uint32_t *checksum,
+     libcerror_error_t **error );
+
+ssize_t libewf_chunk_data_read_from_file_io_pool(
+         libewf_chunk_data_t *chunk_data,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         off64_t chunk_data_offset,
+         size64_t chunk_data_size,
+         uint32_t chunk_data_flags,
+         libcerror_error_t **error );
+
+int libewf_chunk_data_read_element_data(
+     libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
+     libfdata_list_element_t *element,
+     libfcache_cache_t *cache,
+     int file_io_pool_entry,
+     off64_t chunk_data_offset,
+     size64_t chunk_data_size,
+     uint32_t chunk_data_flags,
+     uint8_t read_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

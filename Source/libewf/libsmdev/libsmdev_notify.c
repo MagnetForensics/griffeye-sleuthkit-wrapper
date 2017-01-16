@@ -1,7 +1,7 @@
 /*
  * Notification functions
  *
- * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,7 +33,7 @@
 
 #if !defined( HAVE_LOCAL_LIBSMDEV )
 
-/* Set the verbose notification
+/* Sets the verbose notification
  */
 void libsmdev_notify_set_verbose(
       int verbose )
@@ -42,7 +42,7 @@ void libsmdev_notify_set_verbose(
 	 verbose );
 }
 
-/* Set the notification stream
+/* Sets the notification stream
  * Returns 1 if successful or -1 on error
  */
 int libsmdev_notify_set_stream(
@@ -117,3 +117,4 @@ int libsmdev_notify_stream_close(
 }
 
 #endif /* !defined( HAVE_LOCAL_LIBSMDEV ) */
+

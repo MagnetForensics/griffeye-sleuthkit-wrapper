@@ -1,7 +1,7 @@
 /*
  * Date and time values functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -2262,7 +2262,7 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
-	if( ( *utf16_string_index + 16 ) >= utf16_string_size )
+	if( ( *utf16_string_index + 8 ) >= utf16_string_size )
 	{
 		libcerror_error_set(
 		 error,

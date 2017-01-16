@@ -1,7 +1,7 @@
 /*
  * FileEntry class of libewf .net managed wrapper
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -83,6 +83,50 @@ FileEntry::~FileEntry( void )
 		throw gcnew System::Exception(
 			     error_string );
 	}
+}
+
+System::Byte FileEntry::GetType( void )
+{
+	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
+
+	libewf_error_t *error        = NULL;
+	libewf_handle_t *handle      = NULL;
+	System::String^ error_string = nullptr;
+	System::String^ function     = "FileEntry::GetType";
+	uint8_t ewf_type             = 0;
+
+	Marshal::WriteIntPtr(
+	 (IntPtr) &handle,
+	 this->ewf_file_entry );
+
+	if( libewf_file_entry_get_type(
+	     handle,
+	     &ewf_type,
+	     &error ) != 1 )
+	{
+		error_string = gcnew System::String(
+		                      "ewf.net " + function + ": unable to retrieve type from ewf file entry." );
+
+		if( libewf_error_backtrace_sprint(
+		     error,
+		     &( ewf_error_string[ 1 ] ),
+		     EWF_NET_ERROR_STRING_SIZE - 1 ) > 0 )
+		{
+			ewf_error_string[ 0 ] = '\n';
+
+			error_string = System::String::Concat(
+			                error_string,
+			                gcnew System::String(
+			                       ewf_error_string ) );
+		}
+		libewf_error_free(
+		 &error );
+
+		throw gcnew System::Exception(
+			     error_string );
+	}
+	return( Marshal::ReadByte(
+	         (IntPtr) &ewf_type ) );
 }
 
 System::UInt32 FileEntry::GetFlags( void )
@@ -839,16 +883,16 @@ int FileEntry::ReadBuffer( array<System::Byte>^ buffer,
 	return( (int) read_count );
 }
 
-int FileEntry::ReadRandom( array<System::Byte>^ buffer,
-                           int size,
-                           System::Int64 offset )
+int FileEntry::ReadBufferAtOffset( array<System::Byte>^ buffer,
+                                   int size,
+                                   System::Int64 offset )
 {
 	char ewf_error_string[ EWF_NET_ERROR_STRING_SIZE ];
 
 	libewf_error_t *error           = NULL;
 	libewf_file_entry_t *file_entry = NULL;
 	System::String^ error_string    = nullptr;
-	System::String^ function        = "FileEntry::ReadRandom";
+	System::String^ function        = "FileEntry::ReadBufferAtOffset";
 	pin_ptr<uint8_t> ewf_buffer     = nullptr;
 	off64_t ewf_offset              = 0;
 	size_t read_count               = 0;
@@ -877,7 +921,7 @@ int FileEntry::ReadRandom( array<System::Byte>^ buffer,
 
 	ewf_buffer = &( buffer[ 0 ] );
 
-	read_count = libewf_file_entry_read_random(
+	read_count = libewf_file_entry_read_buffer_at_offset(
 	              file_entry,
 	              ewf_buffer,
 	              (size_t) size,
@@ -887,7 +931,7 @@ int FileEntry::ReadRandom( array<System::Byte>^ buffer,
 	if( read_count == -1 )
 	{
 		error_string = gcnew System::String(
-		                      "ewf.net " + function + ": unable to read random from ewf file entry." );
+		                      "ewf.net " + function + ": unable to read buffer at offset from ewf file entry." );
 
 		if( libewf_error_backtrace_sprint(
 		     error,

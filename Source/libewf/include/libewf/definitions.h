@@ -1,7 +1,7 @@
 /*
  * Definitions for libewf
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,11 +24,11 @@
 
 #include <libewf/types.h>
 
-#define LIBEWF_VERSION						20130331
+#define LIBEWF_VERSION						20160424
 
 /* The version string
  */
-#define LIBEWF_VERSION_STRING					"20130331"
+#define LIBEWF_VERSION_STRING					"20160424"
 
 /* The access flags definitions
  * bit 1	set to 1 for read access
@@ -48,7 +48,6 @@ enum LIBEWF_ACCESS_FLAGS
 /* The file access macros
  */
 #define LIBEWF_OPEN_READ					( LIBEWF_ACCESS_FLAG_READ )
-#define LIBEWF_OPEN_READ_WRITE					( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE )
 #define LIBEWF_OPEN_WRITE					( LIBEWF_ACCESS_FLAG_WRITE )
 #define LIBEWF_OPEN_WRITE_RESUME				( LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME )
 
@@ -89,10 +88,6 @@ enum LIBEWF_FORMAT
 	LIBEWF_FORMAT_EWFX					= 0x71
 };
 
-/* TODO deprecated remove after a while */
-#define LIBEWF_FORMAT_LVF					LIBEWF_FORMAT_LOGICAL_ENCASE5
-#define LIBEWF_FORMAT_FTK					LIBEWF_FORMAT_FTK_IMAGER
-
 /* The default segment file size
  */
 #define LIBEWF_DEFAULT_SEGMENT_FILE_SIZE			( 1500 * 1024 * 1024 )
@@ -117,21 +112,19 @@ enum LIBEWF_COMPRESSION_LEVELS
 };
 
 /* The compression flags
- * bit 1	set to 1 for emtpy block compression
+ * bit 1	set to 1 for empty block compression
  *              detects empty blocks and stored them compressed, the compression
  *              is only done once
  * bit 2	set to 1 for pattern fill compression
  *              this implies empty block compression using the pattern fill method
+ *              used internally only
  * bit 3-8	not used
  */
 enum LIBEWF_COMPRESSION_FLAGS
 {
 	LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION	= (uint8_t) 0x01,
-	LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION	= (uint8_t) 0x02,
+	LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION	= (uint8_t) 0x10,
 };
-
-/* TODO deprecated remove after a while */
-#define LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK			LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION
 
 /* The media type definitions
  */
@@ -153,16 +146,6 @@ enum LIBEWF_MEDIA_FLAGS
 	LIBEWF_MEDIA_FLAG_TABLEAU				= 0x08
 };
 
-#if 0
-/* The volume type definitions
- */
-enum LIBEWF_VOLUME_TYPES
-{
-	LIBEWF_VOLUME_TYPE_LOGICAL				= 0x00,
-	LIBEWF_VOLUME_TYPE_PHYSICAL				= 0x01
-};
-#endif
-
 /* The date representation formats
  */
 enum LIBEWF_DATE_FORMATS
@@ -179,27 +162,17 @@ enum LIBEWF_DATE_FORMATS
 #define LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_FAST		"f"
 #define LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_BEST		"b"
 
-/* TODO deprecated remove after a while */
-#define LIBEWF_COMPRESSION_LEVEL_NONE				"n"
-#define LIBEWF_COMPRESSION_LEVEL_FAST				"f"
-#define LIBEWF_COMPRESSION_LEVEL_BEST				"b"
-
 /* The segment file type definitions
  */
 enum LIBEWF_SEGMENT_FILE_TYPES
 {
+	LIBEWF_SEGMENT_FILE_TYPE_UNDEFINED			= 0,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1				= 1,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART			= 2,
 	LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL			= 3,
-	LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA			= 4,
-	LIBEWF_SEGMENT_FILE_TYPE_EWF2				= 5,
-	LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL			= 6
+	LIBEWF_SEGMENT_FILE_TYPE_EWF2				= 4,
+	LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL			= 5
 };
-
-/* TODO deprecated remove after a while */
-#define LIBEWF_SEGMENT_FILE_TYPE_DWF				LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA
-#define LIBEWF_SEGMENT_FILE_TYPE_EWF				LIBEWF_SEGMENT_FILE_TYPE_EWF1
-#define LIBEWF_SEGMENT_FILE_TYPE_LWF				LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL
 
 /* The chunk IO (read/write) flags
  */

@@ -801,6 +801,16 @@ namespace SleuthKit
         EWF = 0x0040,
 
         /// <summary>
+        /// TSK_IMG_TYPE_VMDK_VMDK, VMDK image
+        /// </summary>
+        VMDK = 0x0080,
+
+        /// <summary>
+        /// TSK_IMG_TYPE_VHD_VHD, VHD image
+        /// </summary>
+        VHD = 0x0100,
+
+        /// <summary>
         /// TSK_IMG_TYPE_UNSUPP, Unsupported disk image type
         /// </summary>
         Unsupported = 0xffff,

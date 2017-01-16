@@ -1,9 +1,7 @@
 /*
- * The internal libuna header
+ * The libuna header wrapper
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
- *
- * Refer to AUTHORS for acknowledgements.
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * This software is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -32,7 +30,6 @@
 #include <libuna_base32_stream.h>
 #include <libuna_base64_stream.h>
 #include <libuna_byte_stream.h>
-#include <libuna_error.h>
 #include <libuna_unicode_character.h>
 #include <libuna_url_stream.h>
 #include <libuna_utf16_stream.h>
@@ -44,7 +41,7 @@
 #include <libuna_utf8_string.h>
 #include <libuna_types.h>
 
-#elif defined( HAVE_LIBUNA_H )
+#else
 
 /* If libtool DLL support is enabled set LIBUNA_DLL_IMPORT
  * before including libuna.h
@@ -55,9 +52,7 @@
 
 #include <libuna.h>
 
-#else
-#error Missing libuna.h
-#endif
+#endif /* defined( HAVE_LOCAL_LIBUNA ) */
 
-#endif
+#endif /* !defined( _EWFTOOLS_LIBUNA_H ) */
 

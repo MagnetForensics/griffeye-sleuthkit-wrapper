@@ -223,12 +223,6 @@
 /* Define to 1 if you have the <libclocale.h> header file. */
 /* #undef HAVE_LIBCLOCALE_H */
 
-/* Define to 1 if you have the `cmulti' library (-lcmulti). */
-/* #undef HAVE_LIBCMULTI */
-
-/* Define to 1 if you have the <libcmulti.h> header file. */
-/* #undef HAVE_LIBCMULTI_H */
-
 /* Define to 1 if you have the `cnotify' library (-lcnotify). */
 /* #undef HAVE_LIBCNOTIFY */
 
@@ -372,9 +366,6 @@
 
 /* Define to 1 if the local version of libclocale is used. */
 #define HAVE_LOCAL_LIBCLOCALE 1
-
-/* Define to 1 if the local version of libcmulti is used. */
-#define HAVE_LOCAL_LIBCMULTI 1
 
 /* Define to 1 if the local version of libcnotify is used. */
 #define HAVE_LOCAL_LIBCNOTIFY 1
@@ -724,7 +715,7 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20130331"
+#define PACKAGE_STRING "libewf 20130416"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
@@ -733,7 +724,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20130331"
+#define PACKAGE_VERSION "20130416"
 
 /* The size of `off_t', as computed by sizeof. */
 #define SIZEOF_OFF_T 8
@@ -757,7 +748,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20130331"
+#define VERSION "20130416"
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */

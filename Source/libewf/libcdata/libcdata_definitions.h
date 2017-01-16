@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,11 +35,11 @@
  */
 #else
 
-#define LIBCDATA_VERSION				20130103
+#define LIBCDATA_VERSION				20160424
 
 /* The libcstring version string
  */
-#define LIBCDATA_VERSION_STRING				"20130103"
+#define LIBCDATA_VERSION_STRING				"20160424"
 
 /* The comparison function definitions
  */
@@ -68,7 +68,7 @@ enum LIBCDATA_INSERT_FLAGS
 
 	/* Only allow unique entries, no duplicates
 	 */
-	LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES	= 0x01,
+	LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES	= 0x01
 };
 
 #endif /* !defined( HAVE_LOCAL_LIBCDATA ) */

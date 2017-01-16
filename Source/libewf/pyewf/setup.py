@@ -56,7 +56,7 @@ module = Extension(
 setup(
 	name = "pyewf",
 	url = "http://code.google.com/p/libewf/",
-	version = "20130331",
+	version = "20130416",
 	description = "Python bindings module for libewf",
 	author = "Joachim Metz",
 	author_email = "joachim.metz@gmail.com",

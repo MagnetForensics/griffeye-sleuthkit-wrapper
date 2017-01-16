@@ -1,7 +1,7 @@
 /*
  * Handle functions
  *
- * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,6 +35,10 @@
 #include <errno.h>
 #endif
 
+#if defined( WINAPI )
+#include <winioctl.h>
+#endif
+
 #include "libsmdev_ata.h"
 #include "libsmdev_definitions.h"
 #include "libsmdev_handle.h"
@@ -53,7 +57,101 @@
 #include "libsmdev_track_value.h"
 #include "libsmdev_types.h"
 
-/* Initializes the handle
+#if defined( WINAPI )
+
+#if !defined( IOCTL_STORAGE_QUERY_PROPERTY )
+#define IOCTL_STORAGE_QUERY_PROPERTY \
+	CTL_CODE( IOCTL_STORAGE_BASE, 0x0500, METHOD_BUFFERED, FILE_ANY_ACCESS )
+
+typedef enum _STORAGE_PROPERTY_ID
+{
+	StorageDeviceProperty = 0,
+	StorageAdapterProperty,
+	StorageDeviceIdProperty,
+	StorageDeviceUniqueIdProperty,
+	StorageDeviceWriteCacheProperty,
+	StorageMiniportProperty,
+	StorageAccessAlignmentProperty,
+	StorageDeviceSeekPenaltyProperty,
+	StorageDeviceTrimProperty,
+	StorageDeviceWriteAggregationProperty
+}
+STORAGE_PROPERTY_ID, *PSTORAGE_PROPERTY_ID;
+
+typedef enum _STORAGE_QUERY_TYPE
+{
+	PropertyStandardQuery = 0,
+	PropertyExistsQuery,
+	PropertyMaskQuery,
+	PropertyQueryMaxDefined
+}
+STORAGE_QUERY_TYPE, *PSTORAGE_QUERY_TYPE;
+
+#if defined( _MSC_VER ) || defined( __BORLANDC__ )
+#define HAVE_WINIOCTL_H_STORAGE_BUS_TYPE
+#endif
+
+#if !defined( HAVE_WINIOCTL_H_STORAGE_BUS_TYPE )
+
+typedef enum _STORAGE_BUS_TYPE
+{
+	BusTypeUnknown		= 0x00,
+	BusTypeScsi		= 0x01,
+	BusTypeAtapi		= 0x02,
+	BusTypeAta		= 0x03,
+	BusType1394		= 0x04,
+	BusTypeSsa		= 0x05,
+	BusTypeFibre		= 0x06,
+	BusTypeUsb		= 0x07,
+	BusTypeRAID		= 0x08,
+	BusTypeiSCSI		= 0x09,
+	BusTypeSas		= 0x0a,
+	BusTypeSata		= 0x0b,
+	BusTypeMaxReserved	= 0x7f
+}
+STORAGE_BUS_TYPE, *PSTORAGE_BUS_TYPE;
+
+#endif /* !defined( HAVE_WINIOCTL_H_STORAGE_BUS_TYPE ) */
+
+typedef struct _STORAGE_PROPERTY_QUERY
+{
+	STORAGE_PROPERTY_ID PropertyId;
+	STORAGE_QUERY_TYPE QueryType;
+	UCHAR AdditionalParameters[ 1 ];
+}
+STORAGE_PROPERTY_QUERY, *PSTORAGE_PROPERTY_QUERY;
+
+typedef struct _STORAGE_DEVICE_DESCRIPTOR
+{
+	ULONG Version;
+	ULONG Size;
+	UCHAR DeviceType;
+	UCHAR DeviceTypeModifier;
+	BOOLEAN RemovableMedia;
+	BOOLEAN CommandQueueing;
+	ULONG VendorIdOffset;
+	ULONG ProductIdOffset;
+	ULONG ProductRevisionOffset;
+	ULONG SerialNumberOffset;
+	STORAGE_BUS_TYPE BusType;
+	ULONG RawPropertiesLength;
+	UCHAR RawDeviceProperties[ 1 ];
+}
+STORAGE_DEVICE_DESCRIPTOR, *PSTORAGE_DEVICE_DESCRIPTOR;
+
+typedef struct _STORAGE_DESCRIPTOR_HEADER
+{
+	ULONG Version;
+	ULONG Size;
+}
+STORAGE_DESCRIPTOR_HEADER, *PSTORAGE_DESCRIPTOR_HEADER;
+
+#endif /* !defined( IOCTL_STORAGE_QUERY_PROPERTY ) */
+
+#endif /* defined( WINAPI ) */
+
+/* Creates a handle
+ * Make sure the value handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libsmdev_handle_initialize(
@@ -207,7 +305,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the handle
+/* Frees a handle
  * Returns 1 if succesful or -1 on error
  */
 int libsmdev_handle_free(
@@ -251,11 +349,6 @@ int libsmdev_handle_free(
 		}
 		*handle = NULL;
 
-		if( internal_handle->filename != NULL )
-		{
-			memory_free(
-			 internal_handle->filename );
-		}
 		if( libcdata_array_free(
 		     &( internal_handle->tracks_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libsmdev_track_value_free,
@@ -300,6 +393,7 @@ int libsmdev_handle_free(
 		}
 		if( libcdata_range_list_free(
 		     &( internal_handle->errors_range_list ),
+		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -355,6 +449,8 @@ int libsmdev_handle_open(
 	static char *function                       = "libsmdev_handle_open";
 	size64_t media_size                         = 0;
 	size_t filename_length                      = 0;
+	uint32_t bytes_per_sector                   = 0;
+	int result                                  = 0;
 
 	if( handle == NULL )
 	{
@@ -435,6 +531,7 @@ int libsmdev_handle_open(
 	}
 	if( libcdata_range_list_empty(
 	     internal_handle->errors_range_list,
+	     NULL,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -492,6 +589,56 @@ int libsmdev_handle_open(
 
 		goto on_error;
 	}
+	if( libsmdev_handle_get_media_size(
+	     handle,
+	     &media_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve media size.",
+		 function );
+
+		goto on_error;
+	}
+	/* /dev/rdisk# on Mac OS X and some Windows devices require
+	 * sector aligned read and seek operations
+	 */
+	result = libsmdev_handle_get_bytes_per_sector(
+	          handle,
+	          &bytes_per_sector,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libcfile_file_set_block_size(
+		     internal_handle->device_file,
+		     (size_t) bytes_per_sector,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to set block size in device file.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	/* Use this function to double the read-ahead system buffer on POSIX system
 	 * This provides for some additional performance
 	 */
@@ -505,20 +652,6 @@ int libsmdev_handle_open(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set access behavior.",
-		 function );
-
-		goto on_error;
-	}
-	if( libsmdev_handle_get_media_size(
-	     handle,
-	     &media_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size.",
 		 function );
 
 		goto on_error;
@@ -558,6 +691,8 @@ int libsmdev_handle_open_wide(
 	static char *function                       = "libsmdev_handle_open_wide";
 	size64_t media_size                         = 0;
 	size_t filename_length                      = 0;
+	uint32_t bytes_per_sector                   = 0;
+	int result                                  = 0;
 
 	if( handle == NULL )
 	{
@@ -638,6 +773,7 @@ int libsmdev_handle_open_wide(
 	}
 	if( libcdata_range_list_empty(
 	     internal_handle->errors_range_list,
+	     NULL,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -695,6 +831,56 @@ int libsmdev_handle_open_wide(
 
 		goto on_error;
 	}
+	if( libsmdev_handle_get_media_size(
+	     handle,
+	     &media_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve media size.",
+		 function );
+
+		goto on_error;
+	}
+	/* /dev/rdisk# on Mac OS X and some Windows devices require
+	 * sector aligned read and seek operations
+	 */
+	result = libsmdev_handle_get_bytes_per_sector(
+	          handle,
+	          &bytes_per_sector,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libcfile_file_set_block_size(
+		     internal_handle->device_file,
+		     (size_t) bytes_per_sector,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to set block size in device file.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	/* Use this function to double the read-ahead system buffer on POSIX system
 	 * This provides for some additional performance
 	 */
@@ -708,20 +894,6 @@ int libsmdev_handle_open_wide(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set access behavior.",
-		 function );
-
-		goto on_error;
-	}
-	if( libsmdev_handle_get_media_size(
-	     handle,
-	     &media_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size.",
 		 function );
 
 		goto on_error;
@@ -800,61 +972,121 @@ int libsmdev_handle_close(
 
 			result = -1;
 		}
-		if( libcdata_array_empty(
-		     internal_handle->tracks_array,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libsmdev_track_value_free,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty tracks array.",
-			 function );
+	}
+	internal_handle->offset                = 0;
+	internal_handle->bytes_per_sector      = 0;
+	internal_handle->bytes_per_sector_set  = 0;
+	internal_handle->media_size            = 0;
+	internal_handle->media_size_set        = 0;
+	internal_handle->bus_type              = 0;
+	internal_handle->device_type           = 0;
+	internal_handle->removable             = 0;
+	internal_handle->media_information_set = 0;
 
-			result = -1;
-		}
-		if( libcdata_array_empty(
-		     internal_handle->sessions_array,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libsmdev_sector_range_free,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty sessions array.",
-			 function );
+	if( memory_set(
+	     internal_handle->vendor,
+	     0,
+	     64 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear vendor string.",
+		 function );
 
-			result = -1;
-		}
-		if( libcdata_array_empty(
-		     internal_handle->lead_outs_array,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libsmdev_sector_range_free,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty lead-outs array.",
-			 function );
+		result = -1;
+	}
+	if( memory_set(
+	     internal_handle->model,
+	     0,
+	     64 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear model string.",
+		 function );
 
-			result = -1;
-		}
-		if( libcdata_range_list_empty(
-		     internal_handle->errors_range_list,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty errors range list.",
-			 function );
+		result = -1;
+	}
+	if( memory_set(
+	     internal_handle->serial_number,
+	     0,
+	     64 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear serial number string.",
+		 function );
 
-			result = -1;
-		}
+		result = -1;
+	}
+	if( internal_handle->filename != NULL )
+	{
+		memory_free(
+		 internal_handle->filename );
+
+		internal_handle->filename = NULL;
+	}
+	if( libcdata_array_empty(
+	     internal_handle->tracks_array,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libsmdev_track_value_free,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty tracks array.",
+		 function );
+
+		result = -1;
+	}
+	if( libcdata_array_empty(
+	     internal_handle->sessions_array,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libsmdev_sector_range_free,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty sessions array.",
+		 function );
+
+		result = -1;
+	}
+	if( libcdata_array_empty(
+	     internal_handle->lead_outs_array,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libsmdev_sector_range_free,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty lead-outs array.",
+		 function );
+
+		result = -1;
+	}
+	if( libcdata_range_list_empty(
+	     internal_handle->errors_range_list,
+	     NULL,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty errors range list.",
+		 function );
+
+		result = -1;
 	}
 	return( result );
 }
@@ -989,7 +1221,7 @@ ssize_t libsmdev_handle_read_buffer(
 		{
 			switch( error_code )
 			{
-#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI )
 				default:
 #else
 				/* Reading should not be retried for some POSIX error conditions
@@ -1008,7 +1240,7 @@ ssize_t libsmdev_handle_read_buffer(
 
 					return( -1 );
 
-#if defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI )
 				/* A WINAPI read error generates the error code ERROR_UNRECOGNIZED_MEDIA
 				 */
 				case ERROR_UNRECOGNIZED_MEDIA:
@@ -1208,17 +1440,20 @@ ssize_t libsmdev_handle_read_buffer(
 				 read_error_size );
 			}
 #endif
-			if( libcdata_range_list_append_range(
+			if( libcdata_range_list_insert_range(
 			     internal_handle->errors_range_list,
 			     (uint64_t) current_offset,
 			     (uint64_t) read_error_size,
+			     NULL,
+			     NULL,
+			     NULL,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append read error to range list.",
+				 "%s: unable to insert read error to range list.",
 				 function );
 
 				return( -1 );
@@ -1257,6 +1492,54 @@ ssize_t libsmdev_handle_read_buffer(
 	internal_handle->offset += buffer_offset;
 
 	return( (ssize_t) buffer_offset );
+}
+
+/* Reads a buffer at a specific offset
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libsmdev_handle_read_buffer_at_offset(
+         libsmdev_handle_t *handle,
+         uint8_t *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error )
+{
+	static char *function = "libsmdev_handle_read_buffer_at_offset";
+	ssize_t read_count    = 0;
+
+	if( libsmdev_handle_seek_offset(
+	     handle,
+	     offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libsmdev_handle_read_buffer(
+	              handle,
+	              buffer,
+	              buffer_size,
+	              error );
+
+	if( read_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read buffer.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
 }
 
 /* Writes a buffer
@@ -1316,6 +1599,54 @@ ssize_t libsmdev_handle_write_buffer(
 	}
 	internal_handle->offset += write_count;
 
+	return( write_count );
+}
+
+/* Writes a buffer at a specific offset
+ * Returns the number of bytes written or -1 on error
+ */
+ssize_t libsmdev_handle_write_buffer_at_offset(
+         libsmdev_handle_t *handle,
+         const uint8_t *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error )
+{
+	static char *function = "libsmdev_handle_write_buffer_at_offset";
+	ssize_t write_count   = 0;
+
+	if( libsmdev_handle_seek_offset(
+	     handle,
+	     offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		return( -1 );
+	}
+	write_count = libsmdev_handle_write_buffer(
+	               handle,
+	               buffer,
+	               buffer_size,
+	               error );
+
+	if( write_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write buffer.",
+		 function );
+
+		return( -1 );
+	}
 	return( write_count );
 }
 
@@ -3208,7 +3539,7 @@ int libsmdev_handle_append_session(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -3287,7 +3618,7 @@ int libsmdev_handle_append_lead_out(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -3367,7 +3698,7 @@ int libsmdev_handle_append_track(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );

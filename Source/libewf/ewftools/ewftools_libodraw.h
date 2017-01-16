@@ -1,7 +1,7 @@
 /*
  * The internal libodraw header
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -32,7 +32,7 @@
 #include <libodraw_support.h>
 #include <libodraw_types.h>
 
-#elif defined( HAVE_LIBODRAW_H )
+#else
 #include <libodraw.h>
 
 #endif
