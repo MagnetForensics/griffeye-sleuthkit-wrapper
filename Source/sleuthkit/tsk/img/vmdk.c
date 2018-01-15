@@ -20,7 +20,7 @@
 
 
 /**
- * Get error string from libvmdk and make buffer emtpy if that didn't work. 
+ * Get error string from libvmdk and make buffer empty if that didn't work. 
  * @returns 1 if error message was not set
 */
 static uint8_t
@@ -86,13 +86,12 @@ vmdk_image_read(TSK_IMG_INFO * img_info, TSK_OFF_T offset, char *buf,
 static void
 vmdk_image_imgstat(TSK_IMG_INFO * img_info, FILE * hFile)
 {
-    IMG_VMDK_INFO *vmdk_info = (IMG_VMDK_INFO *) img_info;
-
     tsk_fprintf(hFile, "IMAGE FILE INFORMATION\n");
     tsk_fprintf(hFile, "--------------------------------------------\n");
     tsk_fprintf(hFile, "Image Type:\t\tvmdk\n");
     tsk_fprintf(hFile, "\nSize of data in bytes:\t%" PRIuOFF "\n",
         img_info->size);
+    tsk_fprintf(hFile, "Sector size:\t%d\n", img_info->sector_size);
 
     return;
 }
@@ -132,10 +131,10 @@ static void
         tsk_error_set_errstr("vmdk_image_close: unable to free handle - %s", errmsg);
     }
 
-    for (i = 0; i < vmdk_info->num_imgs; i++) {
-        free(vmdk_info->images[i]);
+    for (i = 0; i < vmdk_info->img_info.num_img; i++) {
+        free(vmdk_info->img_info.images[i]);
     }
-    free(vmdk_info->images);
+    free(vmdk_info->img_info.images);
 
     tsk_deinit_lock(&(vmdk_info->read_lock));
     tsk_img_free(img_info);
@@ -147,7 +146,6 @@ vmdk_open(int a_num_img,
 {
     char error_string[TSK_VMDK_ERROR_STRING_SIZE];
     libvmdk_error_t *vmdk_error = NULL;
-    int result = 0;
     int i;
 
     IMG_VMDK_INFO *vmdk_info = NULL;
@@ -166,21 +164,21 @@ vmdk_open(int a_num_img,
     vmdk_info->handle = NULL;
     img_info = (TSK_IMG_INFO *) vmdk_info;
  
-    vmdk_info->num_imgs = a_num_img;
-    if ((vmdk_info->images =
+    vmdk_info->img_info.num_img = a_num_img;
+    if ((vmdk_info->img_info.images =
         (TSK_TCHAR **) tsk_malloc(a_num_img *
         sizeof(TSK_TCHAR *))) == NULL) {
             tsk_img_free(vmdk_info);
             return NULL;
     }
     for (i = 0; i < a_num_img; i++) {
-        if ((vmdk_info->images[i] =
+        if ((vmdk_info->img_info.images[i] =
             (TSK_TCHAR *) tsk_malloc((TSTRLEN(a_images[i]) +
             1) * sizeof(TSK_TCHAR))) == NULL) {
                 tsk_img_free(vmdk_info);
                 return NULL;
         }
-        TSTRNCPY(vmdk_info->images[i], a_images[i],
+        TSTRNCPY(vmdk_info->img_info.images[i], a_images[i],
             TSTRLEN(a_images[i]) + 1);
     }
 
@@ -202,7 +200,7 @@ vmdk_open(int a_num_img,
     }
 #if defined( TSK_WIN32 )
     if (libvmdk_handle_open_wide(vmdk_info->handle,
-            (const wchar_t *) vmdk_info->images[0],
+            (const wchar_t *) vmdk_info->img_info.images[0],
             LIBVMDK_OPEN_READ, &vmdk_error) != 1)
 #else
     if (libvmdk_handle_open(vmdk_info->handle,

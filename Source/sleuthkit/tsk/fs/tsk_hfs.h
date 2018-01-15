@@ -247,7 +247,7 @@ typedef struct {
     uint8_t blk_cnt[4];         /* block count */
 } hfs_ext_desc;
 
-/* Structre used in the extents tree */
+/* Structure used in the extents tree */
 typedef struct {
     hfs_ext_desc extents[8];
 } hfs_extents;
@@ -475,16 +475,22 @@ typedef struct {
 
 /***************** ATTRIBUTES FILE ******************************/
 
+// Maximum UTF8 size of an attribute name = 127 * 4 
+#define HFS_MAX_ATTR_NAME_LEN_UTF8_B 508
+#define HFS_MAX_ATTR_NAME_LEN_UTF16_B 254
+
+
+/* A record is made up of a hfs_btree_key_attr followed by a
+ * hfs_attr_data.  Total length of the record is:
+ * key_len + 2 + attr_size */
 typedef struct {
     uint8_t key_len[2];
     uint8_t pad[2];
     uint8_t file_id[4];
     uint8_t start_block[4];
     uint8_t attr_name_len[2];
-    uint8_t attr_name[254];
+    uint8_t attr_name[HFS_MAX_ATTR_NAME_LEN_UTF16_B]; // @@@ Seems like this is variable length because the key_len is specified. This seems to be max size.
 } hfs_btree_key_attr;
-
-
 
 typedef struct {
     uint8_t record_type[4];     // HFS_ATTRIBUTE_RECORD_INLINE_DATA
@@ -503,8 +509,6 @@ typedef struct {
 #define HFS_ATTR_RECORD_FORK_DATA 0x20
 #define HFS_ATTR_RECORD_EXTENTS 0x30
 
-// Maximum UTF8 size of an attribute name = 127 * 3 + 1; // 382
-#define MAX_ATTR_NAME_LENGTH 382
 
 /*
  * If a file is compressed, then it will have an extended attribute
@@ -531,6 +535,15 @@ typedef struct {
     unsigned char attr_bytes[0];        /* the bytes of the attribute after the header, if any. */
 } DECMPFS_DISK_HEADER;
 
+typedef enum {
+  DECMPFS_TYPE_ZLIB_ATTR = 3,
+  DECMPFS_TYPE_ZLIB_RSRC = 4,
+  DECMPFS_TYPE_DATALESS = 5,
+  DECMPFS_TYPE_LZVN_ATTR = 7,
+  DECMPFS_TYPE_LZVN_RSRC = 8,
+  DECMPFS_TYPE_RAW_ATTR = 9,
+  DECMPFS_TYPE_RAW_RSRC = 10
+} DECMPFS_TYPE_ENUM;
 
 #define COMPRESSION_UNIT_SIZE 65536U
 

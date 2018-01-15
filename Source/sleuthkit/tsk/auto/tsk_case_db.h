@@ -37,6 +37,7 @@ class TskAutoDb:public TskAuto {
     virtual ~ TskAutoDb();
     virtual uint8_t openImage(int, const TSK_TCHAR * const images[],
         TSK_IMG_TYPE_ENUM, unsigned int a_ssize, const char* deviceId = NULL);
+    virtual uint8_t openImage(const char* a_deviceId = NULL);
     virtual uint8_t openImageUtf8(int, const char *const images[],
         TSK_IMG_TYPE_ENUM, unsigned int a_ssize, const char* deviceId = NULL);
     virtual void closeImage();
@@ -65,6 +66,12 @@ class TskAutoDb:public TskAuto {
     virtual void hashFiles(bool flag);
 
     /**
+     * Sets whether or not the file systems for an image should be added when 
+     * the image is added to the case database. The default value is true. 
+     */
+    void setAddFileSystems(bool addFileSystems);
+
+    /**
      * Skip processing of orphans on FAT filesystems.  
      * This will make the loading of the database much faster
      * but you will not have all deleted files.  Default value is false. 
@@ -74,18 +81,29 @@ class TskAutoDb:public TskAuto {
 
     /**
      * When enabled, records for unallocated file system space will be added to the database. Default value is false.
-     * @param addUnallocSpace If true, create records for contigious unallocated file system sectors. 
+     * @param addUnallocSpace If true, create records for contiguous unallocated file system sectors. 
      */
     virtual void setAddUnallocSpace(bool addUnallocSpace);
 
     /**
      * When enabled, records for unallocated file system space will be added to the database. Default value is false.
-     * @param addUnallocSpace If true, create records for contigious unallocated file system sectors.
-     * @param chunkSize the number of bytes to group unallocated data into. A value of 0 will create
+     * @param addUnallocSpace If true, create records for contiguous unallocated file system sectors.
+     * @param minChunkSize the number of bytes to group unallocated data into. A value of 0 will create
      * one large chunk and group only on volume boundaries. A value of -1 will group each consecutive
      * chunk.
      */
-    virtual void setAddUnallocSpace(bool addUnallocSpace, int64_t chunkSize);
+    virtual void setAddUnallocSpace(bool addUnallocSpace, int64_t minChunkSize);
+
+    /**
+    * When enabled, records for unallocated file system space will be added to the database with the given parameters.
+    * Automatically sets the flag to create records for contiguous unallocated file system sectors.
+    * @param minChunkSize the number of bytes to group unallocated data into. A value of 0 will create
+    * one large chunk and group only on volume boundaries. A value of -1 will group each consecutive
+    * chunk.
+    * @param maxChunkSize the maximum number of bytes in one record of unallocated data. A value of -1 will not
+    * split the records based on size
+    */
+    virtual void setAddUnallocSpace(int64_t minChunkSize, int64_t maxChunkSize);
 
     uint8_t addFilesInImgToDb();
 
@@ -94,6 +112,7 @@ class TskAutoDb:public TskAuto {
      */
     uint8_t startAddImage(int numImg, const TSK_TCHAR * const imagePaths[],
         TSK_IMG_TYPE_ENUM imgType, unsigned int sSize, const char* deviceId = NULL);
+    uint8_t startAddImage(TSK_IMG_INFO * img_info, const char* deviceId = NULL);
 #ifdef WIN32
     uint8_t startAddImage(int numImg, const char *const imagePaths[],
         TSK_IMG_TYPE_ENUM imgType, unsigned int sSize, const char* deviceId = NULL);
@@ -122,9 +141,11 @@ class TskAutoDb:public TskAuto {
     bool m_imgTransactionOpen;
     TSK_HDB_INFO * m_NSRLDb;
     TSK_HDB_INFO * m_knownBadDb;
+    bool m_addFileSystems;
     bool m_noFatFsOrphans;
     bool m_addUnallocSpace;
-    int64_t m_chunkSize;
+    int64_t m_minChunkSize; ///< -1 for no minimum, 0 for no chunking at all, greater than 0 to wait for that number of chunks before writing to the database 
+    int64_t m_maxChunkSize; ///< Max number of unalloc bytes to process before writing to the database, even if there is no natural break. -1 for no chunking
     bool m_foundStructure;  ///< Set to true when we find either a volume or file system
     bool m_attributeAdded; ///< Set to true when an attribute was added by processAttributes
 
@@ -134,21 +155,22 @@ class TskAutoDb:public TskAuto {
 
     //internal structure to keep track of temp. unalloc block range
     typedef struct _UNALLOC_BLOCK_WLK_TRACK {
-        _UNALLOC_BLOCK_WLK_TRACK(const TskAutoDb & tskAutoDb, const TSK_FS_INFO & fsInfo, const int64_t fsObjId, int64_t chunkSize)
-            : tskAutoDb(tskAutoDb),fsInfo(fsInfo),fsObjId(fsObjId),curRangeStart(0), chunkSize(chunkSize), prevBlock(0), isStart(true), nextSequenceNo(0) {}
+        _UNALLOC_BLOCK_WLK_TRACK(const TskAutoDb & tskAutoDb, const TSK_FS_INFO & fsInfo, const int64_t fsObjId, int64_t minChunkSize, int64_t maxChunkSize)
+            : tskAutoDb(tskAutoDb),fsInfo(fsInfo),fsObjId(fsObjId),curRangeStart(0), minChunkSize(minChunkSize), maxChunkSize(maxChunkSize), prevBlock(0), isStart(true), nextSequenceNo(0) {}
         const TskAutoDb & tskAutoDb;
         const TSK_FS_INFO & fsInfo;
         const int64_t fsObjId;
         vector<TSK_DB_FILE_LAYOUT_RANGE> ranges;																																										
         TSK_DADDR_T curRangeStart;
         int64_t size;
-        const int64_t chunkSize;
+        const int64_t minChunkSize;
+        const int64_t maxChunkSize;
         TSK_DADDR_T prevBlock;
         bool isStart;
         uint32_t nextSequenceNo;
     } UNALLOC_BLOCK_WLK_TRACK;
 
-    uint8_t addImageDetails(const char *const images[], int, const char *);
+    uint8_t addImageDetails(const char *);
     TSK_RETVAL_ENUM insertFileData(TSK_FS_FILE * fs_file,
         const TSK_FS_ATTR *, const char *path,
         const unsigned char *const md5,

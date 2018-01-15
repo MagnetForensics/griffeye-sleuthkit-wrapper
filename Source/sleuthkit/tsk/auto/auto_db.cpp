@@ -14,6 +14,7 @@
  */
 
 #include "tsk_case_db.h"
+#include "tsk/img/img_writer.h"
 #if HAVE_LIBEWF
 #include "tsk/img/ewf.h"
 #endif
@@ -47,23 +48,29 @@ TskAutoDb::TskAutoDb(TskDb * a_db, TSK_HDB_INFO * a_NSRLDb, TSK_HDB_INFO * a_kno
     m_stopped = false;
     m_foundStructure = false;
     m_imgTransactionOpen = false;
+    m_attributeAdded = false;
     m_NSRLDb = a_NSRLDb;
     m_knownBadDb = a_knownBadDb;
-    if ((m_NSRLDb) || (m_knownBadDb))
+    if ((m_NSRLDb) || (m_knownBadDb)) {
         m_fileHashFlag = true;
-    else
+    }
+    else {
         m_fileHashFlag = false;
+    }
+    m_addFileSystems = true;
     m_noFatFsOrphans = false;
     m_addUnallocSpace = false;
-    m_chunkSize = -1;
+    m_minChunkSize = -1;
+    m_maxChunkSize = -1;
     tsk_init_lock(&m_curDirPathLock);
 }
 
 TskAutoDb::~TskAutoDb()
 {
     // if they didn't commit / revert, then revert
-    if (m_imgTransactionOpen)
+    if (m_imgTransactionOpen) {
         revertAddImage();
+    }
 
     closeImage();
     tsk_deinit_lock(&m_curDirPathLock);
@@ -90,6 +97,11 @@ void
     m_fileHashFlag = flag;
 }
 
+void TskAutoDb::setAddFileSystems(bool addFileSystems)
+{
+    m_addFileSystems = addFileSystems;
+}
+
 void TskAutoDb::setNoFatFsOrphans(bool noFatFsOrphans)
 {
     m_noFatFsOrphans = noFatFsOrphans;
@@ -100,10 +112,18 @@ void TskAutoDb::setAddUnallocSpace(bool addUnallocSpace)
     setAddUnallocSpace(addUnallocSpace, -1);
 }
 
-void TskAutoDb::setAddUnallocSpace(bool addUnallocSpace, int64_t chunkSize)
+void TskAutoDb::setAddUnallocSpace(bool addUnallocSpace, int64_t minChunkSize)
 {
     m_addUnallocSpace = addUnallocSpace;
-    m_chunkSize = chunkSize;
+    m_minChunkSize = minChunkSize;
+    m_maxChunkSize = -1;
+}
+
+void TskAutoDb::setAddUnallocSpace(int64_t minChunkSize, int64_t maxChunkSize)
+{
+    m_addUnallocSpace = true;
+    m_minChunkSize = minChunkSize;
+    m_maxChunkSize = maxChunkSize;
 }
 
 /**
@@ -126,7 +146,7 @@ uint8_t
         return retval;
     }
 
-    if (addImageDetails(a_images, a_num, a_deviceId)) {
+    if (addImageDetails(a_deviceId)) {
         return 1;
     }
     return 0;
@@ -156,64 +176,36 @@ uint8_t
         return retval;
     }
 
-    // convert image paths to UTF-8
-    char **img_ptrs = (char **) tsk_malloc(a_num * sizeof(char *));
-    if (img_ptrs == NULL) {
-        return 1;
-    }
-
-    for (int i = 0; i < a_num; i++) {
-        char * img2 = (char*) tsk_malloc(1024 * sizeof(char));
-        UTF8 *ptr8;
-        UTF16 *ptr16;
-
-        ptr8 = (UTF8 *) img2;
-        ptr16 = (UTF16 *) a_images[i];
-
-        retval =
-            tsk_UTF16toUTF8_lclorder((const UTF16 **) &ptr16, (UTF16 *)
-            & ptr16[TSTRLEN(a_images[i]) + 1], &ptr8,
-            (UTF8 *) ((uintptr_t) ptr8 + 1024), TSKlenientConversion);
-        if (retval != TSKconversionOK) {
-            tsk_error_reset();
-            tsk_error_set_errno(TSK_ERR_AUTO_UNICODE);
-            tsk_error_set_errstr("Error converting image to UTF-8\n");
-            return 1;
-        }
-        img_ptrs[i] = img2;
-    }
-
-    if (addImageDetails(img_ptrs, a_num, a_deviceId)) {
-        //cleanup
-        for (int i = 0; i < a_num; ++i) {
-            free(img_ptrs[i]);
-        }
-        free(img_ptrs);
-        return 1;
-    }
-
-    //cleanup
-    for (int i = 0; i < a_num; ++i) {
-        free(img_ptrs[i]);
-    }
-    free(img_ptrs);
-    
-    return 0;
+    return (addImageDetails(a_deviceId));
 #else
     return openImageUtf8(a_num, a_images, a_type, a_ssize, a_deviceId);
 #endif
 }
 
 /**
+* Adds an image to the database. Requires that m_img_info is already initialized
+*
+* @param a_deviceId An ASCII-printable identifier for the device associated with the data source that is intended to be unique across multiple cases (e.g., a UUID).
+* @return 0 for success, 1 for failure
+*/
+uint8_t
+TskAutoDb::openImage(const char* a_deviceId)
+{
+    if (m_img_info == NULL) {
+        return 1;
+    }
+
+    return(addImageDetails(a_deviceId));
+}
+
+/**
  * Adds image details to the existing database tables.
  *
- * @param imgPaths The paths to the image splits
- * @param numPaths The number of paths
  * @param deviceId An ASCII-printable identifier for the device associated with the data source that is intended to be unique across multiple cases (e.g., a UUID).
  * @return Returns 0 for success, 1 for failure
  */
 uint8_t
-TskAutoDb::addImageDetails(const char *const imgPaths[], int numPaths, const char* deviceId)
+TskAutoDb::addImageDetails(const char* deviceId)
 {
    string md5 = "";
 #if HAVE_LIBEWF 
@@ -238,16 +230,55 @@ TskAutoDb::addImageDetails(const char *const imgPaths[], int numPaths, const cha
         return 1;
     }
 
+    char **img_ptrs;
+#ifdef TSK_WIN32
+    // convert image paths to UTF-8
+    img_ptrs = (char **)tsk_malloc(m_img_info->num_img * sizeof(char *));
+    if (img_ptrs == NULL) {
+        return 1;
+    }
+
+    for (int i = 0; i < m_img_info->num_img; i++) {
+        char * img2 = (char*)tsk_malloc(1024 * sizeof(char));
+        UTF8 *ptr8;
+        UTF16 *ptr16;
+
+        ptr8 = (UTF8 *)img2;
+        ptr16 = (UTF16 *)m_img_info->images[i];
+
+        uint8_t retval =
+            tsk_UTF16toUTF8_lclorder((const UTF16 **)&ptr16, (UTF16 *)
+                & ptr16[TSTRLEN(m_img_info->images[i]) + 1], &ptr8,
+                (UTF8 *)((uintptr_t)ptr8 + 1024), TSKlenientConversion);
+        if (retval != TSKconversionOK) {
+            tsk_error_reset();
+            tsk_error_set_errno(TSK_ERR_AUTO_UNICODE);
+            tsk_error_set_errstr("Error converting image to UTF-8\n");
+            return 1;
+        }
+        img_ptrs[i] = img2;
+    }
+#else 
+    img_ptrs = m_img_info->images;
+#endif
+
     // Add the image names
-    for (int i = 0; i < numPaths; i++) {
-        const char *img_ptr = NULL;
-        img_ptr = imgPaths[i];
+    for (int i = 0; i < m_img_info->num_img; i++) {
+        const char *img_ptr = img_ptrs[i];
 
         if (m_db->addImageName(m_curImgId, img_ptr, i)) {
             registerError();
             return 1;
         }
     }
+
+#ifdef TSK_WIN32
+    //cleanup
+    for (int i = 0; i < m_img_info->num_img; ++i) {
+        free(img_ptrs[i]);
+    }
+    free(img_ptrs);
+#endif
 
     return 0;
 }
@@ -336,6 +367,7 @@ TSK_RETVAL_ENUM
     const unsigned char *const md5,
     const TSK_DB_FILES_KNOWN_ENUM known)
 {
+
     if (m_db->addFsFile(fs_file, fs_attr, path, md5, known, m_curFsId, m_curFileId,
             m_curImgId)) {
         registerError();
@@ -349,11 +381,11 @@ TSK_RETVAL_ENUM
  * Analyzes the open image and adds image info to a database.
  * Does not deal with transactions and such.  Refer to startAddImage()
  * for more control. 
- * @returns 1 if a critical error occured (DB doesn't exist, no file system, etc.), 2 if errors occured at some point adding files to the DB (corrupt file, etc.), and 0 otherwise.  Errors will have been registered.
+ * @returns 1 if a critical error occurred (DB doesn't exist, no file system, etc.), 2 if errors occurred at some point adding files to the DB (corrupt file, etc.), and 0 otherwise.  Errors will have been registered.
  */
 uint8_t TskAutoDb::addFilesInImgToDb()
 {
-    if (m_db == NULL || !m_db->isDbOpen()) {
+    if (m_db == NULL || m_db->isDbOpen() == false) {
         tsk_error_reset();
         tsk_error_set_errno(TSK_ERR_AUTO_DB);
         tsk_error_set_errstr("addFilesInImgToDb: m_db not open");
@@ -363,7 +395,7 @@ uint8_t TskAutoDb::addFilesInImgToDb()
 
     // @@@ This seems bad because we are overriding what the user may
     // have set. We should remove the public API if we are going to 
-    // override it -- presumabably this was added so that we always have
+    // override it -- presumably this was added so that we always have
     // unallocated volume space...
     setVolFilterFlags((TSK_VS_PART_FLAG_ENUM) (TSK_VS_PART_FLAG_ALLOC |
             TSK_VS_PART_FLAG_UNALLOC));
@@ -428,7 +460,7 @@ uint8_t
     if (m_db->inTransaction()) {
         tsk_error_reset();
         tsk_error_set_errno(TSK_ERR_AUTO_DB);
-        tsk_error_set_errstr("TskAutoDb::startAddImage(): Already in a transaction, image might not be commited");
+        tsk_error_set_errstr("TskAutoDb::startAddImage(): Already in a transaction, image might not be committed");
         registerError();
         return 1;
     }
@@ -446,8 +478,83 @@ uint8_t
             registerError();
         return 1;
     }
+
+    if (m_imageWriterEnabled) {
+        tsk_img_writer_create(m_img_info, m_imageWriterPath);
+    }
     
-    return addFilesInImgToDb();
+    if (m_addFileSystems) {
+        return addFilesInImgToDb();
+    } else {
+        return 0;
+    }
+}
+
+/**
+* Start the process to add image/file metadata to database inside of a transaction.
+* User must call either commitAddImage() to commit the changes,
+* or revertAddImage() to revert them.
+*
+* @param img_info Previously initialized TSK_IMG_INFO object
+* @param deviceId An ASCII-printable identifier for the device associated with the data source that is intended to be unique across multiple cases (e.g., a UUID)
+* @return 0 for success, 1 for failure
+*/
+uint8_t
+TskAutoDb::startAddImage(TSK_IMG_INFO * img_info, const char* deviceId)
+{
+    openImageHandle(img_info);
+
+    if (m_img_info == NULL) {
+        return 1;
+    }
+
+    if (tsk_verbose)
+        tsk_fprintf(stderr, "TskAutoDb::startAddImage: Starting add image process\n");
+
+    if (m_db->releaseSavepoint(TSK_ADD_IMAGE_SAVEPOINT) == 0) {
+        tsk_error_reset();
+        tsk_error_set_errno(TSK_ERR_AUTO_DB);
+        tsk_error_set_errstr("TskAutoDb::startAddImage(): An add-image savepoint already exists");
+        registerError();
+        return 1;
+    }
+
+    // @@@ This check is a bit paranoid, and may need to be removed in the future
+    if (m_db->inTransaction()) {
+        tsk_error_reset();
+        tsk_error_set_errno(TSK_ERR_AUTO_DB);
+        tsk_error_set_errstr("TskAutoDb::startAddImage(): Already in a transaction, image might not be committed");
+        registerError();
+        return 1;
+    }
+
+    if (m_db->createSavepoint(TSK_ADD_IMAGE_SAVEPOINT)) {
+        registerError();
+        return 1;
+    }
+
+    m_imgTransactionOpen = true;
+    if (openImage(deviceId)) {
+        tsk_error_set_errstr2("TskAutoDb::startAddImage");
+        registerError();
+        if (revertAddImage())
+            registerError();
+        return 1;
+    }
+
+    if (m_imageWriterEnabled) {
+        if (tsk_img_writer_create(m_img_info, m_imageWriterPath)) {
+            registerError();
+            return 1;
+        }
+    }
+
+    if (m_addFileSystems) {
+        return addFilesInImgToDb();
+    }
+    else {
+        return 0;
+    }
 }
 
 
@@ -485,7 +592,7 @@ uint8_t
     if (m_db->inTransaction()) {
         tsk_error_reset();
         tsk_error_set_errno(TSK_ERR_AUTO_DB);
-        tsk_error_set_errstr("TskAutoDb::startAddImage(): Already in a transaction, image might not be commited");
+        tsk_error_set_errstr("TskAutoDb::startAddImage(): Already in a transaction, image might not be committed");
         registerError();
         return 1;
     }
@@ -505,8 +612,15 @@ uint8_t
             registerError();
         return 1;
     }
+    if (m_imageWriterEnabled) {
+        tsk_img_writer_create(m_img_info, m_imageWriterPath);
+    }
 
-    return addFilesInImgToDb();
+    if (m_addFileSystems) {
+        return addFilesInImgToDb();
+    } else {
+        return 0;
+    }
 }
 #endif
 
@@ -526,7 +640,7 @@ void
 }
 
 /**
- * Revert all changes after the startAddImage() process has run sucessfully.
+ * Revert all changes after the startAddImage() process has run successfully.
  * @returns 1 on error (error was NOT registered in list), 0 on success
  */
 int
@@ -563,7 +677,7 @@ int64_t
 TskAutoDb::commitAddImage()
 {
     if (tsk_verbose)
-        tsk_fprintf(stderr, "TskAutoDb::commitAddImage: Commiting add image process\n");
+        tsk_fprintf(stderr, "TskAutoDb::commitAddImage: Committing add image process\n");
 
     if (m_imgTransactionOpen == false) {
         tsk_error_reset();
@@ -608,11 +722,20 @@ TskAutoDb::processFile(TSK_FS_FILE * fs_file, const char *path)
         return TSK_STOP;
     }
 
-     /* If no longe processing the same directroy as the last file, 
-      * then update the class-level setting. */
-    int64_t cur = fs_file->name->par_addr;
-    if (m_curDirId != cur) {
-        m_curDirId = cur;
+    /* Update the current directory, which can be used to show
+     * progress.  If we get a directory, then use its name.  We
+     * do this so that when we are searching for orphan files, then
+     * we at least show $OrphanFiles as status.  The secondary check
+     * is to grab the parent folder from files once we return back 
+     * into a folder when we are doing our depth-first recursion. */
+    if (isDir(fs_file)) {
+        m_curDirId = fs_file->name->meta_addr;
+        tsk_take_lock(&m_curDirPathLock);
+        m_curDirPath = string(path) + fs_file->name->name;
+        tsk_release_lock(&m_curDirPathLock);
+    }
+    else if (m_curDirId != fs_file->name->par_addr) {
+        m_curDirId = fs_file->name->par_addr;
         tsk_take_lock(&m_curDirPathLock);
         m_curDirPath = path;
         tsk_release_lock(&m_curDirPathLock);
@@ -712,7 +835,7 @@ TskAutoDb::processAttribute(TSK_FS_FILE * fs_file,
                 if (run->flags & TSK_FS_ATTR_RUN_FLAG_SPARSE)
                     continue;
 
-                // @@@ We probaly want to keep on going here
+                // @@@ We probably want to keep on going here
                 if (m_db->addFileLayoutRange(m_curFileId,
                     run->addr * block_size, run->len * block_size, sequence++)) {
                     registerError();
@@ -787,35 +910,41 @@ TSK_WALK_RET_ENUM TskAutoDb::fsWalkUnallocBlocksCb(const TSK_FS_BLOCK *a_block, 
         unallocBlockWlkTrack->isStart = false;
         unallocBlockWlkTrack->curRangeStart = a_block->addr;
         unallocBlockWlkTrack->prevBlock = a_block->addr;
-        unallocBlockWlkTrack->size = 0;
+        unallocBlockWlkTrack->size = unallocBlockWlkTrack->fsInfo.block_size;
         unallocBlockWlkTrack->nextSequenceNo = 0;
         return TSK_WALK_CONT;
     }
 
-    // if this block is consecutive with the previous one, update prevBlock and return
-    if (a_block->addr == unallocBlockWlkTrack->prevBlock + 1) {
+    // We want to keep consecutive blocks in the same run, so simply update prevBlock and the size
+    // if this one is consecutive with the last call. But, if we have hit the max chunk
+    // size, then break up this set of consecutive blocks.
+    if ((a_block->addr == unallocBlockWlkTrack->prevBlock + 1) && ((unallocBlockWlkTrack->maxChunkSize <= 0) ||
+            (unallocBlockWlkTrack->size < unallocBlockWlkTrack->maxChunkSize))) {
         unallocBlockWlkTrack->prevBlock = a_block->addr;
+		unallocBlockWlkTrack->size += unallocBlockWlkTrack->fsInfo.block_size;
         return TSK_WALK_CONT;
     }
 
-    // this block is not contiguous with the previous one; create and add a range object
+    // this block is not contiguous with the previous one or we've hit the maximum size; create and add a range object
     const uint64_t rangeStartOffset = unallocBlockWlkTrack->curRangeStart * unallocBlockWlkTrack->fsInfo.block_size 
         + unallocBlockWlkTrack->fsInfo.offset;
     const uint64_t rangeSizeBytes = (1 + unallocBlockWlkTrack->prevBlock - unallocBlockWlkTrack->curRangeStart) 
         * unallocBlockWlkTrack->fsInfo.block_size;
     unallocBlockWlkTrack->ranges.push_back(TSK_DB_FILE_LAYOUT_RANGE(rangeStartOffset, rangeSizeBytes, unallocBlockWlkTrack->nextSequenceNo++));
-    
-    // bookkeeping for the next range object
-    unallocBlockWlkTrack->size += rangeSizeBytes;
-    unallocBlockWlkTrack->curRangeStart = a_block->addr;
-    unallocBlockWlkTrack->prevBlock = a_block->addr;
 
-    // Here we just return if we are a) collecting all unallocated data
-    // for the given volumen (chunkSize == 0) or b) collecting all unallocated
-    // data whose total size is at least chunkSize (chunkSize > 0)
-    if ((unallocBlockWlkTrack->chunkSize == 0) ||
-        ((unallocBlockWlkTrack->chunkSize > 0) &&
-        (unallocBlockWlkTrack->size < unallocBlockWlkTrack->chunkSize))) {
+    // Return (instead of adding this run) if we are going to:
+    // a) Make one big file with all unallocated space (minChunkSize == 0)
+    // or
+    // b) Only make an unallocated file once we have at least chunkSize bytes
+    // of data in our current run (minChunkSize > 0)
+    // In either case, reset the range pointers and add this block to the size
+    if ((unallocBlockWlkTrack->minChunkSize == 0) ||
+        ((unallocBlockWlkTrack->minChunkSize > 0) &&
+        (unallocBlockWlkTrack->size < unallocBlockWlkTrack->minChunkSize))) {
+
+        unallocBlockWlkTrack->size += unallocBlockWlkTrack->fsInfo.block_size;
+        unallocBlockWlkTrack->curRangeStart = a_block->addr;
+        unallocBlockWlkTrack->prevBlock = a_block->addr;
         return TSK_WALK_CONT;
     }
     
@@ -829,7 +958,8 @@ TSK_WALK_RET_ENUM TskAutoDb::fsWalkUnallocBlocksCb(const TSK_FS_BLOCK *a_block, 
 
     // reset
     unallocBlockWlkTrack->curRangeStart = a_block->addr;
-    unallocBlockWlkTrack->size = 0;
+    unallocBlockWlkTrack->prevBlock = a_block->addr;
+    unallocBlockWlkTrack->size = unallocBlockWlkTrack->fsInfo.block_size; // The current block is part of the new range
     unallocBlockWlkTrack->ranges.clear();
     unallocBlockWlkTrack->nextSequenceNo = 0;
 
@@ -864,7 +994,7 @@ TSK_RETVAL_ENUM TskAutoDb::addFsInfoUnalloc(const TSK_DB_FS_INFO & dbFsInfo) {
 
     //walk unalloc blocks on the fs and process them
     //initialize the unalloc block walk tracking 
-    UNALLOC_BLOCK_WLK_TRACK unallocBlockWlkTrack(*this, *fsInfo, dbFsInfo.objId, m_chunkSize);
+    UNALLOC_BLOCK_WLK_TRACK unallocBlockWlkTrack(*this, *fsInfo, dbFsInfo.objId, m_minChunkSize, m_maxChunkSize);
     uint8_t block_walk_ret = tsk_fs_block_walk(fsInfo, fsInfo->first_block, fsInfo->last_block, (TSK_FS_BLOCK_WALK_FLAG_ENUM)(TSK_FS_BLOCK_WALK_FLAG_UNALLOC | TSK_FS_BLOCK_WALK_FLAG_AONLY), 
         fsWalkUnallocBlocksCb, &unallocBlockWlkTrack);
 
@@ -888,7 +1018,6 @@ TSK_RETVAL_ENUM TskAutoDb::addFsInfoUnalloc(const TSK_DB_FS_INFO & dbFsInfo) {
     const uint64_t byteStart = unallocBlockWlkTrack.curRangeStart * fsInfo->block_size + fsInfo->offset;
     const uint64_t byteLen = (1 + unallocBlockWlkTrack.prevBlock - unallocBlockWlkTrack.curRangeStart) * fsInfo->block_size;
     unallocBlockWlkTrack.ranges.push_back(TSK_DB_FILE_LAYOUT_RANGE(byteStart, byteLen, unallocBlockWlkTrack.nextSequenceNo++));
-    unallocBlockWlkTrack.size += byteLen;
     int64_t fileObjId = 0;
 
     if (m_db->addUnallocBlockFile(m_curUnallocDirId, dbFsInfo.objId, unallocBlockWlkTrack.size, unallocBlockWlkTrack.ranges, fileObjId, m_curImgId) == TSK_ERR) {

@@ -46,7 +46,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..;$(ProjectDir)\..\..\..;$(POCO_HOME)\Foundation\include;$(POCO_HOME)\Util\include;$(POCO_HOME)\XML\include;$(POCO_HOME)\Net\include;$(ProjectDir)\..\..\..\libewf\common;$(ProjectDir)\..\..\..\libewf\include;$(ProjectDir)\..\..\..\tsk\img;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..;$(ProjectDir)\..\..\..;$(POCO_HOME)\Foundation\include;$(POCO_HOME)\Util\include;$(POCO_HOME)\XML\include;$(POCO_HOME)\Net\include;$(LIBEWF_HOME)\common;$(LIBEWF_HOME)\include;$(ProjectDir)\..\..\..\tsk\img;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;TSK_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -58,7 +58,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libewf.lib;libtsk.lib;ws2_32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(POCO_HOME)\lib;$(ProjectDir)\..\..\..\win32\Debug;$(ProjectDir)\..\..\..\libewf\msvscpp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(POCO_HOME)\lib;$(ProjectDir)\..\..\..\win32\Debug;$(LIBEWF_HOME)\msvscpp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
     </Link>
@@ -69,8 +69,8 @@ xcopy "$(POCO_HOME)\bin\PocoFoundationd.dll" "$(ProjectDir)..\..\runtime" /R /Y
 xcopy "$(POCO_HOME)\bin\PocoNetd.dll" "$(ProjectDir)..\..\runtime" /R /Y
 xcopy "$(POCO_HOME)\bin\PocoUtild.dll" "$(ProjectDir)..\..\runtime" /R /Y
 xcopy "$(POCO_HOME)\bin\PocoXMLd.dll" "$(ProjectDir)..\..\runtime" /R /Y
-xcopy "$(ProjectDir)\..\..\..\libewf\msvscpp\Release\libewf.dll" "$(ProjectDir)..\..\runtime" /R /Y
-xcopy "$(ProjectDir)\..\..\..\libewf\msvscpp\Release\zlib.dll" "$(ProjectDir)..\..\runtime" /R /Y
+xcopy "$(LIBEWF_HOME)\msvscpp\Release\libewf.dll" "$(ProjectDir)..\..\runtime" /R /Y
+xcopy "$(LIBEWF_HOME)\msvscpp\Release\zlib.dll" "$(ProjectDir)..\..\runtime" /R /Y
 del "$(ProjectDir)..\..\runtime\framework_config.xml"
 xcopy "$(ProjectDir)..\..\SampleConfig\framework_config_win32dev.xml" "$(ProjectDir)..\..\runtime" /R /Y
 ren "$(ProjectDir)..\..\runtime\framework_config_win32dev.xml" framework_config.xml</Command>
@@ -80,7 +80,7 @@ ren "$(ProjectDir)..\..\runtime\framework_config_win32dev.xml" framework_config.
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..;$(ProjectDir)\..\..\..;$(POCO_HOME)\Foundation\include;$(POCO_HOME)\Util\include;$(POCO_HOME)\XML\include;$(POCO_HOME)\Net\include;$(ProjectDir)\..\..\..\libewf\common;$(ProjectDir)\..\..\..\libewf\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..;$(ProjectDir)\..\..\..;$(POCO_HOME)\Foundation\include;$(POCO_HOME)\Util\include;$(POCO_HOME)\XML\include;$(POCO_HOME)\Net\include;$(LIBEWF_HOME)\common;$(LIBEWF_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;TSK_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -91,7 +91,7 @@ ren "$(ProjectDir)..\..\runtime\framework_config_win32dev.xml" framework_config.
     </ClCompile>
     <Link>
       <AdditionalDependencies>libewf.lib;libtsk.lib;ws2_32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(POCO_HOME)\lib;$(ProjectDir)\..\..\..\win32\Release;$(ProjectDir)\..\..\..\libewf\msvscpp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(POCO_HOME)\lib;$(ProjectDir)\..\..\..\win32\Release;$(LIBEWF_HOME)\msvscpp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
@@ -102,8 +102,8 @@ xcopy "$(POCO_HOME)\bin\PocoFoundation.dll" "$(ProjectDir)..\..\runtime" /R /Y
 xcopy "$(POCO_HOME)\bin\PocoNet.dll" "$(ProjectDir)..\..\runtime" /R /Y
 xcopy "$(POCO_HOME)\bin\PocoUtil.dll" "$(ProjectDir)..\..\runtime" /R /Y
 xcopy "$(POCO_HOME)\bin\PocoXML.dll" "$(ProjectDir)..\..\runtime" /R /Y
-xcopy "$(ProjectDir)\..\..\..\libewf\msvscpp\Release\libewf.dll" "$(ProjectDir)..\..\runtime" /R /Y
-xcopy "$(ProjectDir)\..\..\..\libewf\msvscpp\Release\zlib.dll" "$(ProjectDir)..\..\runtime" /R /Y
+xcopy "$(LIBEWF_HOME)\msvscpp\Release\libewf.dll" "$(ProjectDir)..\..\runtime" /R /Y
+xcopy "$(LIBEWF_HOME)\msvscpp\Release\zlib.dll" "$(ProjectDir)..\..\runtime" /R /Y
 del "$(ProjectDir)..\..\runtime\framework_config.xml"
 xcopy "$(ProjectDir)..\..\SampleConfig\framework_config_win32dev.xml" "$(ProjectDir)..\..\runtime" /R /Y
 ren "$(ProjectDir)..\..\runtime\framework_config_win32dev.xml" framework_config.xml</Command>

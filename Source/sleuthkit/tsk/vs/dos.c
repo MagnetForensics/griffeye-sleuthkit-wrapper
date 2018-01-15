@@ -743,7 +743,8 @@ dos_load_ext_table(TSK_VS_INFO * vs, TSK_DADDR_T sect_cur,
                 PRIu32 "  Type: %d\n", table, i, part_start, part_size,
                 part->ptype);
 
-        if (part_size == 0)
+        /* part_start == 0 would cause infinite recursion */
+        if (part_size == 0 || part_start == 0)
             continue;
 
         /* partitions are addressed differently
@@ -806,7 +807,7 @@ dos_load_ext_table(TSK_VS_INFO * vs, TSK_DADDR_T sect_cur,
  * This will automatically call load_ext_table for extended
  * partitions
  *
- * sect_cur is the addres of the table to load
+ * sect_cur is the address of the table to load
  *
  * 0 is returned if the load is successful and 1 if error
  */
@@ -1041,6 +1042,13 @@ tsk_vs_dos_open(TSK_IMG_INFO * img_info, TSK_DADDR_T offset, uint8_t test)
     // clean up any errors that are lying around
     tsk_error_reset();
 
+    if (img_info->sector_size == 0) {
+        tsk_error_reset();
+        tsk_error_set_errno(TSK_ERR_VS_ARG);
+        tsk_error_set_errstr("tsk_vs_dos_open: sector size is 0");
+        return NULL;
+    }
+
     vs = (TSK_VS_INFO *) tsk_malloc(sizeof(*vs));
     if (vs == NULL)
         return NULL;
@@ -1051,11 +1059,12 @@ tsk_vs_dos_open(TSK_IMG_INFO * img_info, TSK_DADDR_T offset, uint8_t test)
 
     vs->offset = offset;
 
-    /* inititialize settings */
+    /* initialize settings */
     vs->part_list = NULL;
     vs->part_count = 0;
     vs->endian = 0;
     vs->block_size = img_info->sector_size;
+    
 
     /* Assign functions */
     vs->close = dos_close;

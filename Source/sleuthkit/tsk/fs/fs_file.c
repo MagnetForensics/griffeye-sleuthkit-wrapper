@@ -86,7 +86,7 @@ tsk_fs_file_close(TSK_FS_FILE * a_fs_file)
 * that the returned TSK_FS_FILE structure will not have the file name set because
 * it was not used to load the file and this function does not search the 
 * directory structure to find the name that points to the address.   In general,
-* if you know the metadata address of a file, this function is more effecient 
+* if you know the metadata address of a file, this function is more efficient 
 * then tsk_fs_file_open, which first maps a file name to the metadata address 
 * and then opens the file using this function. 
 *
@@ -139,7 +139,7 @@ tsk_fs_file_open_meta(TSK_FS_INFO * a_fs,
 * \ingroup fslib
 * Return the handle structure for a specific file, given its full path. Note that
 * if you have the metadata address fo the file, then tsk_fs_file_open_meta() is a
-* more effecient approach. 
+* more efficient approach. 
 *
 * @param a_fs File system to analyze
 * @param a_fs_file Structure to store file data in or NULL to have one allocated. 
@@ -651,7 +651,7 @@ tsk_fs_file_hash_calc(TSK_FS_FILE * a_fs_file,
         TSK_MD5_Final(a_hash_results->md5_digest,
             &(hash_data.md5_context));
     }
-    if (a_flags & TSK_BASE_HASH_MD5) {
+    if (a_flags & TSK_BASE_HASH_SHA1) {
         TSK_SHA_Final(a_hash_results->sha1_digest,
             &(hash_data.sha1_context));
     }

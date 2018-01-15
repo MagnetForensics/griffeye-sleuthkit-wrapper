@@ -35,11 +35,13 @@ class NTFS_META_ADDR {
 private:
     uint64_t addr; ///< MFT entry
     uint32_t seq; ///< Sequence 
+    uint32_t hash; ///< Hash of the path
 
 public:
-    NTFS_META_ADDR(uint64_t a_addr, uint32_t a_seq) {
+    NTFS_META_ADDR(uint64_t a_addr, uint32_t a_seq, uint32_t a_hash) {
         addr = a_addr;
         seq = a_seq;
+        hash = a_hash;
     }
 
     uint64_t getAddr() {
@@ -48,6 +50,10 @@ public:
 
     uint32_t getSeq() {
         return seq;
+    }
+
+    uint32_t getHash(){
+        return hash;
     }
 };
 
@@ -70,8 +76,8 @@ public:
          * @param inum Address of child in the folder.
          * @param seq Sequence of child in the folder
          */
-        void add (uint32_t parSeq, TSK_INUM_T inum, uint32_t seq) {
-            NTFS_META_ADDR addr(inum, seq);
+        void add (uint32_t parSeq, TSK_INUM_T inum, uint32_t seq, uint32_t hash) {
+            NTFS_META_ADDR addr(inum, seq, hash);
             seq2addrs[parSeq].push_back(addr);
         }
 
@@ -118,7 +124,7 @@ static std::map<TSK_INUM_T, NTFS_PAR_MAP> * getParentMap(NTFS_INFO *ntfs) {
 /** \internal
  * Add a parent and child pair to the map stored in NTFS_INFO
  *
- * Note: This routine assumes &ntfs->orhpan_map_lock is locked by the caller.
+ * Note: This routine assumes &ntfs->orphan_map_lock is locked by the caller.
  *
  * @param ntfs structure to add the pair to
  * @param par Parent address
@@ -130,14 +136,14 @@ ntfs_parent_map_add(NTFS_INFO * ntfs, TSK_FS_META_NAME_LIST *name_list, TSK_FS_M
 {
     std::map<TSK_INUM_T, NTFS_PAR_MAP> *tmpParentMap = getParentMap(ntfs);
     NTFS_PAR_MAP &tmpParMap = (*tmpParentMap)[name_list->par_inode];
-    tmpParMap.add(name_list->par_seq, child_meta->addr, child_meta->seq);
+    tmpParMap.add(name_list->par_seq, child_meta->addr, child_meta->seq, tsk_fs_dir_hash(name_list->name));
     return 0;
 }
 
 /** \internal
  * Returns if a parent has children or not.
  *
- * Note: This routine assumes &ntfs->orhpan_map_lock is locked by the caller.
+ * Note: This routine assumes &ntfs->orphan_map_lock is locked by the caller.
  *
  * @param ntfs File system that has already been analyzed
  * @param par Parent inode to find child files for
@@ -160,7 +166,7 @@ ntfs_parent_map_exists(NTFS_INFO *ntfs, TSK_INUM_T par, uint32_t seq)
  * Look up a map entry by the parent address. You should call ntfs_parent_map_exists() before this, otherwise
  * an empty entry could be created. 
  *
- * Note: This routine assumes &ntfs->orhpan_map_lock is locked by the caller.
+ * Note: This routine assumes &ntfs->orphan_map_lock is locked by the caller.
  *
  * @param ntfs File system that has already been analyzed
  * @param par Parent inode to find child files for
@@ -222,8 +228,9 @@ ntfs_parent_act(TSK_FS_FILE * fs_file, void *ptr)
     fs_name_list = fs_file->meta->name2;
     while (fs_name_list) {
         if (ntfs_parent_map_add(ntfs, fs_name_list,
-                fs_file->meta))
+                fs_file->meta)) {
             return TSK_WALK_ERROR;
+        }
         fs_name_list = fs_name_list->next;
     }
     return TSK_WALK_CONT;
@@ -579,7 +586,7 @@ ntfs_proc_idxentry(NTFS_INFO * a_ntfs, TSK_FS_DIR * a_fs_dir,
                     tsk_getu16(fs->endian, a_idxe->idxlen)),
                 fs_name->flags);
 
-        // WINDOS entries will not have a short 8.3 veresion, so add them now.
+        // WINDOS entries will not have a short 8.3 version, so add them now.
         // otherwise, we stash the name to see if we get the 8.3 next. 
         if (fname->nspace == NTFS_FNAME_WINDOS) {
             if (tsk_fs_dir_add(a_fs_dir, fs_name)) {
@@ -721,10 +728,10 @@ ntfs_fix_idxrec(NTFS_INFO * ntfs, ntfs_idxrec * idxrec, uint32_t len)
 
 /** \internal
 * Process a directory and load up FS_DIR with the entries. If a pointer to
-* an already allocated FS_DIR struture is given, it will be cleared.  If no existing
+* an already allocated FS_DIR structure is given, it will be cleared.  If no existing
 * FS_DIR structure is passed (i.e. NULL), then a new one will be created. If the return
 * value is error or corruption, then the FS_DIR structure could
-* have entries (depending on when the error occured).
+* have entries (depending on when the error occurred).
 *
 * @param a_fs File system to analyze
 * @param a_fs_dir Pointer to FS_DIR pointer. Can contain an already allocated
@@ -745,7 +752,6 @@ ntfs_dir_open_meta(TSK_FS_INFO * a_fs, TSK_FS_DIR ** a_fs_dir,
     ntfs_idxroot *idxroot;
     ntfs_idxelist *idxelist;
     ntfs_idxrec *idxrec_p, *idxrec;
-    int off;
     TSK_OFF_T idxalloc_len;
     TSK_FS_LOAD_FILE load_file;
 
@@ -989,6 +995,7 @@ ntfs_dir_open_meta(TSK_FS_INFO * a_fs, TSK_FS_DIR ** a_fs_dir,
         }
     }
     else {
+        int off;
 
         if (fs_attr_idx->flags & TSK_FS_ATTR_RES) {
             tsk_error_reset();
@@ -1061,7 +1068,7 @@ ntfs_dir_open_meta(TSK_FS_INFO * a_fs, TSK_FS_DIR ** a_fs_dir,
                     PRIx32 "\n", off, tsk_getu32(a_fs->endian,
                         idxrec->magic));
 
-            /* Is this the begining of an index record? */
+            /* Is this the beginning of an index record? */
             if (tsk_getu32(a_fs->endian,
                     idxrec->magic) != NTFS_IDXREC_MAGIC)
                 continue;
@@ -1270,7 +1277,7 @@ ntfs_dir_open_meta(TSK_FS_INFO * a_fs, TSK_FS_DIR ** a_fs_dir,
              * We have only unalloc for this same entry (from idx entries),
              * then try to add it.   If we got an allocated entry from
              * the idx entries, then assume we have everything. */
-            if (tsk_fs_dir_contains(fs_dir, childFiles[a].getAddr()) == TSK_FS_NAME_FLAG_ALLOC) {
+            if (tsk_fs_dir_contains(fs_dir, childFiles[a].getAddr(), childFiles[a].getHash()) == TSK_FS_NAME_FLAG_ALLOC) {
                 continue;
             }
 
@@ -1383,7 +1390,6 @@ ntfs_find_file_rec(TSK_FS_INFO * fs, NTFS_DINFO * dinfo,
     uint8_t decrem = 0;
     size_t len = 0, i;
     char *begin = NULL;
-    int retval;
 
 
     if (fs_name_list->par_inode < fs->first_inum ||
@@ -1407,9 +1413,10 @@ ntfs_find_file_rec(TSK_FS_INFO * fs, NTFS_DINFO * dinfo,
      * - The parent is no longer a directory
      * - The sequence number of the parent is no longer correct
      */
-    if ((fs_file_par->meta->type != TSK_FS_META_TYPE_DIR)
+    if (( ! TSK_FS_IS_DIR_META(fs_file_par->meta->type))
         || (fs_file_par->meta->seq != fs_name_list->par_seq)) {
         const char *str = TSK_FS_ORPHAN_STR;
+        int retval;
         len = strlen(str);
 
         /* @@@ There should be a sanity check here to verify that the
@@ -1515,7 +1522,7 @@ ntfs_find_file_rec(TSK_FS_INFO * fs, NTFS_DINFO * dinfo,
  * @param dir_walk_flags Flags to use during search
  * @param action Callback that will be called for each name that uses the specified addresses.
  * @param ptr Pointer that will be passed into action when it is called (so that you can pass in other data)
- * @returns 1 on error, 0 on sucess
+ * @returns 1 on error, 0 on success
  */
 
 uint8_t
