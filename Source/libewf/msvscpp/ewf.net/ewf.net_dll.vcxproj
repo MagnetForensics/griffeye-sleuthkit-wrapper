@@ -80,8 +80,10 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='VSDebug|x64'">$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkKeyFile>..\..\..\ncpub.snk</LinkKeyFile>
-    <LinkDelaySign>true</LinkDelaySign>
+    <LinkKeyFile>
+    </LinkKeyFile>
+    <LinkDelaySign>
+    </LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkKeyFile>
