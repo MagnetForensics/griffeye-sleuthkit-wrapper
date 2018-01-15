@@ -811,6 +811,11 @@ namespace SleuthKit
         VHD = 0x0100,
 
         /// <summary>
+        /// TSK_IMG_TYPE_EXTERNAL, external defined format which at least implements TSK_IMG_INFO, used by pytsk
+        /// </summary>
+        External = 0x1000,
+
+        /// <summary>
         /// TSK_IMG_TYPE_UNSUPP, Unsupported disk image type
         /// </summary>
         Unsupported = 0xffff,

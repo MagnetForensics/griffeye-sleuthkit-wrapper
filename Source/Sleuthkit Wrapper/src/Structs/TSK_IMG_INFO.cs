@@ -29,14 +29,14 @@ namespace SleuthKit.Structs
         internal long size;
 
         /// <summary>
-        /// sector size of device in bytes (typically 512)
-        /// </summary>
-        internal uint sector_size;
-
-        /// <summary>
         /// page size of NAND page in bytes (defaults to 2048)
         /// </summary>
         internal uint page_size;
+
+        /// <summary>
+        /// sector size of device in bytes (typically 512)
+        /// </summary>
+        internal uint sector_size;
 
         /// <summary>
         /// spare or OOB size of NAND in bytes (defaults to 64)
@@ -50,19 +50,19 @@ namespace SleuthKit.Structs
 
         //#define TSK_IMG_INFO_CACHE_NUM  4
         //#define TSK_IMG_INFO_CACHE_LEN  65536
-        IntPtr cache;//        char[][] cache[4][65536];     ///< read cache
+        private IntPtr cache;//        char[][] cache[4][65536];     ///< read cache
 
         #region function pointers
 
-        IntPtr cache_off;//TSK_OFF_T cache_off[TSK_IMG_INFO_CACHE_NUM];    ///< starting byte offset of corresponding cache entry
-        IntPtr cache_age; //int cache_age[TSK_IMG_INFO_CACHE_NUM];  ///< "Age" of corresponding cache entry, higher means more recently used
-        IntPtr cache_len; //size_t cache_len[TSK_IMG_INFO_CACHE_NUM];       ///< Length of cache entry used (0 if never used)
+        private IntPtr cache_off;//TSK_OFF_T cache_off[TSK_IMG_INFO_CACHE_NUM];    ///< starting byte offset of corresponding cache entry
+        private IntPtr cache_age; //int cache_age[TSK_IMG_INFO_CACHE_NUM];  ///< "Age" of corresponding cache entry, higher means more recently used
+        private IntPtr cache_len; //size_t cache_len[TSK_IMG_INFO_CACHE_NUM];       ///< Length of cache entry used (0 if never used)
 
-        IntPtr read;//ssize_t(*read) (TSK_IMG_INFO * img, TSK_OFF_T off, char *buf, size_t len);     ///< \internal External progs should call tsk_img_read() 
-        IntPtr close;//void (*close) (TSK_IMG_INFO *); ///< \internal Progs should call tsk_img_close()
-        IntPtr imgstat;//void (*imgstat) (TSK_IMG_INFO *, FILE *);       ///< Pointer to file type specific function 
+        private IntPtr read;//ssize_t(*read) (TSK_IMG_INFO * img, TSK_OFF_T off, char *buf, size_t len);     ///< \internal External progs should call tsk_img_read()
+        private IntPtr close;//void (*close) (TSK_IMG_INFO *); ///< \internal Progs should call tsk_img_close()
+        private IntPtr imgstat;//void (*imgstat) (TSK_IMG_INFO *, FILE *);       ///< Pointer to file type specific function
 
-        #endregion
+        #endregion function pointers
 
         /// <summary>
         /// Checks that size and sector_size are non-zero.
