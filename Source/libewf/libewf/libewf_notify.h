@@ -1,7 +1,7 @@
 /*
  * Notification function
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,11 +23,13 @@
 #define _LIBEWF_NOTIFY_H
 
 #include <common.h>
-#include <file_stream.h>
 #include <types.h>
 
-#include "libewf_extern.h"
 #include "libewf_libcerror.h"
+
+#include <stdio.h>
+
+#include "libewf_extern.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -53,11 +55,11 @@ LIBEWF_EXTERN \
 int libewf_notify_stream_close(
      libcerror_error_t **error );
 
-#endif /* !defined( HAVE_LOCAL_LIBEWF ) */
+#endif
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBEWF_NOTIFY_H ) */
+#endif
 

@@ -1,7 +1,7 @@
 /*
  * Error functions
  *
- * Copyright (C) 2011-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2011-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -20,8 +20,9 @@
  */
 
 #include <common.h>
-#include <file_stream.h>
 #include <types.h>
+
+#include <stdio.h>
 
 #include "libhmac_error.h"
 #include "libhmac_libcerror.h"
@@ -91,5 +92,5 @@ int libhmac_error_backtrace_sprint(
 	         size ) );
 }
 
-#endif /* !defined( HAVE_LOCAL_LIBHMAC ) */
+#endif
 

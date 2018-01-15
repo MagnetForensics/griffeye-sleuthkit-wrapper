@@ -1,7 +1,7 @@
 /*
  * Info handle
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -60,7 +60,7 @@ struct info_handle
 	 */
 	libewf_handle_t *input_handle;
 
-	/* The notification output stream
+	/* The nofication output stream
 	 */
 	FILE *notify_stream;
 };

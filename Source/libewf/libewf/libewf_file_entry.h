@@ -1,7 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -29,7 +29,6 @@
 #include "libewf_handle.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
-#include "libewf_libcthreads.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_types.h"
 
@@ -56,18 +55,13 @@ struct libewf_internal_file_entry
 	/* The offset
 	 */
 	off64_t offset;
-
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	/* The read/write lock
-	 */
-	libcthreads_read_write_lock_t *read_write_lock;
-#endif
 };
 
 int libewf_file_entry_initialize(
      libewf_file_entry_t **file_entry,
      libewf_internal_handle_t *internal_handle,
      libcdata_tree_node_t *file_entry_tree_node,
+     uint8_t flags,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -189,13 +183,6 @@ int libewf_file_entry_get_utf16_hash_value_sha1(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-ssize_t libewf_internal_file_entry_read_buffer_from_single_file_entry(
-         libewf_internal_file_entry_t *internal_file_entry,
-         libewf_single_file_entry_t *single_file_entry,
-         void *buffer,
-         size_t buffer_size,
-         libcerror_error_t **error );
-
 LIBEWF_EXTERN \
 ssize_t libewf_file_entry_read_buffer(
          libewf_file_entry_t *file_entry,
@@ -204,18 +191,11 @@ ssize_t libewf_file_entry_read_buffer(
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-ssize_t libewf_file_entry_read_buffer_at_offset(
+ssize_t libewf_file_entry_read_random(
          libewf_file_entry_t *file_entry,
          void *buffer,
          size_t buffer_size,
          off64_t offset,
-         libcerror_error_t **error );
-
-off64_t libewf_internal_file_entry_seek_offset_in_single_file_entry(
-         libewf_internal_file_entry_t *internal_file_entry,
-         libewf_single_file_entry_t *single_file_entry,
-         off64_t offset,
-         int whence,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \

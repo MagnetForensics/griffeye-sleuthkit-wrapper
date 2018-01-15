@@ -1,7 +1,7 @@
 /*
  * Low level reading functions
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,12 +26,11 @@
 #include <types.h>
 
 #include "libewf_chunk_data.h"
-#include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfcache.h"
-#include "libewf_libfdata.h"
+#include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 
 #if defined( __cplusplus )
@@ -42,29 +41,13 @@ typedef struct libewf_read_io_handle libewf_read_io_handle_t;
 
 struct libewf_read_io_handle
 {
-	/* Cached version of the case data
+	/* The sectors with checksum errors
 	 */
-	uint8_t *case_data;
+	libcdata_range_list_t *checksum_errors;
 
-	/* Size of the cached version of the case data
+	/* A value to indicate if the chunk data should be zeroed on error
 	 */
-	size_t case_data_size;
-
-	/* Cached version of the device information
-	 */
-	uint8_t *device_information;
-
-	/* Size of the cached version of the device information
-	 */
-	size_t device_information_size;
-
-	/* The storage media size read
-	 */
-	size64_t storage_media_size_read;
-
-        /* The (total) number of chunks read
-         */
-        uint64_t number_of_chunks_read;
+	uint8_t zero_on_error;
 };
 
 int libewf_read_io_handle_initialize(
@@ -78,6 +61,17 @@ int libewf_read_io_handle_free(
 int libewf_read_io_handle_clone(
      libewf_read_io_handle_t **destination_read_io_handle,
      libewf_read_io_handle_t *source_read_io_handle,
+     libcerror_error_t **error );
+
+int libewf_read_io_handle_read_chunk_data(
+     libewf_read_io_handle_t *read_io_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_media_values_t *media_values,
+     libmfdata_list_t *chunk_table_list,
+     libfcache_cache_t *chunk_table_cache,
+     int chunk_index,
+     off64_t chunk_offset,
+     libewf_chunk_data_t **chunk_data,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

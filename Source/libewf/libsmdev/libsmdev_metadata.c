@@ -1,7 +1,7 @@
 /*
  * Meta data functions
  *
- * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -167,7 +167,7 @@ int libsmdev_handle_get_media_size(
 }
 
 /* Retrieves the number of bytes per sector
- * Returns the 1 if succesful, 0 if not or -1 on error
+ * Returns the 1 if succesful or -1 on error
  */
 int libsmdev_handle_get_bytes_per_sector(
      libsmdev_handle_t *handle,
@@ -185,9 +185,6 @@ int libsmdev_handle_get_bytes_per_sector(
 
 #if defined( WINAPI )
 	uint32_t error_code                         = 0;
-
-#elif !defined( BLKSSZGET ) && defined( DIOCGSECTORSIZE )
-	u_int safe_bytes_per_sector                 = 0;
 #endif
 
 	if( handle == NULL )
@@ -346,69 +343,7 @@ int libsmdev_handle_get_bytes_per_sector(
 		{
 			internal_handle->bytes_per_sector_set = 1;
 		}
-#elif defined( DIOCGSECTORSIZE )
-		read_count = libcfile_file_io_control_read(
-		              internal_handle->device_file,
-		              DIOCGSECTORSIZE,
-		              NULL,
-		              0,
-		              (uint8_t *) &safe_bytes_per_sector,
-		              sizeof( u_int ),
-		              error );
-
-		if( read_count == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_IOCTL_FAILED,
-			 "%s: unable to query device for: DIOCGSECTORSIZE.",
-			 function );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( ( error != NULL )
-				 && ( *error != NULL ) )
-				{
-					libcnotify_print_error_backtrace(
-					 *error );
-				}
-			}
-#endif
-			libcerror_error_free(
-			 error );
-		}
-		else if( safe_bytes_per_sector > (u_int) UINT32_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid bytes per sector value out of bounds.",
-			 function );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( ( error != NULL )
-				 && ( *error != NULL ) )
-				{
-					libcnotify_print_error_backtrace(
-					 *error );
-				}
-			}
-#endif
-			libcerror_error_free(
-			 error );
-
-		}
-		else
-		{
-			internal_handle->bytes_per_sector     = (uint32_t) safe_bytes_per_sector;
-			internal_handle->bytes_per_sector_set = 1;
-		}
-#elif defined( DKIOCGETBLOCKSIZE )
+#elif defined( DKIOCGETBLOCKCOUNT )
 		read_count = libcfile_file_io_control_read(
 		              internal_handle->device_file,
 		              DKIOCGETBLOCKSIZE,
@@ -449,9 +384,6 @@ int libsmdev_handle_get_bytes_per_sector(
 	}
 	if( internal_handle->bytes_per_sector_set == 0 )
 	{
-#if defined( BLKSSZGET ) || defined( DKIOCGETBLOCKSIZE ) || defined( DIOCGSECTORSIZE ) || defined( WINAPI )
-		return( 0 );
-#else
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
@@ -460,7 +392,6 @@ int libsmdev_handle_get_bytes_per_sector(
 		 function );
 
 		return( -1 );
-#endif
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -1356,7 +1287,6 @@ int libsmdev_handle_get_error(
 {
 	libsmdev_internal_handle_t *internal_handle = NULL;
 	static char *function                       = "libsmdev_handle_get_error";
-	intptr_t *value                             = NULL;
 
 	if( handle == NULL )
 	{
@@ -1371,12 +1301,11 @@ int libsmdev_handle_get_error(
 	}
 	internal_handle = (libsmdev_internal_handle_t *) handle;
 
-	if( libcdata_range_list_get_range_by_index(
+	if( libcdata_range_list_get_range(
 	     internal_handle->errors_range_list,
 	     index,
 	     (uint64_t *) offset,
 	     (uint64_t *) size,
-	     &value,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

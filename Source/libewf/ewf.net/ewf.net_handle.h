@@ -1,7 +1,7 @@
 /*
  * Handle class of libewf .net managed wrapper
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -65,16 +65,16 @@ public ref class Handle sealed
 		int ReadBuffer( array<System::Byte>^ buffer,
 		                int size );
 
-		int ReadBufferAtOffset( array<System::Byte>^ buffer,
-		                        int size,
-		                        System::Int64 offset );
+		int ReadRandom( array<System::Byte>^ buffer,
+		                int size,
+		                System::Int64 offset );
 
 		int WriteBuffer( array<System::Byte>^ buffer,
 		                 int size );
 
-		int WriteBufferAtOffset( array<System::Byte>^ buffer,
-		                         int size,
-		                         System::Int64 offset );
+		int WriteRandom( array<System::Byte>^ buffer,
+		                 int size,
+		                 System::Int64 offset );
 
 		System::Int64 SeekOffset( System::Int64 offset,
 		                          System::IO::SeekOrigin origin );

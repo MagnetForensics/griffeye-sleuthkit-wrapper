@@ -1,7 +1,7 @@
 /*
  * Hash sections functions
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "libewf_libcerror.h"
-#include "libewf_libfvalue.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -46,31 +45,13 @@ struct libewf_hash_sections
 	 */
 	size_t xhash_size;
 
-	/* The MD5 hash of the data as found in the MD5 hash section
+	/* The MD5 hash of the data as found in the hash section
 	 */
 	uint8_t md5_hash[ 16 ];
 
 	/* Value to indicate if the MD5 hash was set
 	 */
 	uint8_t md5_hash_set;
-
-	/* The SHA1 hash of the data as found in the SHA1 hash section
-	 */
-	uint8_t sha1_hash[ 20 ];
-
-	/* Value to indicate if the SHA1 hash was set
-	 */
-	uint8_t sha1_hash_set;
-
-#ifdef TODO
-	/* The SHA256 hash of the data as found in the SHA256 hash section
-	 */
-	uint8_t sha256_hash[ 32 ];
-
-	/* Value to indicate if the SHA256 hash was set
-	 */
-	uint8_t sha256_hash_set;
-#endif
 
 	/* The MD5 hash of the data as found in the digest section
 	 */
@@ -100,13 +81,6 @@ int libewf_hash_sections_free(
 int libewf_hash_sections_clone(
      libewf_hash_sections_t **destination_hash_sections,
      libewf_hash_sections_t *source_hash_sections,
-     libcerror_error_t **error );
-
-int libewf_hash_sections_set_digest_from_hash_values(
-     libewf_hash_sections_t *hash_sections,
-     const uint8_t *identifier,
-     size_t identifier_length,
-     libfvalue_table_t *hash_values,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

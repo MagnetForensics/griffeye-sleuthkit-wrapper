@@ -1,7 +1,7 @@
 /*
  * GetOpt functions
  *
- * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libcsystem_extern.h"
 #include "libcsystem_libcstring.h"
 
 /* unistd.h is included here to export getopt, optarg, optind and optopt
@@ -43,22 +42,25 @@ extern "C" {
 	getopt( argument_count, argument_values, options_string )
 
 #else
-LIBCSYSTEM_EXTERN \
-libcstring_system_character_t *optarg;
 
-LIBCSYSTEM_EXTERN \
-int optind;
+/* The current option argument
+ */
+extern libcstring_system_character_t *optarg;
 
-LIBCSYSTEM_EXTERN \
-libcstring_system_integer_t optopt;
+/* The option index
+ */
+extern int optind;
 
-LIBCSYSTEM_EXTERN \
+/* Value to indicate the current option
+ */
+extern libcstring_system_integer_t optopt;
+
 libcstring_system_integer_t libcsystem_getopt(
                              int argument_count,
                              libcstring_system_character_t * const argument_values[],
                              const libcstring_system_character_t *options_string );
 
-#endif /* defined( HAVE_GETOPT ) */
+#endif
 
 #if defined( __cplusplus )
 }

@@ -1,7 +1,7 @@
 /*
  * The internal libfcache header
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -33,7 +33,7 @@
 #include <libfcache_definitions.h>
 #include <libfcache_types.h>
 
-#else
+#elif defined( HAVE_LIBFCACHE_H )
 
 /* If libtool DLL support is enabled set LIBFCACHE_DLL_IMPORT
  * before including libfcache.h
@@ -44,7 +44,9 @@
 
 #include <libfcache.h>
 
-#endif /* defined( HAVE_LOCAL_LIBFCACHE ) */
+#else
+#error Missing libfcache.h
+#endif
 
-#endif /* !defined( _LIBEWF_LIBFCACHE_H ) */
+#endif
 

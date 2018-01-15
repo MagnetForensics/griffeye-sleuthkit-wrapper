@@ -1,7 +1,7 @@
 /*
  * The libbfio header wrapper
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -37,7 +37,7 @@
 #include <libbfio_pool.h>
 #include <libbfio_types.h>
 
-#else
+#elif defined( HAVE_LIBBFIO_H )
 
 /* If libtool DLL support is enabled set LIBBFIO_DLL_IMPORT
  * before including libbfio.h
@@ -48,11 +48,9 @@
 
 #include <libbfio.h>
 
-#if defined( HAVE_MULTI_THREAD_SUPPORT ) && !defined( LIBBFIO_HAVE_MULTI_THREAD_SUPPORT )
-#error Multi-threading support requires libbfio with multi-threading support
+#else
+#error Missing libbfio.h
 #endif
 
-#endif /* defined( HAVE_LOCAL_LIBBFIO ) */
-
-#endif /* !defined( _LIBEWF_LIBBFIO_H ) */
+#endif
 

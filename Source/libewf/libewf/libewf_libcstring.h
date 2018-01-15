@@ -1,7 +1,7 @@
 /*
  * The internal libcstring header
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -43,9 +43,9 @@
 #define LIBCSTRING_DLL_IMPORT
 #endif
 
-#include <libcstring.h>
+#include "libewf_libcstring.h"
 
-#endif /* defined( HAVE_LOCAL_LIBCSTRING ) */
+#endif
 
-#endif /* !defined( _LIBEWF_LIBCSTRING_H ) */
+#endif
 

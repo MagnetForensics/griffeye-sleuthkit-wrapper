@@ -1,7 +1,7 @@
 /*
  * The internal libcdata header
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -37,7 +37,7 @@
 #include <libcdata_tree_node.h>
 #include <libcdata_types.h>
 
-#else
+#elif defined( HAVE_LIBCDATA_H )
 
 /* If libtool DLL support is enabled set LIBCDATA_DLL_IMPORT
  * before including libcdata.h
@@ -48,7 +48,9 @@
 
 #include <libcdata.h>
 
-#endif /* defined( HAVE_LOCAL_LIBCDATA ) */
+#else
+#error Missing libcdata.h
+#endif
 
-#endif /* !defined( _LIBEWF_LIBCDATA_H ) */
+#endif
 

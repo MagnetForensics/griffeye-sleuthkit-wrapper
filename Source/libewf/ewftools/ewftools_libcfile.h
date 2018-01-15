@@ -1,7 +1,7 @@
 /*
  * The internal libcfile header
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -44,7 +44,7 @@
 
 #include <libcfile.h>
 
-#endif /* defined( HAVE_LOCAL_LIBCFILE ) */
+#endif
 
-#endif /* !defined( _EWFTOOLS_LIBCFILE_H ) */
+#endif
 

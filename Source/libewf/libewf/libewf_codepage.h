@@ -1,7 +1,7 @@
 /*
  * Codepage functions
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -80,11 +80,11 @@ enum LIBEWF_CODEPAGES
 	LIBEWF_CODEPAGE_WINDOWS_1258			= 1258
 };
 
-#endif /* !defined( HAVE_LOCAL_LIBEWF ) */
+#endif
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBEWF_INTERNAL_CODEPAGE_H ) */
+#endif
 

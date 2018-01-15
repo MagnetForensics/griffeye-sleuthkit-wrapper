@@ -1,7 +1,7 @@
 /*
  * The internal libclocale header
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -44,7 +44,7 @@
 
 #include <libclocale.h>
 
-#endif /* defined( HAVE_LOCAL_LIBCLOCALE ) */
+#endif
 
-#endif /* !defined( _EWFTOOLS_LIBCLOCALE_H ) */
+#endif
 

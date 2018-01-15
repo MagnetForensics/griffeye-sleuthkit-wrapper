@@ -1,7 +1,7 @@
 /*
  * Reads data from a file or device and writes it in EWF format
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -37,13 +37,11 @@
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
-#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "imaging_handle.h"
 #include "log_handle.h"
 #include "process_status.h"
 #include "storage_media_buffer.h"
-#include "storage_media_buffer_queue.h"
 
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
 #define EWFACQUIRE_2_TIB			0x20000000000UL
@@ -114,12 +112,12 @@ void ewfacquire_usage_fprint(
 	                 "                  [ -B number_of_bytes ] [ -c compression_values ]\n"
 	                 "                  [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
 	                 "                  [ -e examiner_name ] [ -E evidence_number ] [ -f format ]\n"
-	                 "                  [ -g number_of_sectors ] [ -j jobs ] [ -l log_filename ]\n"
+	                 "                  [ -g number_of_sectors ] [ -l log_filename ]\n"
 	                 "                  [ -m media_type ] [ -M media_flags ] [ -N notes ]\n"
 	                 "                  [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                  [ -P bytes_per_sector ] [ -r read_error_retries ]\n"
 	                 "                  [ -S segment_file_size ] [ -t target ] [ -T toc_file ]\n"
-	                 "                  [ -2 secondary_target ] [ -hqRsuvVwx ] source\n\n" );
+	                 "                  [ -2 secondary_target ] [ -hqRsuvVw ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file(s) or device\n\n" );
 
@@ -133,12 +131,8 @@ void ewfacquire_usage_fprint(
 	                 "\t        8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-B:     specify the number of bytes to acquire (default is all bytes)\n" );
 	fprintf( stream, "\t-c:     specify the compression values as: level or method:level\n"
-#if defined( HAVE_BZIP2_SUPPORT )
 	                 "\t        compression method options: deflate (default), bzip2\n"
 	                 "\t        (bzip2 is only supported by EWF2 formats)\n"
-#else
-	                 "\t        compression method options: deflate (default)\n"
-#endif
 	                 "\t        compression level options: none (default), empty-block,\n"
 	                 "\t        fast or best\n" );
 	fprintf( stream, "\t-C:     specify the case number (default is case_number).\n" );
@@ -152,9 +146,6 @@ void ewfacquire_usage_fprint(
 	                 "\t        encase7, encase7-v2, linen5, linen6, linen7, ewfx\n" );
 	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
-	fprintf( stream, "\t-j:     the number of concurrent processing jobs (threads), where\n"
-	                 "\t        a number of 0 represents single-threaded mode (default is 4\n"
-	                 "\t        if multi-threaded mode is supported)\n" );
 	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-m:     specify the media type, options: fixed (default), removable,\n"
 	                 "\t        optical, memory\n" );
@@ -175,7 +166,7 @@ void ewfacquire_usage_fprint(
 	{
 		fprintf( stream, "\t-S:     specify the segment file size in bytes (default is %" PRIs_LIBCSTRING_SYSTEM ")\n"
 		                 "\t        (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for encase6\n"
-		                 "\t        and later formats and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n",
+		                 "\t        and encase7 format and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
@@ -185,7 +176,7 @@ void ewfacquire_usage_fprint(
 	{
 		fprintf( stream, "\t-S:     specify the segment file size in bytes (default is %" PRIu32 ")\n"
 		                 "\t        (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6\n"
-		                 "\t        and later formats and %" PRIu32 " for other formats)\n",
+		                 "\t        and encase7 format and %" PRIu32 " for other formats)\n",
 		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
@@ -199,8 +190,6 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 	fprintf( stream, "\t-w:     zero sectors on read error (mimic EnCase like behavior)\n" );
-	fprintf( stream, "\t-x:     use the chunk data instead of the buffered read and write\n"
-	                 "\t        functions.\n" );
 	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write\n"
 	                 "\t        to\n" );
 }
@@ -567,18 +556,16 @@ int ewfacquire_read_input(
      off64_t resume_acquiry_offset,
      uint8_t swap_byte_pairs,
      uint8_t print_status_information,
-     uint8_t use_chunk_data_functions,
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
+	process_status_t *process_status             = NULL;
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	uint8_t *data                                = NULL;
 	static char *function                        = "ewfacquire_read_input";
 	off64_t read_error_offset                    = 0;
-	off64_t storage_media_offset                 = 0;
 	size64_t acquiry_count                       = 0;
 	size64_t read_error_size                     = 0;
-	size64_t remaining_aquiry_size               = 0;
 	size_t data_size                             = 0;
 	size_t process_buffer_size                   = 0;
 	size_t read_size                             = 0;
@@ -586,8 +573,6 @@ int ewfacquire_read_input(
 	ssize_t process_count                        = 0;
 	ssize_t write_count                          = 0;
 	uint32_t chunk_size                          = 0;
-	uint8_t storage_media_buffer_mode            = 0;
-	int maximum_number_of_queued_items           = 0;
 	int number_of_read_errors                    = 0;
 	int read_error_iterator                      = 0;
 	int status                                   = PROCESS_STATUS_COMPLETED;
@@ -603,6 +588,7 @@ int ewfacquire_read_input(
 
 		return( -1 );
 	}
+#if !defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( imaging_handle->process_buffer_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
@@ -614,6 +600,7 @@ int ewfacquire_read_input(
 
 		return( -1 );
 	}
+#endif
         if( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX )
 	{
 		libcerror_error_set(
@@ -636,22 +623,8 @@ int ewfacquire_read_input(
 
 		return( -1 );
 	}
-#if !defined( HAVE_MULTI_THREAD_SUPPORT )
-	if( imaging_handle->number_of_threads != 0 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: multi-threading not supported.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( ( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX )
-	 || ( ( imaging_handle->input_media_size != 0 )
-	  && ( imaging_handle->acquiry_size > imaging_handle->input_media_size ) ) )
+	if( ( imaging_handle->acquiry_size > imaging_handle->input_media_size )
+	 || ( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -665,13 +638,13 @@ int ewfacquire_read_input(
 	if( imaging_handle->acquiry_offset > 0 )
 	{
 		if( ( imaging_handle->acquiry_offset > (uint64_t) imaging_handle->input_media_size )
-		 || ( imaging_handle->acquiry_size > (uint64_t) ( imaging_handle->input_media_size - imaging_handle->acquiry_offset ) ) )
+		 || ( ( imaging_handle->acquiry_size + imaging_handle->acquiry_offset ) > (uint64_t) imaging_handle->input_media_size ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid acquire offset value out of bound.",
+			 "%s: unable to acquire beyond media size.",
 			 function );
 
 			goto on_error;
@@ -694,13 +667,13 @@ int ewfacquire_read_input(
 	}
 	if( resume_acquiry_offset > 0 )
 	{
-		if( (uint64_t) resume_acquiry_offset > (uint64_t) ( imaging_handle->input_media_size - imaging_handle->acquiry_offset ) )
+		if( ( imaging_handle->acquiry_offset + (uint64_t) resume_acquiry_offset ) > (uint64_t) imaging_handle->input_media_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid resume acquire offset value out of bound.",
+			 "%s: unable to resume acquire beyond media size.",
 			 function );
 
 			goto on_error;
@@ -760,96 +733,32 @@ int ewfacquire_read_input(
 
 		goto on_error;
 	}
-	if( use_chunk_data_functions != 0 )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	process_buffer_size = (size_t) chunk_size;
+#else
+	if( imaging_handle->process_buffer_size == 0 )
 	{
-		process_buffer_size       = (size_t) chunk_size;
-		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA;
+		process_buffer_size = (size_t) chunk_size;
 	}
 	else
 	{
-		if( imaging_handle->process_buffer_size == 0 )
-		{
-			process_buffer_size = (size_t) chunk_size;
-		}
-		else
-		{
-			process_buffer_size = imaging_handle->process_buffer_size;
-		}
-		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_BUFFERED;
-	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-	if( imaging_handle->number_of_threads != 0 )
-	{
-		maximum_number_of_queued_items = 1 + ( ( 512 * 1024 * 1024 ) / process_buffer_size );
-
-		if( libcthreads_thread_pool_create(
-		     &( imaging_handle->process_thread_pool ),
-		     NULL,
-		     imaging_handle->number_of_threads,
-		     maximum_number_of_queued_items,
-		     (int (*)(intptr_t *, void *)) &imaging_handle_process_storage_media_buffer_callback,
-		     (void *) imaging_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize process thread pool.",
-			 function );
-
-			goto on_error;
-		}
-		if( libcthreads_thread_pool_create(
-		     &( imaging_handle->output_thread_pool ),
-		     NULL,
-		     1,
-		     maximum_number_of_queued_items,
-		     (int (*)(intptr_t *, void *)) &imaging_handle_output_storage_media_buffer_callback,
-		     (void *) imaging_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize output thread pool.",
-			 function );
-
-			goto on_error;
-		}
-		if( libcdata_list_initialize(
-		     &( imaging_handle->output_list ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create output list.",
-			 function );
-
-			goto on_error;
-		}
-		if( storage_media_buffer_queue_initialize(
-		     &( imaging_handle->storage_media_buffer_queue ),
-		     imaging_handle->output_handle,
-		     maximum_number_of_queued_items,
-		     storage_media_buffer_mode,
-		     process_buffer_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize storage media buffer queue.",
-			 function );
-
-			goto on_error;
-		}
+		process_buffer_size = imaging_handle->process_buffer_size;
 	}
 #endif
+	if( storage_media_buffer_initialize(
+	     &storage_media_buffer,
+	     process_buffer_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
 	if( imaging_handle_initialize_integrity_hash(
 	     imaging_handle,
 	     error ) != 1 )
@@ -864,7 +773,7 @@ int ewfacquire_read_input(
 		goto on_error;
         }
 	if( process_status_initialize(
-	     &( imaging_handle->process_status ),
+	     &process_status,
 	     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
 	     _LIBCSTRING_SYSTEM_STRING( "acquired" ),
 	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
@@ -882,7 +791,7 @@ int ewfacquire_read_input(
 		goto on_error;
 	}
 	if( process_status_start(
-	     imaging_handle->process_status,
+	     process_status,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -894,147 +803,19 @@ int ewfacquire_read_input(
 
 		goto on_error;
 	}
-	if( imaging_handle->number_of_threads == 0 )
+	while( acquiry_count < (size64_t) imaging_handle->acquiry_size )
 	{
-		if( storage_media_buffer_initialize(
-		     &storage_media_buffer,
-		     imaging_handle->output_handle,
-		     storage_media_buffer_mode,
-		     process_buffer_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create storage media buffer.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	remaining_aquiry_size = imaging_handle->acquiry_size;
-
-	while( remaining_aquiry_size > 0 )
-	{
-		if( ewfacquire_abort != 0 )
-		{
-			break;
-		}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-		if( ( storage_media_buffer == NULL )
-		 && ( imaging_handle->number_of_threads != 0 ) )
-		{
-			if( storage_media_buffer_queue_grab_buffer(
-			     imaging_handle->storage_media_buffer_queue,
-			     &storage_media_buffer,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to grab storage media buffer from queue.",
-				 function );
-
-				goto on_error;
-			}
-			if( storage_media_buffer == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing storage media buffer.",
-				 function );
-
-				goto on_error;
-			}
-		}
-#endif
 		read_size = process_buffer_size;
 
-		if( remaining_aquiry_size < (size64_t) read_size )
+		if( ( (size64_t) imaging_handle->acquiry_size - acquiry_count ) < (size64_t) read_size )
 		{
-			read_size = (size_t) remaining_aquiry_size;
+			read_size = (size_t) ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count );
 		}
-		if( imaging_handle->last_offset_written < resume_acquiry_offset )
+		if( (off64_t) acquiry_count >= resume_acquiry_offset )
 		{
-			/* Align with resume acquiry offset if necessary
-			 */
-			if( ( resume_acquiry_offset - (off64_t) acquiry_count ) < (off64_t) read_size )
-			{
-				read_size = (size_t) ( resume_acquiry_offset - acquiry_count );
-			}
-			read_count = storage_media_buffer_read_from_handle(
-			              storage_media_buffer,
-			              imaging_handle->output_handle,
-			              read_size,
-			              error );
-
-			if( read_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read data.",
-				 function );
-
-				goto on_error;
-			}
-			if( read_count == 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unexpected end of data.",
-				 function );
-
-				goto on_error;
-			}
-			storage_media_buffer->storage_media_offset = storage_media_offset;
-
-			process_count = storage_media_buffer_read_process(
-					 storage_media_buffer,
-					 error );
-
-			if( process_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to prepare buffer after read.",
-				 function );
-
-				goto on_error;
-			}
-			if( process_count > (ssize_t) read_size )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: more bytes read than requested.",
-				 function,
-				 process_count,
-				 read_size );
-
-				goto on_error;
-			}
-			read_count = process_count;
-
-			storage_media_offset  += read_count;
-			remaining_aquiry_size -= read_count;
-		}
-		else
-		{
-			read_count = device_handle_read_storage_media_buffer(
+			read_count = device_handle_read_buffer(
 				      device_handle,
-				      storage_media_buffer,
-				      storage_media_offset,
+				      storage_media_buffer->raw_buffer,
 				      read_size,
 				      error );
 
@@ -1060,9 +841,110 @@ int ewfacquire_read_input(
 
 				goto on_error;
 			}
-			storage_media_offset  += read_count;
-			remaining_aquiry_size -= read_count;
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			storage_media_buffer->data_in_compression_buffer = 0;
+#endif
+			storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
+
+			/* Swap byte pairs
+			 */
+			if( swap_byte_pairs == 1 )
+			{
+				if( imaging_handle_swap_byte_pairs(
+				     imaging_handle,
+				     storage_media_buffer,
+				     read_count,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
+					 "%s: unable to swap byte pairs.",
+					 function );
+
+					goto on_error;
+				}
+			}
 		}
+		else
+		{
+			/* Align with resume acquiry offset if necessary
+			 */
+			if( ( resume_acquiry_offset - (off64_t) acquiry_count ) < (off64_t) read_size )
+			{
+				read_size = (size_t) ( resume_acquiry_offset - acquiry_count );
+			}
+			read_count = imaging_handle_read_buffer(
+				      imaging_handle,
+				      storage_media_buffer,
+				      read_size,
+				      error );
+
+			if( read_count < 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				"%s: unable to read data.",
+				 function );
+
+				goto on_error;
+			}
+			if( read_count == 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unexpected end of data.",
+				 function );
+
+				goto on_error;
+			}
+			process_count = imaging_handle_prepare_read_buffer(
+					 imaging_handle,
+					 storage_media_buffer,
+					 error );
+
+			if( process_count < 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				"%s: unable to prepare buffer after read.",
+				 function );
+
+				goto on_error;
+			}
+			if( process_count > (ssize_t) read_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: more bytes read than requested.",
+				 function,
+				 process_count,
+				 read_size );
+
+				goto on_error;
+			}
+			read_count = process_count;
+
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+			/* Set the chunk data size in the compression buffer
+			 */
+			if( storage_media_buffer->data_in_compression_buffer == 1 )
+			{
+				storage_media_buffer->compression_buffer_data_size = (size_t) process_count;
+			}
+#endif
+		}
+		/* Digest hashes are calcultated after swap
+		 */
 		if( storage_media_buffer_get_data(
 		     storage_media_buffer,
 		     &data,
@@ -1078,29 +960,6 @@ int ewfacquire_read_input(
 
 			goto on_error;
 		}
-		/* Swap byte pairs
-		 */
-		if( ( swap_byte_pairs == 1 )
-		 && ( imaging_handle->last_offset_written >= resume_acquiry_offset ) )
-		{
-			if( imaging_handle_swap_byte_pairs(
-			     imaging_handle,
-			     data,
-			     read_count,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_GENERIC,
-				 "%s: unable to swap byte pairs.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		/* Digest hashes are calcultated after swap
-		 */
 		if( imaging_handle_update_integrity_hash(
 		     imaging_handle,
 		     data,
@@ -1116,49 +975,10 @@ int ewfacquire_read_input(
 
 			goto on_error;
 		}
-		if( imaging_handle->last_offset_written < resume_acquiry_offset )
+		if( (off64_t) acquiry_count >= resume_acquiry_offset )
 		{
-			imaging_handle->last_offset_written += (off64_t) read_count;
-
-			if( process_status_update(
-			     imaging_handle->process_status,
-			     imaging_handle->last_offset_written,
-			     imaging_handle->acquiry_size,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to update process status.",
-				 function );
-
-				goto on_error;
-			}
-		}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-		else if( imaging_handle->number_of_threads != 0 )
-		{
-			if( libcthreads_thread_pool_push(
-			     imaging_handle->process_thread_pool,
-			     (intptr_t *) storage_media_buffer,
-			     error ) == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to push storage media buffer onto process thread pool queue.",
-				 function );
-
-				goto on_error;
-			}
-			storage_media_buffer = NULL;
-		}
-#endif
-		else
-		{
-			process_count = storage_media_buffer_write_process(
+			process_count = imaging_handle_prepare_write_buffer(
+					 imaging_handle,
 					 storage_media_buffer,
 					 error );
 
@@ -1168,15 +988,15 @@ int ewfacquire_read_input(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to prepare storage media buffer before write.",
+				"%s: unable to prepare buffer before write.",
 				 function );
 
 				goto on_error;
 			}
-			write_count = imaging_handle_write_storage_media_buffer(
+			write_count = imaging_handle_write_buffer(
 				       imaging_handle,
 				       storage_media_buffer,
-				       storage_media_buffer->processed_size,
+				       process_count,
 				       error );
 
 			if( write_count < 0 )
@@ -1185,126 +1005,47 @@ int ewfacquire_read_input(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write storage media buffer.",
-				 function );
-
-				goto on_error;
-			}
-			imaging_handle->last_offset_written += (off64_t) process_count;
-
-			if( process_status_update(
-			     imaging_handle->process_status,
-			     imaging_handle->last_offset_written,
-			     imaging_handle->acquiry_size,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to update process status.",
+				 "%s: unable to write data to file.",
 				 function );
 
 				goto on_error;
 			}
 		}
+		acquiry_count += read_count;
+
+		if( process_status_update(
+		     process_status,
+		     acquiry_count,
+		     imaging_handle->acquiry_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update process status.",
+			 function );
+
+			goto on_error;
+		}
+		if( ewfacquire_abort != 0 )
+		{
+			break;
+		}
 	}
-	if( imaging_handle->number_of_threads == 0 )
+	if( storage_media_buffer_free(
+	     &storage_media_buffer,
+	     error ) != 1 )
 	{
-		if( storage_media_buffer_free(
-		     &storage_media_buffer,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free storage media buffer.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free storage media buffer.",
+		 function );
 
-			goto on_error;
-		}
+		goto on_error;
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-	if( imaging_handle->process_thread_pool != NULL )
-	{
-		if( libcthreads_thread_pool_join(
-		     &( imaging_handle->process_thread_pool ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to join process thread pool.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( imaging_handle->output_thread_pool != NULL )
-	{
-		if( libcthreads_thread_pool_join(
-		     &( imaging_handle->output_thread_pool ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to join output thread pool.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( imaging_handle->output_list != NULL )
-	{
-		if( imaging_handle_empty_output_list(
-		     imaging_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty output list.",
-			 function );
-
-			goto on_error;
-		}
-		if( libcdata_list_free(
-		     &( imaging_handle->output_list ),
-		     NULL,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free output list.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( imaging_handle->storage_media_buffer_queue != NULL )
-	{
-		if( storage_media_buffer_queue_free(
-		     &( imaging_handle->storage_media_buffer_queue ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free storage media buffer queue.",
-			 function );
-
-			goto on_error;
-		}
-	}
-#endif
 	if( imaging_handle_finalize_integrity_hash(
 	     imaging_handle,
 	     error ) != 1 )
@@ -1318,7 +1059,7 @@ int ewfacquire_read_input(
 
 		goto on_error;
 	}
-	if( imaging_handle->last_offset_written >= resume_acquiry_offset )
+	if( (off64_t) acquiry_count >= resume_acquiry_offset )
 	{
 		if( device_handle_get_number_of_read_errors(
 		     device_handle,
@@ -1387,15 +1128,15 @@ int ewfacquire_read_input(
 
 			goto on_error;
 		}
-		imaging_handle->last_offset_written += write_count;
+		acquiry_count += write_count;
 	}
 	if( ewfacquire_abort != 0 )
 	{
 		status = PROCESS_STATUS_ABORTED;
 	}
 	if( process_status_stop(
-	     imaging_handle->process_status,
-	     imaging_handle->last_offset_written,
+	     process_status,
+	     acquiry_count,
 	     status,
 	     error ) != 1 )
 	{
@@ -1409,7 +1150,7 @@ int ewfacquire_read_input(
 		goto on_error;
 	}
 	if( process_status_free(
-	     &( imaging_handle->process_status ),
+	     &process_status,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1486,54 +1227,23 @@ int ewfacquire_read_input(
 	return( 1 );
 
 on_error:
-	if( ( imaging_handle->number_of_threads == 0 )
-	 && ( storage_media_buffer != NULL ) )
+	if( process_status != NULL )
+	{
+		process_status_stop(
+		 process_status,
+		 (size64_t) write_count,
+		 PROCESS_STATUS_FAILED,
+		 NULL );
+		process_status_free(
+		 &process_status,
+		 NULL );
+	}
+	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
 		 &storage_media_buffer,
 		 NULL );
 	}
-	if( imaging_handle->process_status != NULL )
-	{
-		process_status_stop(
-		 imaging_handle->process_status,
-		 (size64_t) write_count,
-		 PROCESS_STATUS_FAILED,
-		 NULL );
-		process_status_free(
-		 &( imaging_handle->process_status ),
-		 NULL );
-	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-	if( imaging_handle->process_thread_pool != NULL )
-	{
-		libcthreads_thread_pool_join(
-		 &( imaging_handle->process_thread_pool ),
-		 NULL );
-	}
-	if( imaging_handle->output_thread_pool != NULL )
-	{
-		libcthreads_thread_pool_join(
-		 &( imaging_handle->output_thread_pool ),
-		 NULL );
-	}
-	if( imaging_handle->output_list != NULL )
-	{
-		imaging_handle_empty_output_list(
-		 imaging_handle,
-		 NULL );
-		libcdata_list_free(
-		 &( imaging_handle->output_list ),
-		 NULL,
-		 NULL );
-	}
-	if( imaging_handle->storage_media_buffer_queue != NULL )
-	{
-		storage_media_buffer_queue_free(
-		 &( imaging_handle->storage_media_buffer_queue ),
-		 NULL );
-	}
-#endif
 	return( -1 );
 }
 
@@ -1549,7 +1259,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t media_information_model[ 64 ];
 	libcstring_system_character_t media_information_serial_number[ 64 ];
 
-	libcerror_error_t *error                                        = NULL;
+	libcerror_error_t *error                                         = NULL;
 
 	libcstring_system_character_t *log_filename                     = NULL;
 	libcstring_system_character_t *option_additional_digest_types   = NULL;
@@ -1566,7 +1276,6 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_media_type                = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
 	libcstring_system_character_t *option_number_of_error_retries   = NULL;
-	libcstring_system_character_t *option_number_of_jobs            = NULL;
 	libcstring_system_character_t *option_offset                    = NULL;
 	libcstring_system_character_t *option_process_buffer_size       = NULL;
 	libcstring_system_character_t *option_secondary_target_filename = NULL;
@@ -1587,7 +1296,6 @@ int main( int argc, char * const argv[] )
 	uint8_t print_status_information                                = 1;
 	uint8_t resume_acquiry                                          = 0;
 	uint8_t swap_byte_pairs                                         = 0;
-	uint8_t use_chunk_data_functions                                = 0;
 	uint8_t verbose                                                 = 0;
 	uint8_t zero_buffer_on_error                                    = 0;
 	int8_t acquiry_parameters_confirmed                             = 0;
@@ -1627,7 +1335,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:g:hj:l:m:M:N:o:p:P:qr:RsS:t:T:uvVwx2:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:T:uvVw2:" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1640,7 +1348,7 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
-				 argv[ optind ] );
+				 argv[ optind - 1 ] );
 
 				ewfacquire_usage_fprint(
 				 stdout );
@@ -1711,11 +1419,6 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_SUCCESS );
-
-			case (libcstring_system_integer_t) 'j':
-				option_number_of_jobs = optarg;
-
-				break;
 
 			case (libcstring_system_integer_t) 'l':
 				log_filename = optarg;
@@ -1809,11 +1512,6 @@ int main( int argc, char * const argv[] )
 
 			case (libcstring_system_integer_t) 'w':
 				zero_buffer_on_error = 1;
-
-				break;
-
-			case (libcstring_system_integer_t) 'x':
-				use_chunk_data_functions = 1;
 
 				break;
 
@@ -1974,7 +1672,6 @@ int main( int argc, char * const argv[] )
 	if( imaging_handle_initialize(
 	     &ewfacquire_imaging_handle,
 	     calculate_md5,
-	     use_chunk_data_functions,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -2050,73 +1747,6 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	/* Make sure we can write the target file
-	 */
-	if( interactive_mode == 0 )
-	{
-		if( resume_acquiry == 0 )
-		{
-			if( imaging_handle_check_write_access(
-			     ewfacquire_imaging_handle,
-			     ewfacquire_imaging_handle->target_filename,
-			     &error ) != 1 )
-			{
-#if defined( HAVE_VERBOSE_OUTPUT )
-				libcnotify_print_error_backtrace(
-				 error );
-#endif
-				libcerror_error_free(
-				 &error );
-
-				fprintf(
-				 stdout,
-				 "Unable to write target file.\n" );
-
-				goto on_error;
-			}
-		}
-		else
-		{
-			if( libcsystem_signal_attach(
-			     ewfacquire_signal_handler,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to attach signal handler.\n" );
-
-				goto on_error;
-			}
-			if( imaging_handle_open_output_resume(
-			     ewfacquire_imaging_handle,
-			     ewfacquire_imaging_handle->target_filename,
-			     &resume_acquiry_offset,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unable to resume acquire - starting from scratch.\n" );
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-				libcnotify_print_error_backtrace(
-				 error );
-#endif
-				libcerror_error_free(
-				 &error );
-
-				resume_acquiry = 0;
-			}
-			if( libcsystem_signal_detach(
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to detach signal handler.\n" );
-
-				goto on_error;
-			}
-		}
-	}
 	if( option_secondary_target_filename != NULL )
 	{
 		if( imaging_handle_set_string(
@@ -2129,26 +1759,6 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unable to set secondary target filename.\n" );
-
-			goto on_error;
-		}
-		/* Make sure we can write the secondary target file
-		 */
-		if( imaging_handle_check_write_access(
-		     ewfacquire_imaging_handle,
-		     ewfacquire_imaging_handle->secondary_target_filename,
-		     &error ) != 1 )
-		{
-#if defined( HAVE_VERBOSE_OUTPUT )
-			libcnotify_print_error_backtrace(
-			 error );
-#endif
-			libcerror_error_free(
-			 &error );
-
-			fprintf(
-			 stdout,
-			 "Unable to write secondary target file.\n" );
 
 			goto on_error;
 		}
@@ -2360,25 +1970,16 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		result = device_handle_get_bytes_per_sector(
-		          ewfacquire_device_handle,
-		          &( ewfacquire_imaging_handle->bytes_per_sector ),
-		          &error );
-
-		if( result == -1 )
+		if( device_handle_get_bytes_per_sector(
+		     ewfacquire_device_handle,
+		     &( ewfacquire_imaging_handle->bytes_per_sector ),
+		     &error ) != 1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to retrieve bytes per sector from device.\n" );
 
 			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			fprintf(
-			 stderr,
-			 "Device returned unsupported bytes per sector defaulting to: %" PRIu32 ".\n",
-			 ewfacquire_imaging_handle->bytes_per_sector );
 		}
 	}
 	if( option_sectors_per_chunk != NULL )
@@ -2466,8 +2067,7 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 		else if( ( result == 0 )
-		      || ( ( ewfacquire_imaging_handle->input_media_size != 0 )
-		       &&  ( ewfacquire_imaging_handle->acquiry_offset >= ewfacquire_imaging_handle->input_media_size ) ) )
+		      || ( ewfacquire_imaging_handle->acquiry_offset >= ewfacquire_imaging_handle->input_media_size ) )
 		{
 			ewfacquire_imaging_handle->acquiry_offset = 0;
 
@@ -2492,8 +2092,7 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 		else if( ( result == 0 )
-		      || ( ( ewfacquire_imaging_handle->input_media_size != 0 )
-		       &&  ( ewfacquire_imaging_handle->acquiry_size > ( ewfacquire_imaging_handle->input_media_size - ewfacquire_imaging_handle->acquiry_offset ) ) ) )
+		      || ( ewfacquire_imaging_handle->acquiry_size > ( ewfacquire_imaging_handle->input_media_size - ewfacquire_imaging_handle->acquiry_offset ) ) )
 		{
 			ewfacquire_imaging_handle->acquiry_size = 0;
 
@@ -2524,36 +2123,6 @@ int main( int argc, char * const argv[] )
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
 		}
 	}
-	if( option_number_of_jobs != NULL )
-	{
-		result = imaging_handle_set_number_of_threads(
-			  ewfacquire_imaging_handle,
-			  option_number_of_jobs,
-			  &error );
-
-		if( result == -1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set number of jobs (threads).\n" );
-
-			goto on_error;
-		}
-		else if( ( result == 0 )
-		      || ( ewfacquire_imaging_handle->number_of_threads > (int) 32 ) )
-		{
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-			ewfacquire_imaging_handle->number_of_threads = 4;
-#else
-			ewfacquire_imaging_handle->number_of_threads = 0;
-#endif
-
-			fprintf(
-			 stderr,
-			 "Unsupported number of jobs (threads) defaulting to: %d.\n",
-			 ewfacquire_imaging_handle->number_of_threads );
-		}
-	}
 	if( option_additional_digest_types != NULL )
 	{
 		result = imaging_handle_set_additional_digest_types(
@@ -2572,8 +2141,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* Initialize values
 	 */
-	if( ( ewfacquire_imaging_handle->acquiry_size == 0 )
-	 && ( ewfacquire_imaging_handle->input_media_size != 0 ) )
+	if( ewfacquire_imaging_handle->acquiry_size == 0 )
 	{
 		ewfacquire_imaging_handle->acquiry_size = ewfacquire_imaging_handle->input_media_size
 		                                        - ewfacquire_imaging_handle->acquiry_offset;
@@ -2587,16 +2155,13 @@ int main( int argc, char * const argv[] )
 		 stdout,
 		 "Acquiry parameters required, please provide the necessary input\n" );
 
-		if( option_target_filename == NULL )
+		if( resume_acquiry != 0 )
 		{
-			if( resume_acquiry != 0 )
-			{
-				request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename with extension" );
-			}
-			else
-			{
-				request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename without extension" );
-			}
+			request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename with extension" );
+		}
+		else if( option_target_filename == NULL )
+		{
+			request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename without extension" );
 		}
 		if( request_string != NULL )
 		{
@@ -2623,27 +2188,6 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Target is required, please try again or terminate using Ctrl^C.\n" );
 				}
-				else if( resume_acquiry == 0 )
-				{
-					result = imaging_handle_check_write_access(
-					          ewfacquire_imaging_handle,
-					          ewfacquire_imaging_handle->target_filename,
-					          &error );
-
-					if( result != 1 )
-					{
-#if defined( HAVE_VERBOSE_OUTPUT )
-						libcnotify_print_error_backtrace(
-						 error );
-#endif
-						libcerror_error_free(
-						 &error );
-
-						fprintf(
-						 stdout,
-						 "Unable to write target file, please try again or terminate using Ctrl^C.\n" );
-					}
-				}
 			}
 			while( result != 1 );
 		}
@@ -2659,10 +2203,10 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
-			if( imaging_handle_open_output_resume(
+			if( imaging_handle_open_output(
 			     ewfacquire_imaging_handle,
 			     ewfacquire_imaging_handle->target_filename,
-			     &resume_acquiry_offset,
+			     resume_acquiry,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2690,6 +2234,48 @@ int main( int argc, char * const argv[] )
 		}
 		if( resume_acquiry != 0 )
 		{
+			if( imaging_handle_get_output_values(
+			     ewfacquire_imaging_handle,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to determine previous acquiry parameters.\n" );
+
+				libcnotify_print_error_backtrace(
+				 error );
+				libcerror_error_free(
+				 &error );
+
+				imaging_handle_close(
+				 ewfacquire_imaging_handle,
+				 NULL );
+
+				resume_acquiry = 0;
+			}
+		}
+		if( resume_acquiry != 0 )
+		{
+			if( imaging_handle_get_offset(
+			     ewfacquire_imaging_handle,
+			     &resume_acquiry_offset,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to determine resume acquiry offset.\n" );
+
+				libcnotify_print_error_backtrace(
+				 error );
+				libcerror_error_free(
+				 &error );
+
+				imaging_handle_close(
+				 ewfacquire_imaging_handle,
+				 NULL );
+
+				resume_acquiry = 0;
+			}
 			fprintf(
 			 stdout,
 			 "Resuming acquire at offset: %" PRIi64 ".\n",
@@ -3271,7 +2857,6 @@ int main( int argc, char * const argv[] )
 		  resume_acquiry_offset,
 		  swap_byte_pairs,
 		  print_status_information,
-	          use_chunk_data_functions,
 		  log_handle,
 		  &error );
 

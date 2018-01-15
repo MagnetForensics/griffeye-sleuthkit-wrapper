@@ -1,7 +1,7 @@
 /*
  * Error functions
  *
- * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2010-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -64,11 +64,11 @@ int libsmdev_error_backtrace_sprint(
      char *string,
      size_t size );
 
-#endif /* !defined( HAVE_LOCAL_LIBSMDEV ) */
+#endif
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBSMDEV_INTERNAL_ERROR_H ) */
+#endif
 

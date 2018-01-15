@@ -1,7 +1,7 @@
 /*
  * The internal type definitions
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,23 +34,16 @@
 /* The following type definitions hide internal data structures
  */
 #if defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI )
-typedef struct libewf_data_chunk {}	libewf_data_chunk_t;
-typedef struct libewf_file_entry {}	libewf_file_entry_t;
 typedef struct libewf_handle {}		libewf_handle_t;
+typedef struct libewf_file_entry {}	libewf_file_entry_t;
 
 #else
-typedef intptr_t libewf_data_chunk_t;
-typedef intptr_t libewf_file_entry_t;
 typedef intptr_t libewf_handle_t;
+typedef intptr_t libewf_file_entry_t;
 
-#endif /* defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI ) */
+#endif
 
-#endif /* defined( HAVE_LOCAL_LIBEWF ) */
+#endif
 
-/* The largest primary (or scalar) available
- * supported by a single load and store instruction
- */
-typedef unsigned long int libewf_aligned_t;
-
-#endif /* !defined( _LIBEWF_INTERNAL_TYPES_H ) */
+#endif
 

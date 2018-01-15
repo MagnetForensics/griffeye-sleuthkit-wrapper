@@ -1,7 +1,9 @@
 /*
- * The libuna header wrapper
+ * The internal libuna header
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2009-2013, Joachim Metz <joachim.metz@gmail.com>
+ *
+ * Refer to AUTHORS for acknowledgements.
  *
  * This software is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -36,7 +38,6 @@
 #include <libuna_utf16_string.h>
 #include <libuna_utf32_stream.h>
 #include <libuna_utf32_string.h>
-#include <libuna_utf7_stream.h>
 #include <libuna_utf8_stream.h>
 #include <libuna_utf8_string.h>
 #include <libuna_types.h>
@@ -52,7 +53,7 @@
 
 #include <libuna.h>
 
-#endif /* defined( HAVE_LOCAL_LIBUNA ) */
+#endif
 
-#endif /* !defined( _LIBBFIO_LIBUNA_H ) */
+#endif
 

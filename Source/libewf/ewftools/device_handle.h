@@ -1,7 +1,7 @@
 /*
  * Device handle
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -102,7 +102,7 @@ struct device_handle
 
 	/* libsmraw input handle
 	 */
-	libsmraw_handle_t *smraw_input_handle;
+	libsmdev_handle_t *smraw_input_handle;
 
 	/* The number of error retries
 	 */
@@ -112,7 +112,7 @@ struct device_handle
 	 */
 	uint8_t zero_buffer_on_error;
 
-	/* The notification output stream
+	/* The nofication output stream
 	 */
 	FILE *notify_stream;
 };
@@ -160,10 +160,9 @@ int device_handle_close(
      device_handle_t *device_handle,
      libcerror_error_t **error );
 
-ssize_t device_handle_read_storage_media_buffer(
+ssize_t device_handle_read_buffer(
          device_handle_t *device_handle,
-         storage_media_buffer_t *storage_media_buffer,
-         off64_t storage_media_offset,
+         uint8_t *buffer,
          size_t read_size,
          libcerror_error_t **error );
 
