@@ -84,8 +84,10 @@
     <LinkDelaySign>true</LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkKeyFile>..\..\..\ncpub.snk</LinkKeyFile>
-    <LinkDelaySign>true</LinkDelaySign>
+    <LinkKeyFile>
+    </LinkKeyFile>
+    <LinkDelaySign>
+    </LinkDelaySign>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

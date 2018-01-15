@@ -9,10 +9,7 @@ Use the version here: https://github.com/sleuthkit/libewf_64bit
 
 1. Open the solution in the latest Visual Studio version that is supported by the builders
 2. Disable build of pyewf project (and dokan and ewfmount if they exist in the solution)
-3. Add signing of ewf.net under Properties->Linker->Advanced
-	Set LinkerKeyFile to ..\..\..\ncpub.snk
-	Set LinkDellaySign to Yes
-4. Change build output of bzip2 project to static library 
+3. Change build output of bzip2 project to static library if it exists
 
 LIBVMDK:
 Use the version here: https://github.com/sleuthkit/libvmdk_64bit
@@ -22,13 +19,9 @@ Use the version here: https://github.com/sleuthkit/libvhdi_64bit
 
 SLEUTHKIT:
 
-1. Open the solution in the latest Visual Studio version that is supported by the builders
-2. Disable build of libtsk_jni project
-3. Replace $(LIBEWF_HOME) with $(ProjectDir)\..\..\..\libewf in all .vcxproj files 
-	(For example by opening all files in  notepad++ and doing a find and replace in all opened documents)
-3. Replace $(LIBVMDK_HOME) with $(ProjectDir)\..\..\..\libvmdk\libvmdk in all .vcxproj files 
-3. Replace $(LIBVHDI_HOME) with $(ProjectDir)\..\..\..\libvhdi in all .vcxproj files 
-4. Replace "Windows7.1SDK" with "v140" in all .vcxproj files
+1. Open the solution in the latest Visual Studio version that is supported by the builders and update the toolset if required.
+2. Disable build of the libtsk_jni project
+3. Run SetEnvironmentVaraiblesForSleuthkit.ps1 to set environment variables for build
 	
 	
 SLEUTHKIT SHARP:

@@ -176,6 +176,8 @@ copy /y "$(SolutionDir)\..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvm
 copy /y "$(SolutionDir)\..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
 copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\libewf.dll" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
 copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\libewf.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\ewf.net.dll" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
+
 copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\zlib.dll" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
 copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\zlib.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
 copy /y "$(SolutionDir)\..\sleuthkit\win32\$(PlatformName)\Release\libtsk.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
