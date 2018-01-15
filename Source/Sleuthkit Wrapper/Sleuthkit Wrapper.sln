@@ -1,9 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sleuthkit-sharp", "src\sleuthkit-sharp.csproj", "{828A2D64-EFAD-496C-A369-7C8658AE4FFA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DF313F6E-4C87-41F9-B6BF-2416B472E7C8} = {DF313F6E-4C87-41F9-B6BF-2416B472E7C8}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sleuthkit-sharp-test", "test\sleuthkit-sharp-test.csproj", "{9E62327F-3E3D-4F98-9200-1535073B2186}"
 EndProject
@@ -54,5 +57,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6CF88DD-11A1-4E20-9736-AC32ABAEDC7E}
 	EndGlobalSection
 EndGlobal
