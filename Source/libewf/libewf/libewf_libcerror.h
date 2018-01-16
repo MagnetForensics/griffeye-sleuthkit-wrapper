@@ -1,7 +1,7 @@
 /*
  * The internal libcerror header
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -42,9 +42,9 @@
 #define LIBCERROR_DLL_IMPORT
 #endif
 
-#include <libcerror.h>
+#include "libewf_libcerror.h"
 
-#endif /* defined( HAVE_LOCAL_LIBCERROR ) */
+#endif
 
-#endif /* !defined( _LIBEWF_LIBCERROR_H ) */
+#endif
 

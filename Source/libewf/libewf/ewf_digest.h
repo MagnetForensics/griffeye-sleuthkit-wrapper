@@ -1,7 +1,7 @@
 /*
  * EWF degest section
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -49,8 +49,9 @@ struct ewf_digest
 	 */
 	uint8_t padding1[ 40 ];
 
-	/* The section checksum of all (previous) data
+	/* The section checksum of all (previous) digest data
 	 * consists of 4 bytes (32 bits)
+	 * starts with offset 76
 	 */
 	uint8_t checksum[ 4 ];
 };

@@ -1,7 +1,7 @@
 /*
  * The internal libcpath header
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -42,7 +42,7 @@
 
 #include <libcpath.h>
 
-#endif /* defined( HAVE_LOCAL_LIBCPATH ) */
+#endif
 
-#endif /* !defined( _EWFTOOLS_LIBCPATH_H ) */
+#endif
 

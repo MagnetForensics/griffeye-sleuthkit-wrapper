@@ -72,10 +72,9 @@ static void
 iso9660_inode_list_free(TSK_FS_INFO * fs)
 {
     ISO_INFO *iso = (ISO_INFO *) fs;
-    iso9660_inode_node *tmp;
 
     while (iso->in_list) {
-        tmp = iso->in_list;
+        iso9660_inode_node *tmp = iso->in_list;
         iso->in_list = iso->in_list->next;
         free(tmp);
     }
@@ -142,7 +141,6 @@ parse_susp(TSK_FS_INFO * fs, char *buf, int count, FILE * hFile)
             // read the continued buffer and parse it
             if ((tsk_getu32(fs->endian, ce->blk_m) < fs->last_block) &&
                 (tsk_getu32(fs->endian, ce->offset_m) < fs->block_size)) {
-                ssize_t cnt;
                 TSK_OFF_T off;
                 char *buf2;
 
@@ -155,7 +153,7 @@ parse_susp(TSK_FS_INFO * fs, char *buf, int count, FILE * hFile)
                         ce->celen_m));
 
                 if (buf2 != NULL) {
-                    cnt =
+                    ssize_t cnt =
                         tsk_fs_read(fs, off, buf2,
                         tsk_getu32(fs->endian, ce->celen_m));
                     if (cnt == tsk_getu32(fs->endian, ce->celen_m)) {
@@ -207,7 +205,7 @@ parse_susp(TSK_FS_INFO * fs, char *buf, int count, FILE * hFile)
             }
             buf += head->len;
         }
-        // SUSP Extention Registration -- not used
+        // SUSP Extension Registration -- not used
         else if ((head->sig[0] == 'E') && (head->sig[1] == 'R')) {
             iso9660_susp_er *er = (iso9660_susp_er *) buf;
             if (hFile) {
@@ -229,7 +227,7 @@ parse_susp(TSK_FS_INFO * fs, char *buf, int count, FILE * hFile)
             }
             buf += head->len;
         }
-        // SUSP Extention Sigs  -- not used
+        // SUSP Extension Sigs  -- not used
         else if ((head->sig[0] == 'E') && (head->sig[1] == 'S')) {
             if (hFile) {
                 fprintf(hFile, "ES Entry\n");
@@ -290,6 +288,7 @@ parse_susp(TSK_FS_INFO * fs, char *buf, int count, FILE * hFile)
         // RR -- alternative name
         else if ((head->sig[0] == 'N') && (head->sig[1] == 'M')) {
             iso9660_rr_nm_entry *rr_nm;
+            int len;
 
             if ((uintptr_t)buf + sizeof(iso9660_rr_nm_entry) - 1> (uintptr_t)end) {
                 if (tsk_verbose) 
@@ -305,8 +304,14 @@ parse_susp(TSK_FS_INFO * fs, char *buf, int count, FILE * hFile)
                 break;
             }
 
-            strncpy(rr->fn, &rr_nm->name[0], (int) rr_nm->len - 5);
-            rr->fn[(int) rr_nm->len - 5] = '\0';
+            // Make sure the name will fit in the buffer
+            len = rr_nm->len - 5;
+            if (len >= ISO9660_MAXNAMLEN_RR) {
+                len = ISO9660_MAXNAMLEN_RR - 1;
+            }
+
+            strncpy(rr->fn, &rr_nm->name[0], len);
+            rr->fn[len] = '\0';
             if (hFile) {
                 fprintf(hFile, "NM Entry\n");
                 fprintf(hFile, "* %s\n", rr->fn);
@@ -634,7 +639,7 @@ iso9660_load_inodes_dir(TSK_FS_INFO * fs, TSK_OFF_T a_offs, int count,
             in_node->offset =
                 tsk_getu32(fs->endian, dentry->ext_loc_m) * fs->block_size;
             
-            if (tsk_getu32(fs->endian, in_node->inode.dr.data_len_m) + in_node->offset > fs->block_count * fs->block_size) {
+            if (tsk_getu32(fs->endian, in_node->inode.dr.data_len_m) + in_node->offset > (TSK_OFF_T)(fs->block_count * fs->block_size)) {
                 if (tsk_verbose)
                     tsk_fprintf(stderr,
                                 "iso9660_load_inodes_dir: file ends past end of image (%"PRIu32" bytes). bailing\n",
@@ -753,7 +758,7 @@ iso9660_load_inodes_dir(TSK_FS_INFO * fs, TSK_OFF_T a_offs, int count,
  * Process the path table for a joliet secondary volume descriptor
  * and load all of the files pointed to it.
  * The path table contains an entry for each directory.  This code
- * then locates each of the diretories and proceses the contents.
+ * then locates each of the directories and processes the contents.
  *
  * @param fs File system to process
  * @param svd Pointer to the secondary volume descriptor
@@ -881,7 +886,6 @@ iso9660_load_inodes_pt(ISO_INFO * iso)
     char fn[ISO9660_MAXNAMLEN_STD + 1]; /* store current directory name */
     path_table_rec dir;
     TSK_OFF_T pt_offs;          /* offset of where we are in path table */
-    size_t pt_len;              /* bytes left in path table */
     TSK_OFF_T extent;           /* offset of extent for current directory */
     ssize_t cnt;
     uint8_t is_first = 1;
@@ -915,6 +919,7 @@ iso9660_load_inodes_pt(ISO_INFO * iso)
 
     /* Now look for unique files in the primary descriptors */
     for (p = iso->pvd; p != NULL; p = p->next) {
+        size_t pt_len;              /* bytes left in path table */
 
         pt_offs =
             (TSK_OFF_T) (tsk_getu32(fs->endian,
@@ -1121,18 +1126,17 @@ static void
 iso9660_close(TSK_FS_INFO * fs)
 {
     ISO_INFO *iso = (ISO_INFO *) fs;
-    iso9660_pvd_node *p;
-    iso9660_svd_node *s;
 
     fs->tag = 0;
+
     while (iso->pvd != NULL) {
-        p = iso->pvd;
+        iso9660_pvd_node *p = iso->pvd;
         iso->pvd = iso->pvd->next;
         free(p);
     }
 
     while (iso->svd != NULL) {
-        s = iso->svd;
+        iso9660_svd_node *s = iso->svd;
         iso->svd = iso->svd->next;
         free(s);
     }
@@ -1372,7 +1376,7 @@ iso9660_inode_walk(TSK_FS_INFO * fs, TSK_INUM_T start, TSK_INUM_T last,
     return 0;
 }
 
-// @@@ Doesn' thit seem to ignore interleave?
+// @@@ Doesn' this seem to ignore interleave?
 /* return 1 if block is allocated in a file's extent, return 0 otherwise */
 static int
 iso9660_is_block_alloc(TSK_FS_INFO * fs, TSK_DADDR_T blk_num)
@@ -1540,11 +1544,12 @@ iso9660_make_data_run(TSK_FS_FILE * a_fs_file)
     else if (a_fs_file->meta->attr_state == TSK_FS_META_ATTR_ERROR) {
         return 1;
     }
+
     // not sure why this would ever happen, but...
-    else if (a_fs_file->meta->attr != NULL) {
+    if (a_fs_file->meta->attr != NULL) {
         tsk_fs_attrlist_markunused(a_fs_file->meta->attr);
     }
-    else if (a_fs_file->meta->attr == NULL) {
+    else  {
         a_fs_file->meta->attr = tsk_fs_attrlist_alloc();
     }
 
@@ -2011,7 +2016,7 @@ iso9660_print_rockridge(FILE * hFile, rockridge_ext * rr)
  * @returns 1 on error and 0 on success
  */
 static uint8_t
-iso9660_istat(TSK_FS_INFO * fs, FILE * hFile, TSK_INUM_T inum,
+iso9660_istat(TSK_FS_INFO * fs, TSK_FS_ISTAT_FLAG_ENUM istat_flags, FILE * hFile, TSK_INUM_T inum,
     TSK_DADDR_T numblock, int32_t sec_skew)
 {
     ISO_INFO *iso = (ISO_INFO *) fs;
@@ -2175,8 +2180,21 @@ iso9660_istat(TSK_FS_INFO * fs, FILE * hFile, TSK_INUM_T inum,
         tsk_fs_time_to_str(fs_file->meta->atime, timeBuf));
 
     tsk_fprintf(hFile, "\nSectors:\n");
-    /* since blocks are all contiguous, print them here to simplify file_walk */
-    {
+    if (istat_flags & TSK_FS_ISTAT_RUNLIST) {
+        const TSK_FS_ATTR *fs_attr_default =
+            tsk_fs_file_attr_get_type(fs_file,
+                TSK_FS_ATTR_TYPE_DEFAULT, 0, 0);
+        if (fs_attr_default && (fs_attr_default->flags & TSK_FS_ATTR_NONRES)) {
+            if (tsk_fs_attr_print(fs_attr_default, hFile)) {
+                tsk_fprintf(hFile, "\nError creating run lists\n");
+                tsk_error_print(hFile);
+                tsk_error_reset();
+            }
+        }
+    }
+    else {
+        /* since blocks are all contiguous, print them here to simplify file_walk */
+   
         int block = tsk_getu32(fs->endian, dinode->dr.ext_loc_m);
         TSK_OFF_T size = fs_file->meta->size;
         int rowcount = 0;
@@ -2484,6 +2502,13 @@ iso9660_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset,
         tsk_error_reset();
         tsk_error_set_errno(TSK_ERR_FS_ARG);
         tsk_error_set_errstr("Invalid FS type in iso9660_open");
+        return NULL;
+    }
+
+    if (img_info->sector_size == 0) {
+        tsk_error_reset();
+        tsk_error_set_errno(TSK_ERR_FS_ARG);
+        tsk_error_set_errstr("iso9660_open: sector size is 0");
         return NULL;
     }
 

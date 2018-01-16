@@ -1,7 +1,7 @@
 /*
  * Export handle
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,15 +26,12 @@
 #include <types.h>
 
 #include "digest_hash.h"
-#include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
-#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "ewftools_libsmraw.h"
 #include "log_handle.h"
-#include "process_status.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -152,38 +149,6 @@ struct export_handle
 	 */
 	libcstring_system_character_t *calculated_sha256_hash_string;
 
-	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
-	 */
-	uint8_t use_chunk_data_functions;
-
-	/* The process buffer size
-	 */
-	size_t process_buffer_size;
-
-	/* The number of threads in the process thread pool
-	 */
-	int number_of_threads;
-
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-
-	/* The input process thread pool
-	 */
-	libcthreads_thread_pool_t *input_process_thread_pool;
-
-	/* The output thread pool
-	 */
-	libcthreads_thread_pool_t *output_thread_pool;
-
-	/* The output list
-	 */
-	libcdata_list_t *output_list;
-
-	/* The storage media buffer queue
-	 */
-	libcthreads_queue_t *storage_media_buffer_queue;
-
-#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
-
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
@@ -204,10 +169,6 @@ struct export_handle
 	 */
 	size32_t input_chunk_size;
 
-	/* The output chunk size
-	 */
-	size32_t output_chunk_size;
-
 	/* The number of bytes per sector
 	 */
 	uint32_t bytes_per_sector;
@@ -216,9 +177,11 @@ struct export_handle
 	 */
 	size64_t input_media_size;
 
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	/* The last offset of the input data
 	 */
 	off64_t input_offset;
+#endif
 
 	/* Value to indicate if the write is compressed
 	 */
@@ -228,21 +191,13 @@ struct export_handle
 	 */
 	int zero_chunk_on_error;
 
-	/* Value to indicate if byte pairs should be swapped
+	/* The process buffer size
 	 */
-	uint8_t swap_byte_pairs;
+	size_t process_buffer_size;
 
-	/* The last offset hashed
-	 */
-	off64_t last_offset_hashed;
-
-	/* The notification output stream
+	/* The nofication output stream
 	 */
 	FILE *notify_stream;
-
-	/* The process status information
-	 */
-	process_status_t *process_status;
 
 	/* Value to indicate if abort was signalled
 	 */
@@ -252,7 +207,6 @@ struct export_handle
 int export_handle_initialize(
      export_handle_t **export_handle,
      uint8_t calculate_md5,
-     uint8_t use_chunk_data_functions,
      libcerror_error_t **error );
 
 int export_handle_free(
@@ -266,11 +220,6 @@ int export_handle_signal_abort(
 int export_handle_set_maximum_number_of_open_handles(
      export_handle_t *export_handle,
      int maximum_number_of_open_handles,
-     libcerror_error_t **error );
-
-int export_handle_check_write_access(
-     export_handle_t *export_handle,
-     const libcstring_system_character_t *filename,
      libcerror_error_t **error );
 
 int export_handle_open_input(
@@ -288,19 +237,23 @@ int export_handle_close(
      export_handle_t *export_handle,
      libcerror_error_t **error );
 
-ssize_t export_handle_read_storage_media_buffer(
+ssize_t export_handle_prepare_read_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
-         off64_t storage_media_offset,
+         libcerror_error_t **error );
+
+ssize_t export_handle_read_buffer(
+         export_handle_t *export_handle,
+         storage_media_buffer_t *storage_media_buffer,
          size_t read_size,
          libcerror_error_t **error );
 
-ssize_t export_handle_prepare_write_storage_media_buffer(
+ssize_t export_handle_prepare_write_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          libcerror_error_t **error );
 
-ssize_t export_handle_write_storage_media_buffer(
+ssize_t export_handle_write_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
@@ -313,8 +266,8 @@ off64_t export_handle_seek_offset(
 
 int export_handle_swap_byte_pairs(
      export_handle_t *export_handle,
-     uint8_t *buffer,
-     size_t buffer_size,
+     storage_media_buffer_t *storage_media_buffer,
+     size_t read_size,
      libcerror_error_t **error );
 
 int export_handle_initialize_integrity_hash(
@@ -323,7 +276,7 @@ int export_handle_initialize_integrity_hash(
 
 int export_handle_update_integrity_hash(
      export_handle_t *export_handle,
-     const uint8_t *buffer,
+     uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error );
 
@@ -429,11 +382,6 @@ int export_handle_set_process_buffer_size(
      const libcstring_system_character_t *string,
      libcerror_error_t **error );
 
-int export_handle_set_number_of_threads(
-     export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
-     libcerror_error_t **error );
-
 int export_handle_set_additional_digest_types(
      export_handle_t *export_handle,
      const libcstring_system_character_t *string,
@@ -456,38 +404,17 @@ int export_handle_set_hash_value(
      size_t hash_value_length,
      libcerror_error_t **error );
 
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 int export_handle_append_read_error(
       export_handle_t *export_handle,
       off64_t start_offset,
       size_t number_of_bytes,
       libcerror_error_t **error );
-
-ssize_t export_handle_write(
-         export_handle_t *export_handle,
-         storage_media_buffer_t *input_storage_media_buffer,
-         storage_media_buffer_t *output_storage_media_buffer,
-         size_t input_size,
-         libcerror_error_t **error );
+#endif
 
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,
          libcerror_error_t **error );
-
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-
-int export_handle_process_storage_media_buffer_callback(
-     storage_media_buffer_t *storage_media_buffer,
-     export_handle_t *export_handle );
-
-int export_handle_output_storage_media_buffer_callback(
-     storage_media_buffer_t *storage_media_buffer,
-     export_handle_t *export_handle );
-
-int export_handle_empty_output_list(
-     export_handle_t *export_handle,
-     libcerror_error_t **error );
-
-#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 int export_handle_export_input(
      export_handle_t *export_handle,

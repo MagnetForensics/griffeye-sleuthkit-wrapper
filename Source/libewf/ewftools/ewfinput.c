@@ -1,7 +1,7 @@
 /*
  * User input functions for the ewftools
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <file_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -41,14 +40,8 @@
 
 /* Input selection defintions
  */
-#if defined( HAVE_BZIP2_SUPPORT )
-libcstring_system_character_t *ewfinput_compression_methods[ 2 ] = {
-	_LIBCSTRING_SYSTEM_STRING( "deflate" ),
-	_LIBCSTRING_SYSTEM_STRING( "bzip2" ) };
-#else
 libcstring_system_character_t *ewfinput_compression_methods[ 1 ] = {
 	_LIBCSTRING_SYSTEM_STRING( "deflate" ) };
-#endif
 
 libcstring_system_character_t *ewfinput_compression_levels[ 4 ] = {
 	_LIBCSTRING_SYSTEM_STRING( "none" ),
@@ -56,7 +49,7 @@ libcstring_system_character_t *ewfinput_compression_levels[ 4 ] = {
 	_LIBCSTRING_SYSTEM_STRING( "fast" ),
 	_LIBCSTRING_SYSTEM_STRING( "best" ) };
 
-libcstring_system_character_t *ewfinput_format_types[ 15 ] = {
+libcstring_system_character_t *ewfinput_format_types[ 12 ] = {
 	_LIBCSTRING_SYSTEM_STRING( "ewf" ),
 	_LIBCSTRING_SYSTEM_STRING( "smart" ),
 	_LIBCSTRING_SYSTEM_STRING( "ftk" ),
@@ -66,11 +59,8 @@ libcstring_system_character_t *ewfinput_format_types[ 15 ] = {
 	_LIBCSTRING_SYSTEM_STRING( "encase4" ),
 	_LIBCSTRING_SYSTEM_STRING( "encase5" ),
 	_LIBCSTRING_SYSTEM_STRING( "encase6" ),
-	_LIBCSTRING_SYSTEM_STRING( "encase7" ),
-	_LIBCSTRING_SYSTEM_STRING( "encase7-v2" ),
 	_LIBCSTRING_SYSTEM_STRING( "linen5" ),
 	_LIBCSTRING_SYSTEM_STRING( "linen6" ),
-	_LIBCSTRING_SYSTEM_STRING( "linen7" ),
 	_LIBCSTRING_SYSTEM_STRING( "ewfx" ) };
 
 libcstring_system_character_t *ewfinput_media_types[ 4 ] = {
@@ -153,7 +143,7 @@ int ewfinput_determine_ewf_format(
 		          _LIBCSTRING_SYSTEM_STRING( "ftk" ),
 		          3 ) == 0 )
 		{
-			*ewf_format = LIBEWF_FORMAT_FTK_IMAGER;
+			*ewf_format = LIBEWF_FORMAT_FTK;
 			result      = 1;
 		}
 	}
@@ -196,11 +186,13 @@ int ewfinput_determine_ewf_format(
 				*ewf_format = LIBEWF_FORMAT_LINEN6;
 				result      = 1;
 			}
+/* experimental version only
 			else if( string[ 5 ] == (libcstring_system_character_t) '7' )
 			{
 				*ewf_format = LIBEWF_FORMAT_LINEN7;
 				result      = 1;
 			}
+*/
 		}
 	}
 	else if( string_length == 7 )
@@ -240,13 +232,16 @@ int ewfinput_determine_ewf_format(
 				*ewf_format = LIBEWF_FORMAT_ENCASE6;
 				result      = 1;
 			}
+/* experimental version only
 			else if( string[ 6 ] == (libcstring_system_character_t) '7' )
 			{
 				*ewf_format = LIBEWF_FORMAT_ENCASE7;
 				result      = 1;
 			}
+*/
 		}
 	}
+/* experimental version only
 	else if( string_length == 10 )
 	{
 		if( libcstring_system_string_compare(
@@ -269,6 +264,7 @@ int ewfinput_determine_ewf_format(
 			}
 		}
 	}
+*/
 	return( result );
 }
 
@@ -457,7 +453,7 @@ int ewfinput_determine_compression_method(
 	string_length = libcstring_system_string_length(
 	                 string );
 
-#if defined( HAVE_BZIP2_SUPPORT )
+/* experimental version only
 	if( string_length == 5 )
 	{
 		if( libcstring_system_string_compare(
@@ -469,18 +465,7 @@ int ewfinput_determine_compression_method(
 			result              = 1;
 		}
 	}
-	else if( string_length == 7 )
-	{
-		if( libcstring_system_string_compare(
-		     string,
-		     _LIBCSTRING_SYSTEM_STRING( "deflate" ),
-		     7 ) == 0 )
-		{
-			*compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-			result              = 1;
-		}
-	}
-#else
+*/
 	if( string_length == 7 )
 	{
 		if( libcstring_system_string_compare(
@@ -492,7 +477,6 @@ int ewfinput_determine_compression_method(
 			result              = 1;
 		}
 	}
-#endif
 	return( result );
 }
 
@@ -1188,11 +1172,7 @@ int ewfinput_get_string_variable(
 
 		return( -1 );
 	}
-#if SIZEOF_SIZE_T > SIZEOF_INT
-	if( string_variable_size > (size_t) INT_MAX )
-#else
 	if( string_variable_size > (size_t) SSIZE_MAX )
-#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1214,17 +1194,11 @@ int ewfinput_get_string_variable(
 		 "%" PRIs_LIBCSTRING_SYSTEM ": ",
 		 request_string );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result_string = file_stream_get_string_wide(
+		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 string_variable,
-		                 (int) ( string_variable_size - 1 ) );
-#else
-		result_string = file_stream_get_string(
-		                 stdin,
-		                 string_variable,
-		                 (int) ( string_variable_size - 1 ) );
-#endif
+		                 string_variable_size - 1 );
+
 		if( result_string != NULL )
 		{
 			end_of_input = libcstring_system_string_search_character(
@@ -1240,17 +1214,11 @@ int ewfinput_get_string_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-					result_string = file_stream_get_string_wide(
+					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 string_variable,
-					                 (int) ( string_variable_size - 1 ) );
-#else
-					result_string = file_stream_get_string(
-					                 stdin,
-					                 string_variable,
-					                 (int) ( string_variable_size - 1 ) );
-#endif
+					                 string_variable_size - 1 );
+
 					end_of_input = libcstring_system_string_search_character(
 					                string_variable,
 					                (libcstring_system_character_t) '\n',
@@ -1326,11 +1294,7 @@ int ewfinput_get_size_variable(
 
 		return( -1 );
 	}
-#if SIZEOF_SIZE_T > SIZEOF_INT
-	if( input_buffer_size > (size_t) INT_MAX )
-#else
 	if( input_buffer_size > (size_t) SSIZE_MAX )
-#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1377,17 +1341,11 @@ int ewfinput_get_size_variable(
 		 maximum_size,
 		 default_size );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result_string = file_stream_get_string_wide(
+		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
-		                 (int)( input_buffer_size - 1 ) );
-#else
-		result_string = file_stream_get_string(
-		                 stdin,
-		                 input_buffer,
-		                 (int)( input_buffer_size - 1 ) );
-#endif
+		                 input_buffer_size - 1 );
+
 		if( result_string != NULL )
 		{
 			end_of_input = libcstring_system_string_search_character(
@@ -1403,17 +1361,11 @@ int ewfinput_get_size_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-					result_string = file_stream_get_string_wide(
+					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
-#else
-					result_string = file_stream_get_string(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
-#endif
+					                 input_buffer_size - 1 );
+
 					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,
 					                (libcstring_system_character_t) '\n',
@@ -1511,11 +1463,7 @@ int ewfinput_get_byte_size_variable(
 
 		return( -1 );
 	}
-#if SIZEOF_SIZE_T > SIZEOF_INT
-	if( input_buffer_size > (size_t) INT_MAX )
-#else
 	if( input_buffer_size > (size_t) SSIZE_MAX )
-#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1610,17 +1558,11 @@ int ewfinput_get_byte_size_variable(
 		 maximum_size_string,
 		 default_size_string );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result_string = file_stream_get_string_wide(
+		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
-		                 (int) ( input_buffer_size - 1 ) );
-#else
-		result_string = file_stream_get_string(
-		                 stdin,
-		                 input_buffer,
-		                 (int) ( input_buffer_size - 1 ) );
-#endif
+		                 input_buffer_size - 1 );
+
 		if( result_string != NULL )
 		{
 			end_of_input = libcstring_system_string_search_character(
@@ -1636,17 +1578,11 @@ int ewfinput_get_byte_size_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-					result_string = file_stream_get_string_wide(
+					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
-#else
-					result_string = file_stream_get_string(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
-#endif
+					                 input_buffer_size - 1 );
+
 					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,
 					                (libcstring_system_character_t) '\n',
@@ -1743,11 +1679,7 @@ int ewfinput_get_fixed_string_variable(
 
 		return( -1 );
 	}
-#if SIZEOF_SIZE_T > SIZEOF_INT
-	if( input_buffer_size > (size_t) INT_MAX )
-#else
 	if( input_buffer_size > (size_t) SSIZE_MAX )
-#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1818,17 +1750,11 @@ int ewfinput_get_fixed_string_variable(
 		 ") [%" PRIs_LIBCSTRING_SYSTEM "]: ",
 		 values[ default_value ] );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result_string = file_stream_get_string_wide(
+		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
-		                 (int) ( input_buffer_size - 1 ) );
-#else
-		result_string = file_stream_get_string(
-		                 stdin,
-		                 input_buffer,
-		                 (int) ( input_buffer_size - 1 ) );
-#endif
+		                 input_buffer_size - 1 );
+
 		if( result_string != NULL )
 		{
 			end_of_input = libcstring_system_string_search_character(
@@ -1844,17 +1770,11 @@ int ewfinput_get_fixed_string_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-					result_string = file_stream_get_string_wide(
+					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
-#else
-					result_string = file_stream_get_string(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
-#endif
+					                 input_buffer_size - 1 );
+
 					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,
 					                (libcstring_system_character_t) '\n',

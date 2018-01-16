@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,11 +35,11 @@
  */
 #else
 
-#define LIBCERROR_VERSION				20160424
+#define LIBCERROR_VERSION				20130103
 
 /* The libcstring version string
  */
-#define LIBCERROR_VERSION_STRING			"20160424"
+#define LIBCERROR_VERSION_STRING			"20130103"
 
 /* The error domains
  */
@@ -238,17 +238,6 @@ enum LIBCERROR_MEMORY_ERROR
 	LIBCERROR_MEMORY_ERROR_SET_FAILED		= 3
 };
 
-/* The output error codes
- */
-enum LIBCERROR_OUTPUT_ERROR
-{
-	LIBCERROR_OUTPUT_ERROR_GENERIC			= 0,
-
-	/* There is insuficient space to write the output
-	 */
-	LIBCERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE	= 1
-};
-
 /* The runtime error codes
  * to signify errors regarding runtime processing
  */
@@ -315,6 +304,17 @@ enum LIBCERROR_RUNTIME_ERROR
 	/* An aborted was requested
 	 */
 	LIBCERROR_RUNTIME_ERROR_ABORT_REQUESTED		= 15
+};
+
+/* The output error codes
+ */
+enum LIBCERROR_OUTPUT_ERROR
+{
+	LIBCERROR_OUTPUT_ERROR_GENERIC			= 0,
+
+	/* There is insuficient space to write the output
+	 */
+	LIBCERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE	= 1
 };
 
 #endif /* !defined( HAVE_LOCAL_LIBCERROR ) */

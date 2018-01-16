@@ -1,7 +1,7 @@
 /*
  * Storage media buffer
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -23,22 +23,19 @@
 #include <memory.h>
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcthreads.h"
-#include "ewftools_libewf.h"
 #include "storage_media_buffer.h"
 
-/* Creates a storage media buffer
- * Make sure the value buffer is referencing, is set to NULL
+/* Initialize a buffer
+ * Make sure the value buffer is pointing to is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int storage_media_buffer_initialize(
      storage_media_buffer_t **buffer,
-     libewf_handle_t *handle,
-     uint8_t mode,
      size_t size,
      libcerror_error_t **error )
 {
-	static char *function = "storage_media_buffer_initialize";
+	static char *function  = "storage_media_buffer_initialize";
+	size_t raw_buffer_size = 0;
 
 	if( buffer == NULL )
 	{
@@ -58,18 +55,6 @@ int storage_media_buffer_initialize(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid buffer value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( mode != STORAGE_MEDIA_BUFFER_MODE_BUFFERED )
-	 && ( mode != STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unusupported mode.",
 		 function );
 
 		return( -1 );
@@ -120,11 +105,19 @@ int storage_media_buffer_initialize(
 	}
 	if( size > 0 )
 	{
+		raw_buffer_size = size;
+
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* Add 4 bytes to allow for write checksum buffer alignment
+		 */
+		raw_buffer_size += 4;
+#endif
+
 /* TODO can low level functions and direct IO be combined ? */
 #if defined( memory_allocate_aligned )
 		if( memory_allocate_aligned(
 		     (void **) &( ( *buffer )->raw_buffer ),
-		     size,
+		     raw_buffer_size,
 		     512 ) != 0 )
 		{
 			libcerror_error_set(
@@ -138,7 +131,7 @@ int storage_media_buffer_initialize(
 		}
 #else
 		( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
-		                                       sizeof( uint8_t ) * size );
+		                                       sizeof( uint8_t ) * raw_buffer_size );
 			
 		if( ( *buffer )->raw_buffer == NULL )
 		{
@@ -154,37 +147,32 @@ int storage_media_buffer_initialize(
 #endif /* defined( memory_allocate_aligned ) */
 
 		( *buffer )->raw_buffer_size = size;
-	}
-	if( mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		if( libewf_handle_get_data_chunk(
-		     handle,
-		     &( ( *buffer )->data_chunk ),
-		     error ) != 1 )
+
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		( *buffer )->checksum_buffer = &( ( ( *buffer )->raw_buffer )[ size ] );
+
+		( *buffer )->compression_buffer = (uint8_t *) memory_allocate(
+		                                               sizeof( uint8_t ) * ( size * 2 ) );
+			
+		if( ( *buffer )->compression_buffer == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data chunk.",
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create compression buffer.",
 			 function );
 
 			goto on_error;
 		}
+		( *buffer )->compression_buffer_size = size * 2;
+#endif
 	}
-	( *buffer )->mode = mode;
-
 	return( 1 );
 
 on_error:
 	if( *buffer != NULL )
 	{
-		if( ( *buffer )->data_chunk != NULL )
-		{
-			libewf_data_chunk_free(
-			 &( ( *buffer )->data_chunk ),
-			 NULL );
-		}
 		if( ( *buffer )->raw_buffer != NULL )
 		{
 			memory_free(
@@ -198,7 +186,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a storage media buffer
+/* Frees a buffer
  * Returns 1 if successful or -1 on error
  */
 int storage_media_buffer_free(
@@ -206,7 +194,6 @@ int storage_media_buffer_free(
      libcerror_error_t **error )
 {
 	static char *function = "storage_media_buffer_free";
-	int result            = 1;
 
 	if( buffer == NULL )
 	{
@@ -226,28 +213,79 @@ int storage_media_buffer_free(
 			memory_free(
 			 ( *buffer )->raw_buffer );
 		}
-		if( ( *buffer )->data_chunk != NULL )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		if( ( *buffer )->compression_buffer != NULL )
 		{
-			if( libewf_data_chunk_free(
-			     &( ( *buffer )->data_chunk ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free data chunk.",
-				 function );
-
-				result = -1;
-			}
+			memory_free(
+			 ( *buffer )->compression_buffer );
 		}
+#endif
 		memory_free(
 		 *buffer );
 
 		*buffer = NULL;
 	}
-	return( result );
+	return( 1 );
+}
+
+/* Resizes a buffer
+ * Returns 1 if successful or -1 on error
+ */
+int storage_media_buffer_resize(
+     storage_media_buffer_t *buffer,
+     size_t size,
+     libcerror_error_t **error )
+{
+	void *reallocation    = NULL;
+	static char *function = "storage_media_buffer_resize";
+
+	if( buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( size > buffer->raw_buffer_size )
+	{
+		reallocation = memory_reallocate(
+				buffer->raw_buffer,
+				sizeof( uint8_t ) * size );
+
+		if( reallocation == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to reallocate read buffer.",
+			 function );
+
+			return( -1 );
+		}
+		buffer->raw_buffer           = (uint8_t *) reallocation;
+		buffer->raw_buffer_size      = size;
+		buffer->raw_buffer_data_size = 0;
+
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* The compression buffer is cleared
+		 */
+		if( buffer->compression_buffer != NULL )
+		{
+			memory_free(
+			 buffer->compression_buffer );
+
+			buffer->compression_buffer           = NULL;
+			buffer->compression_buffer_size      = 0;
+			buffer->compression_buffer_data_size = 0;
+		}
+#endif
+	}
+	return( 1 );
 }
 
 /* Retrieves the reference to the actual data and its size
@@ -294,283 +332,21 @@ int storage_media_buffer_get_data(
 
 		return( -1 );
 	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	if( buffer->data_in_compression_buffer == 0 )
+	{
+		*data      = buffer->raw_buffer;
+		*data_size = buffer->raw_buffer_data_size;
+	}
+	else
+	{
+		*data      = buffer->compression_buffer;
+		*data_size = buffer->compression_buffer_data_size;
+	}
+#else
 	*data      = buffer->raw_buffer;
 	*data_size = buffer->raw_buffer_data_size;
-
+#endif
 	return( 1 );
-}
-
-/* Compares two storage media buffers
- * Returns LIBCTHREADS_COMPARE_LESS, LIBCTHREADS_COMPARE_EQUAL, LIBCTHREADS_COMPARE_GREATER
- * if successful or -1 on error
- */
-int storage_media_buffer_compare(
-     storage_media_buffer_t *first_buffer,
-     storage_media_buffer_t *second_buffer,
-     libcerror_error_t **error )
-{
-	static char *function = "storage_media_buffer_compare";
-
-	if( first_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid first buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( second_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid second buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( first_buffer->storage_media_offset < second_buffer->storage_media_offset )
-	{
-		return( LIBCTHREADS_COMPARE_LESS ); 
-	}
-	else if( first_buffer->storage_media_offset > second_buffer->storage_media_offset )
-	{
-		return( LIBCTHREADS_COMPARE_GREATER ); 
-	}
-	return( LIBCTHREADS_COMPARE_EQUAL ); 
-}
-
-/* Reads a storage media buffer from the input handle
- * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
- */
-ssize_t storage_media_buffer_read_from_handle(
-         storage_media_buffer_t *storage_media_buffer,
-         libewf_handle_t *handle,
-         size_t read_size,
-         libcerror_error_t **error )
-{
-	static char *function = "storage_media_buffer_read_from_handle";
-	ssize_t read_count    = 0;
-
-	if( storage_media_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( read_size == 0 )
-	{
-		return( 0 );
-	}
-	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		read_count = libewf_handle_read_data_chunk(
-	                      handle,
-	                      storage_media_buffer->data_chunk,
-		              error );
-	}
-	else
-	{
-		read_count = libewf_handle_read_buffer(
-	                      handle,
-	                      storage_media_buffer->raw_buffer,
-	                      read_size,
-		              error );
-	}
-	if( read_count < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read storage media buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_BUFFERED )
-	{
-		storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
-	}
-	storage_media_buffer->requested_size = read_size;
-
-	return( read_count );
-}
-
-/* Processes a storage media buffer after read
- * Returns the resulting buffer size or -1 on error
- */
-ssize_t storage_media_buffer_read_process(
-         storage_media_buffer_t *storage_media_buffer,
-         libcerror_error_t **error )
-{
-        static char *function = "storage_media_buffer_read_process";
-	ssize_t process_count = 0;
-
-	if( storage_media_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		process_count = libewf_data_chunk_read_buffer(
-		                 storage_media_buffer->data_chunk,
-		                 storage_media_buffer->raw_buffer,
-		                 storage_media_buffer->raw_buffer_size,
-		                 error );
-
-		if( process_count < 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read from data chunk.",
-			 function );
-
-			return( -1 );
-		}
-		if( process_count > (ssize_t) storage_media_buffer->requested_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: more bytes read than requested.",
-			 function );
-
-			return( -1 );
-		}
-		storage_media_buffer->raw_buffer_data_size = (size_t) process_count;
-	}
-	else
-	{
-		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
-	}
-	storage_media_buffer->processed_size = (size_t) process_count;
-
-	return( process_count );
-}
-
-/* Processes a storage media buffer after read
- * Returns the resulting buffer size or -1 on error
- */
-ssize_t storage_media_buffer_write_process(
-         storage_media_buffer_t *storage_media_buffer,
-         libcerror_error_t **error )
-{
-	static char *function = "storage_media_buffer_write_process";
-	ssize_t process_count = 0;
-
-	if( storage_media_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		process_count = libewf_data_chunk_write_buffer(
-				 storage_media_buffer->data_chunk,
-				 storage_media_buffer->raw_buffer,
-				 storage_media_buffer->raw_buffer_data_size,
-				 error );
-
-		if( process_count < 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to write to data chunk.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
-	}
-	storage_media_buffer->processed_size = (size_t) process_count;
-
-	return( process_count );
-}
-
-/* Writes a storage media buffer to the input handle
- * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
- */
-ssize_t storage_media_buffer_write_to_handle(
-         storage_media_buffer_t *storage_media_buffer,
-         libewf_handle_t *handle,
-         size_t write_size,
-         libcerror_error_t **error )
-{
-	static char *function = "storage_media_buffer_write_to_handle";
-	ssize_t write_count   = 0;
-
-	if( storage_media_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( write_size == 0 )
-	{
-		return( 0 );
-	}
-	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		write_count = libewf_handle_write_data_chunk(
-		               handle,
-		               storage_media_buffer->data_chunk,
-		               error );
-	}
-	else
-	{
-		write_count = libewf_handle_write_buffer(
-		               handle,
-		               storage_media_buffer->raw_buffer,
-		               write_size,
-		               error );
-	}
-	if( write_count < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write storage media buffer.",
-		 function );
-
-		return( -1 );
-	}
-	return( write_count );
 }
 

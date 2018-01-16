@@ -1,7 +1,7 @@
 /*
  * Imaging handle
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,13 +26,10 @@
 #include <file_stream.h>
 #include <types.h>
 
-#include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
-#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
-#include "process_status.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -203,38 +200,6 @@ struct imaging_handle
 	 */
 	libcstring_system_character_t *calculated_sha256_hash_string;
 
-	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
-	 */
-	uint8_t use_chunk_data_functions;
-
-	/* The process buffer size
-	 */
-	size_t process_buffer_size;
-
-	/* The number of threads in the process thread pool
-	 */
-	int number_of_threads;
-
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-
-	/* The process thread pool
-	 */
-	libcthreads_thread_pool_t *process_thread_pool;
-
-	/* The output thread pool
-	 */
-	libcthreads_thread_pool_t *output_thread_pool;
-
-	/* The output list
-	 */
-	libcdata_list_t *output_list;
-
-	/* The storage media buffer queue
-	 */
-	libcthreads_queue_t *storage_media_buffer_queue;
-
-#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
-
 	/* The libewf output handle
 	 */
 	libewf_handle_t *output_handle;
@@ -247,17 +212,13 @@ struct imaging_handle
 	 */
 	size64_t input_media_size;
 
-	/* The last offset written
+	/* The process buffer size
 	 */
-	off64_t last_offset_written;
+	size_t process_buffer_size;
 
-	/* The notification output stream
+	/* The nofication output stream
 	 */
 	FILE *notify_stream;
-
-	/* The process status information
-	 */
-	process_status_t *process_status;
 
 	/* Value to indicate if abort was signalled
 	 */
@@ -267,7 +228,6 @@ struct imaging_handle
 int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
-     uint8_t use_chunk_data_functions,
      libcerror_error_t **error );
 
 int imaging_handle_free(
@@ -276,11 +236,6 @@ int imaging_handle_free(
 
 int imaging_handle_signal_abort(
      imaging_handle_t *imaging_handle,
-     libcerror_error_t **error );
-
-int imaging_handle_check_write_access(
-     imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *filename,
      libcerror_error_t **error );
 
 int imaging_handle_open_output(
@@ -295,17 +250,27 @@ int imaging_handle_open_secondary_output(
      uint8_t resume,
      libcerror_error_t **error );
 
-int imaging_handle_open_output_resume(
-     imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *filename,
-     off64_t *resume_acquiry_offset,
-     libcerror_error_t **error );
-
 int imaging_handle_close(
      imaging_handle_t *imaging_handle,
      libcerror_error_t **error );
 
-ssize_t imaging_handle_write_storage_media_buffer(
+ssize_t imaging_handle_prepare_read_buffer(
+         imaging_handle_t *imaging_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         libcerror_error_t **error );
+
+ssize_t imaging_handle_read_buffer(
+         imaging_handle_t *imaging_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         size_t read_size,
+         libcerror_error_t **error );
+
+ssize_t imaging_handle_prepare_write_buffer(
+         imaging_handle_t *imaging_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         libcerror_error_t **error );
+
+ssize_t imaging_handle_write_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
@@ -323,8 +288,8 @@ int imaging_handle_get_offset(
 
 int imaging_handle_swap_byte_pairs(
      imaging_handle_t *imaging_handle,
-     uint8_t *buffer,
-     size_t buffer_size,
+     storage_media_buffer_t *storage_media_buffer,
+     size_t read_size,
      libcerror_error_t **error );
 
 int imaging_handle_initialize_integrity_hash(
@@ -333,29 +298,13 @@ int imaging_handle_initialize_integrity_hash(
 
 int imaging_handle_update_integrity_hash(
      imaging_handle_t *imaging_handle,
-     const uint8_t *buffer,
+     uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error );
 
 int imaging_handle_finalize_integrity_hash(
      imaging_handle_t *imaging_handle,
      libcerror_error_t **error );
-
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-
-int imaging_handle_process_storage_media_buffer_callback(
-     storage_media_buffer_t *storage_media_buffer,
-     imaging_handle_t *imaging_handle );
-
-int imaging_handle_output_storage_media_buffer_callback(
-     storage_media_buffer_t *storage_media_buffer,
-     imaging_handle_t *imaging_handle );
-
-int imaging_handle_empty_output_list(
-     imaging_handle_t *imaging_handle,
-     libcerror_error_t **error );
-
-#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 int imaging_handle_get_chunk_size(
      imaging_handle_t *imaging_handle,
@@ -491,11 +440,6 @@ int imaging_handle_set_header_codepage(
      libcerror_error_t **error );
 
 int imaging_handle_set_process_buffer_size(
-     imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
-     libcerror_error_t **error );
-
-int imaging_handle_set_number_of_threads(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      libcerror_error_t **error );

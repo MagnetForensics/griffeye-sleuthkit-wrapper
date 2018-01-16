@@ -137,7 +137,7 @@ tsk_error_get_info()
     TSK_ERROR_INFO *ptr = NULL;
     (void) pthread_once(&pt_tls_key_once, make_pt_tls_key);
     if ((ptr = (TSK_ERROR_INFO *) pthread_getspecific(pt_tls_key)) == 0) {
-        // Under high memory presure malloc will return NULL.
+        // Under high memory pressure malloc will return NULL.
         ptr = (TSK_ERROR_INFO *) malloc(sizeof(TSK_ERROR_INFO));
 
         if( ptr != NULL ) {
@@ -377,10 +377,10 @@ tsk_error_vset_errstr2(const char *format, va_list args)
 void
 tsk_error_errstr2_concat(const char *format, ...)
 {
-    va_list args;
     char *errstr2 = tsk_error_get_info()->errstr2;
     int current_length = (int) (strlen(errstr2) + 1);   // +1 for a space
     if (current_length > 0) {
+        va_list args;
         int remaining = TSK_ERROR_STRING_MAX_LENGTH - current_length;
         errstr2[current_length - 1] = ' ';
         va_start(args, format);

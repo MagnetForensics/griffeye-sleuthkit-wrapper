@@ -30,13 +30,13 @@ namespace SleuthkitSharp_UnitTests
         [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_Ext4_dd_BlockSize512_dd_EnCase_Uncompressed.E01")]
         [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_Ext4_Guymager_dd_EnCase_Compressed.E01")]
         [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_FAT_dd_BlockSize512_raw_EnCase_Uncompressed.E01")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_NTFS_OSF_img_EnCase_Uncompressed.Ex01")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_disks_ISO_EnCase_compressed.Ex01")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Compressed.Ex01")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Compressed.E01")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Compressed.Ex01")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Uncompressed.E01")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Uncompressed.Ex01")]
+        //[TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_disk_NTFS_OSF_img_EnCase_Uncompressed.Ex01")]
+        //[TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_disks_ISO_EnCase_compressed.Ex01")]
+        //[TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Compressed.Ex01")]
+        //[TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Compressed.E01")]
+        //[TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Compressed.Ex01")]
+        //[TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Uncompressed.E01")]
+        //[TestCase(@"\\DISKMASKINEN\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Uncompressed.Ex01")]
 
         //IMG
         [TestCase(@"\\DISKMASKINEN\DiskImages\IMG\DSIII_disk_Ext2_dd_SingleBlock.img")]
@@ -97,7 +97,7 @@ namespace SleuthkitSharp_UnitTests
         [TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII_USB_HFS_disks.img")]
         [TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII_USB_HFS_disks_img_EnCase_Uncompressed.E01")]
         [TestCase(@"\\diskmaskinen\DiskImages\NOK\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.aff")]
-        [TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII-partly_folders_YAFFS2_YAFFEY_img_EnCase_Uncompressed.Ex01")]
+        //[TestCase(@"\\DISKMASKINEN\DiskImages\NOK\DSIII-partly_folders_YAFFS2_YAFFEY_img_EnCase_Uncompressed.Ex01")]
 
         //DMG
         [TestCase(@"\\diskmaskinen\DiskImages\DMG\DSIII_USB_HFSplus_DiskUtility_Compressed.dmg")]

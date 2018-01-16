@@ -36,15 +36,6 @@
     <ClCompile Include="..\..\libcdata\libcdata_tree_node.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libcdata\libcdata.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libcdata\libcdata_error.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libcdata\libcdata_range_list_value.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libcdata\libcdata_array.h">
@@ -84,15 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcdata\libcdata_unused.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libcdata\libcdata_error.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libcdata\libcdata_libcthreads.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libcdata\libcdata_range_list_value.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

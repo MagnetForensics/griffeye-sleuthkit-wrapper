@@ -219,6 +219,13 @@ tsk_vs_bsd_open(TSK_IMG_INFO * img_info, TSK_DADDR_T offset)
     // clean up any errors that are lying around
     tsk_error_reset();
 
+    if (img_info->sector_size == 0) {
+        tsk_error_reset();
+        tsk_error_set_errno(TSK_ERR_VS_ARG);
+        tsk_error_set_errstr("tsk_vs_bsd_open: sector size is 0");
+        return NULL;
+    }
+
     vs = (TSK_VS_INFO *) tsk_malloc(sizeof(*vs));
     if (vs == NULL)
         return NULL;
@@ -230,7 +237,7 @@ tsk_vs_bsd_open(TSK_IMG_INFO * img_info, TSK_DADDR_T offset)
     /* use the offset provided */
     vs->offset = offset;
 
-    /* inititialize settings */
+    /* initialize settings */
     vs->part_list = NULL;
     vs->part_count = 0;
     vs->endian = 0;

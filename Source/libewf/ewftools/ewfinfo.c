@@ -1,7 +1,7 @@
 /*
  * Shows information stored in an EWF file
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -29,10 +29,6 @@
 
 #if defined( HAVE_SYS_RESOURCE_H )
 #include <sys/resource.h>
-#endif
-
-#if defined( HAVE_GLOB_H )
-#include <glob.h>
 #endif
 
 #include "byte_size_string.h"
@@ -132,24 +128,24 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_GETRLIMIT )
 	struct rlimit limit_data;
 #endif
-	libcstring_system_character_t * const *source_filenames = NULL;
+	libcstring_system_character_t * const *argv_filenames = NULL;
 
-#if !defined( HAVE_GLOB_H )
-	libcsystem_glob_t *glob                                 = NULL;
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
+	libcsystem_glob_t *glob                               = NULL;
 #endif
-	libcerror_error_t *error                                = NULL;
+	libcerror_error_t *error                              = NULL;
 
-	libcstring_system_character_t *option_date_format       = NULL;
-	libcstring_system_character_t *option_header_codepage   = NULL;
-	libcstring_system_character_t *option_output_format     = NULL;
-	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfinfo" );
+	libcstring_system_character_t *option_date_format     = NULL;
+	libcstring_system_character_t *option_header_codepage = NULL;
+	libcstring_system_character_t *option_output_format   = NULL;
+	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfinfo" );
 
-	libcstring_system_integer_t option                      = 0;
-	uint8_t verbose                                         = 0;
-	char info_option                                        = 'a';
-	int number_of_filenames                                 = 0;
-	int print_header                                        = 1;
-	int result                                              = 0;
+	libcstring_system_integer_t option                    = 0;
+	uint8_t verbose                                       = 0;
+	char info_option                                      = 'a';
+	int number_of_filenames                               = 0;
+	int print_header                                      = 1;
+	int result                                            = 0;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -197,7 +193,7 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
-				 argv[ optind ] );
+				 argv[ optind - 1 ] );
 
 				usage_fprint(
 				 stdout );
@@ -485,7 +481,7 @@ int main( int argc, char * const argv[] )
 			 "Unsupported header codepage defaulting to: ascii.\n" );
 		}
 	}
-#if !defined( HAVE_GLOB_H )
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
 	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
@@ -524,20 +520,10 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libcsystem_glob_get_results(
-	     glob,
-	     &number_of_filenames,
-	     (libcstring_system_character_t ***) &source_filenames,
-	     &error ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to retrieve glob results.\n" );
-
-		goto on_error;
-	}
+	argv_filenames      = glob->result;
+	number_of_filenames = glob->number_of_results;
 #else
-	source_filenames    = &( argv[ optind ] );
+	argv_filenames      = &( argv[ optind ] );
 	number_of_filenames = argc - optind;
 
 #endif
@@ -593,7 +579,7 @@ int main( int argc, char * const argv[] )
 	}
 	result = info_handle_open_input(
 	          ewfinfo_info_handle,
-	          source_filenames,
+	          argv_filenames,
 	          number_of_filenames,
 	          &error );
 
@@ -617,7 +603,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if !defined( HAVE_GLOB_H )
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
 	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
@@ -907,7 +893,7 @@ on_error:
 		 &ewfinfo_info_handle,
 		 NULL );
 	}
-#if !defined( HAVE_GLOB_H )
+#if !defined( LIBCSYSTEM_HAVE_GLOB )
 	if( glob != NULL )
 	{
 		libcsystem_glob_free(

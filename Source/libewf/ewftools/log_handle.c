@@ -1,7 +1,7 @@
 /*
  * Log handle
  *
- * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2009-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,10 +34,10 @@
 
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
+#include "ewftools_libcsystem.h"
 #include "log_handle.h"
 
-/* Creates a log handle
- * Make sure the value log_handle is referencing, is set to NULL
+/* Initializes the log handle
  * Returns 1 if successful or -1 on error
  */
 int log_handle_initialize(
@@ -109,7 +109,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a log handle
+/* Frees the log handle and its elements
  * Returns 1 if successful or -1 on error
  */
 int log_handle_free(
@@ -162,15 +162,10 @@ int log_handle_open(
 	}
 	if( filename != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		log_handle->log_stream = file_stream_open_wide(
+		log_handle->log_stream = libcsystem_file_stream_open(
 		                          filename,
 		                          _LIBCSTRING_SYSTEM_STRING( FILE_STREAM_OPEN_APPEND ) );
-#else
-		log_handle->log_stream = file_stream_open(
-		                          filename,
-		                          FILE_STREAM_OPEN_APPEND );
-#endif
+
 		if( log_handle->log_stream == NULL )
 		{
 			libcerror_error_set(
@@ -208,7 +203,7 @@ int log_handle_close(
 	}
 	if( log_handle->log_stream != NULL )
 	{
-		if( file_stream_close(
+		if( libcsystem_file_stream_close(
 		     log_handle->log_stream ) != 0 )
 		{
 			libcerror_error_set(

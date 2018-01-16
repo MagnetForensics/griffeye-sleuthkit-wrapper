@@ -1,7 +1,7 @@
 /*
  * File functions
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2009-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,8 +34,7 @@
 #include "libbfio_libuna.h"
 #include "libbfio_types.h"
 
-/* Creates a file IO handle
- * Make sure the value file_io_handle is referencing, is set to NULL
+/* Initializes the file IO handle
  * Returns 1 if successful or -1 on error
  */
 int libbfio_file_io_handle_initialize(
@@ -120,8 +119,7 @@ on_error:
 	return( -1 );
 }
 
-/* Creates a file handle
- * Make sure the value handle is referencing, is set to NULL
+/* Initializes the file handle
  * Returns 1 if successful or -1 on error
  */
 int libbfio_file_initialize(
@@ -203,7 +201,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a file IO handle
+/* Frees the file IO handle and its attributes
  * Returns 1 if succesful or -1 on error
  */
 int libbfio_file_io_handle_free(
@@ -317,7 +315,7 @@ int libbfio_file_io_handle_clone(
 	if( source_file_io_handle->name_size > 0 )
 	{
 		if( ( source_file_io_handle->name_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * source_file_io_handle->name_size ) > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( libcstring_system_character_t ) * source_file_io_handle->name_size )  > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -983,7 +981,7 @@ int libbfio_file_io_handle_set_name(
 #endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
 
 	if( ( file_io_handle->name_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( libcstring_system_character_t ) * file_io_handle->name_size ) > (size_t) SSIZE_MAX ) )
+	 || ( ( sizeof( libcstring_system_character_t ) * file_io_handle->name_size )  > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1707,7 +1705,7 @@ int libbfio_file_io_handle_set_name_wide(
 #endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
 
 	if( ( file_io_handle->name_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( libcstring_system_character_t ) * file_io_handle->name_size ) > (size_t) SSIZE_MAX ) )
+	 || ( ( sizeof( libcstring_system_character_t ) * file_io_handle->name_size )  > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2054,7 +2052,6 @@ off64_t libbfio_file_seek_offset(
          libcerror_error_t **error )
 {
 	static char *function = "libbfio_file_seek_offset";
-	off64_t seek_offset   = 0;
 
 	if( file_io_handle == NULL )
 	{
@@ -2078,26 +2075,25 @@ off64_t libbfio_file_seek_offset(
 
 		return( -1 );
 	}
-	seek_offset = libcfile_file_seek_offset(
-	               file_io_handle->file,
-	               offset,
-	               whence,
-	               error );
+	offset = libcfile_file_seek_offset(
+	          file_io_handle->file,
+	          offset,
+	          whence,
+	          error );
 
-	if( seek_offset == -1 )
+	if( offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset: %" PRIi64 " in file: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to find offset in file: %" PRIs_LIBCSTRING_SYSTEM ".",
 		 function,
-		 offset,
 		 file_io_handle->name );
 
 		return( -1 );
 	}
-	return( seek_offset );
+	return( offset );
 }
 
 /* Function to determine if a file exists

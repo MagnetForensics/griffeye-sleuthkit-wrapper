@@ -75,13 +75,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>ncpub.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <DelaySign>true</DelaySign>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -105,7 +106,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup Condition="'$(Platform)' == 'x64'">
-    <Reference Include="ewf.net, Version=1.0.5156.25405, Culture=neutral, PublicKeyToken=c0e8495fa322da2d, processorArchitecture=x86">
+    <Reference Include="ewf.net, Version=1.0.5156.25405, Culture=neutral, PublicKeyToken=c0e8495fa322da2d, processorArchitecture=amd64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Lib\x64\ewf.net.dll</HintPath>
     </Reference>
@@ -172,7 +173,6 @@
     <Compile Include="VolumeSystem.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ncpub.snk" />
     <None Include="NuSpec\SleuthkitSharp.nuspec" />
     <None Include="NuSpec\SleuthkitSharp.targets" />
   </ItemGroup>
@@ -183,6 +183,10 @@
     <DefineConstants>Bit32</DefineConstants>
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
