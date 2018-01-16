@@ -106,6 +106,21 @@
       <ModuleDefinitionFile>src\Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PreBuildEvent>
+      <Command>copy /y "$(SolutionDir)..\libvhdi\msvscpp\Release\libvhdi.dll" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libvhdi\msvscpp\Release\libvhdi.lib" "$(SolutionDir)..\..\Lib\x86\"
+
+copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\Release\libvmdk.dll" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\Release\libvmdk.lib" "$(SolutionDir)..\..\Lib\x86\"
+
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\libewf.dll" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\libewf.lib" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\ewf.net.dll" "$(SolutionDir)..\..\Lib\x86\"
+
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\zlib.dll" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\zlib.lib" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\sleuthkit\win32\Release\libtsk.lib" "$(SolutionDir)..\..\Lib\x86\"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -124,6 +139,21 @@
       <ModuleDefinitionFile>src\Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PreBuildEvent>
+      <Command>copy /y "$(SolutionDir)..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+
+copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\libewf.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\libewf.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\ewf.net.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\zlib.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\zlib.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\sleuthkit\win32\$(PlatformName)\Release\libtsk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -146,6 +176,21 @@
       <AdditionalLibraryDirectories>..\..\..\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PreBuildEvent>
+      <Command>copy /y "$(SolutionDir)..\libvhdi\msvscpp\Release\libvhdi.dll" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libvhdi\msvscpp\Release\libvhdi.lib" "$(SolutionDir)..\..\Lib\x86\"
+
+copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\Release\libvmdk.dll" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\Release\libvmdk.lib" "$(SolutionDir)..\..\Lib\x86\"
+
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\libewf.dll" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\libewf.lib" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\ewf.net.dll" "$(SolutionDir)..\..\Lib\x86\"
+
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\zlib.dll" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\Release\zlib.lib" "$(SolutionDir)..\..\Lib\x86\"
+copy /y "$(SolutionDir)..\sleuthkit\win32\Release\libtsk.lib" "$(SolutionDir)..\..\Lib\x86\"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -169,18 +214,19 @@
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>copy /y "$(SolutionDir)\..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.dll" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)\..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
+      <Command>copy /y "$(SolutionDir)..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-copy /y "$(SolutionDir)\..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.dll" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)\..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\libewf.dll" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\libewf.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\ewf.net.dll" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\zlib.dll" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)\..\libewf\msvscpp\$(PlatformName)\Release\zlib.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)\..\sleuthkit\win32\$(PlatformName)\Release\libtsk.lib" "$(SolutionDir)\..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\libewf.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\libewf.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\ewf.net.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\zlib.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\zlib.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+copy /y "$(SolutionDir)..\sleuthkit\win32\$(PlatformName)\Release\libtsk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
