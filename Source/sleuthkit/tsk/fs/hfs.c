@@ -562,6 +562,13 @@ hfs_ext_find_extent_record_attr(HFS_INFO * hfs, uint32_t cnid,
         }
 
         // process the header / descriptor
+        if (nodesize < sizeof(hfs_btree_node)) {
+            tsk_error_set_errno(TSK_ERR_FS_GENFS);
+            tsk_error_set_errstr
+                ("hfs_ext_find_extent_record_attr: Node size %d is too small to be valid", nodesize);
+            free(node);
+            return 1;
+        }
         node_desc = (hfs_btree_node *) node;
         num_rec = tsk_getu16(fs->endian, node_desc->num_rec);
 
@@ -596,7 +603,7 @@ hfs_ext_find_extent_record_attr(HFS_INFO * hfs, uint32_t cnid,
                 rec_off =
                     tsk_getu16(fs->endian,
                     &node[nodesize - (rec + 1) * 2]);
-                if (rec_off > nodesize) {
+                if (rec_off + sizeof(hfs_btree_key_ext) > nodesize) {
                     tsk_error_set_errno(TSK_ERR_FS_GENFS);
                     tsk_error_set_errstr
                         ("hfs_ext_find_extent_record_attr: offset of record %d in index node %d too large (%d vs %"
@@ -735,8 +742,9 @@ hfs_ext_find_extent_record_attr(HFS_INFO * hfs, uint32_t cnid,
                 }
 
                 // OK, this is one of the extents records that we are seeking, so save it.
+                // Make sure there is room for the hfs_extents struct
                 keylen = 2 + tsk_getu16(fs->endian, key->key_len);
-                if (rec_off + keylen > nodesize) {
+                if (rec_off + keylen + sizeof(hfs_extents) > nodesize) {
                     tsk_error_set_errno(TSK_ERR_FS_GENFS);
                     tsk_error_set_errstr
                         ("hfs_ext_find_extent_record_attr: offset and keylenth of record %d in leaf node %d too large (%d vs %"
@@ -896,6 +904,13 @@ hfs_cat_traverse(HFS_INFO * hfs,
         }
 
         // process the header / descriptor
+        if (nodesize < sizeof(hfs_btree_node)) {
+            tsk_error_set_errno(TSK_ERR_FS_GENFS);
+            tsk_error_set_errstr
+            ("hfs_cat_traverse: Node size %d is too small to be valid", nodesize);
+            free(node);
+            return 1;
+        }
         node_desc = (hfs_btree_node *) node;
         num_rec = tsk_getu16(fs->endian, node_desc->num_rec);
 
@@ -3999,6 +4014,7 @@ hfs_load_extended_attrs(TSK_FS_FILE * fs_file,
                 uint8_t *recData;       // pointer to the data part of the recordBytes
                 hfs_attr_data *attrData;
                 uint32_t attributeLength;
+                uint32_t nameLength;
                 uint32_t recordType;
                 uint16_t keyLength;
                 int conversionResult;
@@ -4046,10 +4062,12 @@ hfs_load_extended_attrs(TSK_FS_FILE * fs_file,
                     goto on_error;
                 }
 
-                // name_len is in UTF_16 chars
-                if ((uint32_t)2 * tsk_getu16(endian, keyB->attr_name_len)  > attributeLength) {
+                // attr_name_len is in UTF_16 chars
+                nameLength = tsk_getu16(endian, keyB->attr_name_len);
+                if (2*nameLength > HFS_MAX_ATTR_NAME_LEN_UTF16_B) {
                     error_detected(TSK_ERR_FS_CORRUPT,
-                        "hfs_load_extended_attrs: Name length is too long.");
+                        "hfs_load_extended_attrs: Name length (%d) is too long.",
+                        nameLength);
                     goto on_error;
                 }
 
@@ -4071,8 +4089,7 @@ hfs_load_extended_attrs(TSK_FS_FILE * fs_file,
                 
 
                 conversionResult = hfs_UTF16toUTF8(fs, keyB->attr_name,
-                    tsk_getu16(endian, keyB->attr_name_len),
-                    nameBuff, HFS_MAX_ATTR_NAME_LEN_UTF8_B+1, 0);
+                    nameLength, nameBuff, HFS_MAX_ATTR_NAME_LEN_UTF8_B+1, 0);
                 if (conversionResult != 0) {
                     error_returned
                         ("-- hfs_load_extended_attrs could not convert the attr_name in the btree key into a UTF8 attribute name");
@@ -6190,8 +6207,11 @@ hfs_close(TSK_FS_INFO * fs)
     fs->tag = 0;
 
     free(hfs->fs);
-    tsk_fs_file_close(hfs->catalog_file);
-    hfs->catalog_attr = NULL;
+
+    if (hfs->catalog_file) {
+        tsk_fs_file_close(hfs->catalog_file);
+        hfs->catalog_attr = NULL;
+    }
 
     if (hfs->blockmap_file) {
         tsk_fs_file_close(hfs->blockmap_file);
@@ -6375,6 +6395,9 @@ hfs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset,
 
     // determine the last block we have in this image
     if (fs->block_size <= 1) {
+        fs->tag = 0;
+        free(hfs->fs);
+        tsk_fs_free((TSK_FS_INFO *)hfs);
         tsk_error_set_errno(TSK_ERR_FS_CORRUPT);
         tsk_error_set_errstr("HFS+ allocation block size too small");
         return NULL;
@@ -6460,9 +6483,7 @@ hfs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset,
     if ((hfs->catalog_file =
             tsk_fs_file_open_meta(fs, NULL,
                 HFS_CATALOG_FILE_ID)) == NULL) {
-        fs->tag = 0;
-        free(hfs->fs);
-        tsk_fs_free((TSK_FS_INFO *)hfs);
+        hfs_close(hfs);
         return NULL;
     }
 
@@ -6471,10 +6492,7 @@ hfs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset,
         tsk_fs_attrlist_get(hfs->catalog_file->meta->attr,
         TSK_FS_ATTR_TYPE_DEFAULT);
     if (!hfs->catalog_attr) {
-        fs->tag = 0;
-        tsk_fs_file_close(hfs->catalog_file);
-        free(hfs->fs);
-        tsk_fs_free((TSK_FS_INFO *)hfs);
+        hfs_close(hfs);
         tsk_error_errstr2_concat
             (" - Data Attribute not found in Catalog File");
         return NULL;
@@ -6489,10 +6507,8 @@ hfs_open(TSK_IMG_INFO * img_info, TSK_OFF_T offset,
             tsk_error_reset();
             tsk_error_set_errno(TSK_ERR_FS_READ);
         }
+        hfs_close(hfs);
         tsk_error_set_errstr2("hfs_open: Error reading catalog header");
-        fs->tag = 0;
-        free(hfs->fs);
-        tsk_fs_free((TSK_FS_INFO *)hfs);
         return NULL;
     }
 

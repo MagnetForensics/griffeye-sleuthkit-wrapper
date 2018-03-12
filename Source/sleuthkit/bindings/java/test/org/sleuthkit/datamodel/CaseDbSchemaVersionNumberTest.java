@@ -59,7 +59,6 @@ public class CaseDbSchemaVersionNumberTest {
 		assertEquals(true, instance.isCompatible(new CaseDbSchemaVersionNumber(7, 2)));
 		assertEquals(false, instance.isCompatible(new CaseDbSchemaVersionNumber(8, 1)));
 		assertEquals(false, instance.isCompatible(new CaseDbSchemaVersionNumber(1, 1)));
-
 	}
 
 	/**
