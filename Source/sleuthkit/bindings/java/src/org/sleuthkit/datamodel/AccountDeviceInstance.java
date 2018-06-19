@@ -1,7 +1,7 @@
 /*
  * Sleuth Kit Data Model
  *
- * Copyright 2017 Basis Technology Corp.
+ * Copyright 2017-18 Basis Technology Corp.
  * Contact: carrier <at> sleuthkit <dot> org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ package org.sleuthkit.datamodel;
  * There is a 1:M:N relationship between 
  * Account, AccountDeviceInstance &  AccountFileInstance
  */
-public class AccountDeviceInstance {
+public final class AccountDeviceInstance {
 	private final Account account;				
 	private final String deviceID;	
 	
@@ -49,5 +49,34 @@ public class AccountDeviceInstance {
 	 */
 	public String getDeviceId(){
 		return this.deviceID;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 5;
+		hash = 11 * hash + (this.account != null ? this.account.hashCode() : 0);
+		hash = 11 * hash + (this.deviceID != null ? this.deviceID.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final AccountDeviceInstance other = (AccountDeviceInstance) obj;
+		if ((this.deviceID == null) ? (other.deviceID != null) : !this.deviceID.equals(other.deviceID)) {
+			return false;
+		}
+		if (this.account != other.account && (this.account == null || !this.account.equals(other.account))) {
+			return false;
+		}
+		return true;
 	}
 }
