@@ -4,7 +4,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
 
-AC_INIT(sleuthkit, 4.6.0)
+AC_INIT(sleuthkit, 4.6.1)
 m4_include([m4/ax_pthread.m4])
 dnl include the version from 1.12.1. This will work for
 m4_include([m4/cppunit.m4])
@@ -132,6 +132,12 @@ AS_IF([test "x$ac_cv_lib_sqlite3_sqlite3_open" = "xyes"],
       [AC_MSG_RESULT([bundled])])
 AM_CONDITIONAL([HAVE_LIBSQLITE3],
                [test "x$ac_cv_lib_sqlite3_sqlite3_open" = "xyes"])
+dnl check for postgresql	
+AC_CHECK_HEADERS([postgresql/libpq-fe.h],AC_CHECK_LIB([pq],[PQlibVersion]))      
+AC_CHECK_HEADERS([libpq-fe.h],AC_CHECK_LIB([pq],[PQlibVersion]))
+AM_CONDITIONAL([HAVE_POSTGRESQL],[test "x$ac_cv_lib_pq_PQlibVersion" = "xyes"])
+AM_COND_IF([HAVE_POSTGRESQL],[ax_libpq=yes],[ax_libpq=no])
+AM_COND_IF([HAVE_POSTGRESQL], [AC_DEFINE([HAVE_LIBPQ_], [1], [Define if using libpq.])])
 
 # Check if we should link afflib.
 AC_ARG_WITH([afflib],
@@ -248,6 +254,60 @@ AS_IF([test "x$with_libewf" != "xno"],
 )
 AS_IF([test "x$ac_cv_lib_ewf_libewf_get_version" = "xyes"], [ax_libewf=yes], [ax_libewf=no])
 
+dnl Check if we should link libvhdi.
+AC_ARG_WITH([libvhdi],
+    [AS_HELP_STRING([--without-libvhdi],[Do not use libvhdi even if it is installed])]
+    [AS_HELP_STRING([--with-libvhdi=dir],[Specify that libvhdi is installed in directory 'dir'])],
+    dnl If --with-libvhdi or --without-libvhdi is given
+    [],
+    dnl if nothing was specified, default to a test
+    [with_libvhdi=yes])
+
+dnl check for the lib if they did not specify no
+AS_IF([test "x$with_libvhdi" != "xno"],
+    dnl Test the dir if they specified something beyond yes/no
+    [AS_IF([test "x$with_libvhdi" != "xyes"],
+        [AS_IF([test -d ${with_libvhdi}/include],
+            [CPPFLAGS="$CPPFLAGS -I${with_libvhdi}/include"
+                LDFLAGS="$LDFLAGS -L${with_libvhdi}/lib"],
+            dnl Dir given was not correct
+            [AC_MSG_FAILURE([libvhdi directory not found at ${with_libvhdi}])])
+        ]
+    )]
+    dnl Check for the header file first to make sure they have the dev install
+    [AC_CHECK_HEADERS([libvhdi.h],
+      [AC_CHECK_LIB([vhdi], [libvhdi_get_version], [], [NO_libvhdi=true])]
+    )]
+)
+AS_IF([test "x$ac_cv_lib_vhdi_libvhdi_get_version" = "xyes"], [ax_libvhdi=yes], [ax_libvhdi=no])
+
+dnl Check if we should link libvmdk.
+AC_ARG_WITH([libvmdk],
+    [AS_HELP_STRING([--without-libvmdk],[Do not use libvmdk even if it is installed])]
+    [AS_HELP_STRING([--with-libvmdk=dir],[Specify that libvmdk is installed in directory 'dir'])],
+    dnl If --with-libvmdk or --without-libvmdk is given
+    [],
+    dnl if nothing was specified, default to a test
+    [with_libvmdk=yes])
+
+dnl check for the lib if they did not specify no
+AS_IF([test "x$with_libvmdk" != "xno"],
+    dnl Test the dir if they specified something beyond yes/no
+    [AS_IF([test "x$with_libvmdk" != "xyes"],
+        [AS_IF([test -d ${with_libvmdk}/include],
+            [CPPFLAGS="$CPPFLAGS -I${with_libvmdk}/include"
+                LDFLAGS="$LDFLAGS -L${with_libvmdk}/lib"],
+            dnl Dir given was not correct
+            [AC_MSG_FAILURE([libvmdk directory not found at ${with_libvmdk}])])
+        ]
+    )]
+    dnl Check for the header file first to make sure they have the dev install
+    [AC_CHECK_HEADERS([libvmdk.h],
+      [AC_CHECK_LIB([vmdk], [libvmdk_get_version], [], [NO_libvmdk=true])]
+    )]
+)
+AS_IF([test "x$ac_cv_lib_vmdk_libvmdk_get_version" = "xyes"], [ax_libvmdk=yes], [ax_libvmdk=no])
+
 dnl Test for the various java things that we need for bindings
 AS_IF([test "x$enable_java" != "xno"], [
     dnl javac is needed to compile the JAR file
@@ -325,6 +385,14 @@ dnl Dependencies for fiwalk
 AC_CHECK_FUNCS([getline])
 AC_SEARCH_LIBS(regexec, [regex], , AC_MSG_ERROR([missing regex]))
 
+dnl Enable compliation warnings
+dnl TODO: Maybe turn on -Wpedantic after fixing all the other warnings?
+dnl WARNINGS='-Wall -Wextra -Wpedantic'
+WARNINGS='-Wall -Wextra -Wpedantic'
+
+AC_SUBST(AM_CFLAGS, $WARNINGS)
+AC_SUBST(AM_CXXFLAGS, $WARNINGS)
+
 AC_CONFIG_FILES([
     Makefile
     tsk/Makefile
@@ -362,7 +430,9 @@ Building:
    afflib support:                        $ax_afflib
    libewf support:                        $ax_libewf
    zlib support:                          $ax_zlib
-
+   libvhdi support:                       $ax_libvhdi
+   libvmdk support:                       $ax_libvmdk
+   postgresql support:                    $ax_libpq
 Features:
    Java/JNI support:                      $ax_java_support
    Multithreading:                        $ax_multithread

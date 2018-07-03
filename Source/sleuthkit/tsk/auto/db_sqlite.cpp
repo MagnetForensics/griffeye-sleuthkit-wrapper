@@ -326,44 +326,44 @@ int
 		"FOREIGN KEY(data_source_obj_id) REFERENCES tsk_objects(obj_id), "
 		"FOREIGN KEY(artifact_type_id) REFERENCES blackboard_artifact_types(artifact_type_id), "
 		"FOREIGN KEY(review_status_id) REFERENCES review_statuses(review_status_id))",
-        "Error creating blackboard_artifact table: %s\n")
-        ||
-        attempt_exec
-        ("CREATE TABLE blackboard_attributes (artifact_id INTEGER NOT NULL, artifact_type_id INTEGER NOT NULL, source TEXT, context TEXT, attribute_type_id INTEGER NOT NULL, value_type INTEGER NOT NULL, "
-        "value_byte BLOB, value_text TEXT, value_int32 INTEGER, value_int64 INTEGER, value_double NUMERIC(20, 10), "
-        "FOREIGN KEY(artifact_id) REFERENCES blackboard_artifacts(artifact_id), FOREIGN KEY(artifact_type_id) REFERENCES blackboard_artifact_types(artifact_type_id), FOREIGN KEY(attribute_type_id) REFERENCES blackboard_attribute_types(attribute_type_id))",
-        "Error creating blackboard_attribute table: %s\n")
-        ||
-        attempt_exec
-        ("CREATE TABLE blackboard_artifact_types (artifact_type_id INTEGER PRIMARY KEY, type_name TEXT NOT NULL, display_name TEXT)",
-        "Error creating blackboard_artifact_types table: %s\n")
-        ||
-        attempt_exec
-        ("CREATE TABLE blackboard_attribute_types (attribute_type_id INTEGER PRIMARY KEY, type_name TEXT NOT NULL, display_name TEXT, value_type INTEGER NOT NULL)",
-        "Error creating blackboard_attribute_types table: %s\n")
-		||
-		attempt_exec
-        ("CREATE TABLE ingest_module_types (type_id INTEGER PRIMARY KEY, type_name TEXT NOT NULL)",
-        "Error creating ingest_module_types table: %s\n")
-		||
-		attempt_exec
-        ("CREATE TABLE ingest_job_status_types (type_id INTEGER PRIMARY KEY, type_name TEXT NOT NULL)",
-        "Error creating ingest_job_status_types table: %s\n")
-		||
-		attempt_exec
-        ("CREATE TABLE ingest_modules (ingest_module_id INTEGER PRIMARY KEY, display_name TEXT NOT NULL, unique_name TEXT UNIQUE NOT NULL, type_id INTEGER NOT NULL, version TEXT NOT NULL, FOREIGN KEY(type_id) REFERENCES ingest_module_types(type_id));",
-        "Error creating ingest_modules table: %s\n")
-		||
-		attempt_exec
-        ("CREATE TABLE ingest_jobs (ingest_job_id INTEGER PRIMARY KEY, obj_id INTEGER NOT NULL, host_name TEXT NOT NULL, start_date_time INTEGER NOT NULL, end_date_time INTEGER NOT NULL, status_id INTEGER NOT NULL, settings_dir TEXT, FOREIGN KEY(obj_id) REFERENCES tsk_objects(obj_id), FOREIGN KEY(status_id) REFERENCES ingest_job_status_types(type_id));",
-        "Error creating ingest_jobs table: %s\n")
-		||
-		attempt_exec
-        ("CREATE TABLE ingest_job_modules (ingest_job_id INTEGER, ingest_module_id INTEGER, pipeline_position INTEGER, PRIMARY KEY(ingest_job_id, ingest_module_id), FOREIGN KEY(ingest_job_id) REFERENCES ingest_jobs(ingest_job_id), FOREIGN KEY(ingest_module_id) REFERENCES ingest_modules(ingest_module_id));",
-        "Error creating ingest_job_modules table: %s\n")
-        ||
-        attempt_exec
-        ("CREATE TABLE reports (report_id INTEGER PRIMARY KEY, path TEXT NOT NULL, crtime INTEGER NOT NULL, src_module_name TEXT NOT NULL, report_name TEXT NOT NULL)",
+		"Error creating blackboard_artifact table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE blackboard_attributes (artifact_id INTEGER NOT NULL, artifact_type_id INTEGER NOT NULL, source TEXT, context TEXT, attribute_type_id INTEGER NOT NULL, value_type INTEGER NOT NULL, "
+		"value_byte BLOB, value_text TEXT, value_int32 INTEGER, value_int64 INTEGER, value_double NUMERIC(20, 10), "
+		"FOREIGN KEY(artifact_id) REFERENCES blackboard_artifacts(artifact_id), FOREIGN KEY(artifact_type_id) REFERENCES blackboard_artifact_types(artifact_type_id), FOREIGN KEY(attribute_type_id) REFERENCES blackboard_attribute_types(attribute_type_id))",
+		"Error creating blackboard_attribute table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE blackboard_artifact_types (artifact_type_id INTEGER PRIMARY KEY, type_name TEXT NOT NULL, display_name TEXT)",
+		"Error creating blackboard_artifact_types table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE blackboard_attribute_types (attribute_type_id INTEGER PRIMARY KEY, type_name TEXT NOT NULL, display_name TEXT, value_type INTEGER NOT NULL)",
+		"Error creating blackboard_attribute_types table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE ingest_module_types (type_id INTEGER PRIMARY KEY, type_name TEXT NOT NULL)",
+		"Error creating ingest_module_types table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE ingest_job_status_types (type_id INTEGER PRIMARY KEY, type_name TEXT NOT NULL)",
+		"Error creating ingest_job_status_types table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE ingest_modules (ingest_module_id INTEGER PRIMARY KEY, display_name TEXT NOT NULL, unique_name TEXT UNIQUE NOT NULL, type_id INTEGER NOT NULL, version TEXT NOT NULL, FOREIGN KEY(type_id) REFERENCES ingest_module_types(type_id));",
+		"Error creating ingest_modules table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE ingest_jobs (ingest_job_id INTEGER PRIMARY KEY, obj_id INTEGER NOT NULL, host_name TEXT NOT NULL, start_date_time INTEGER NOT NULL, end_date_time INTEGER NOT NULL, status_id INTEGER NOT NULL, settings_dir TEXT, FOREIGN KEY(obj_id) REFERENCES tsk_objects(obj_id), FOREIGN KEY(status_id) REFERENCES ingest_job_status_types(type_id));",
+		"Error creating ingest_jobs table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE ingest_job_modules (ingest_job_id INTEGER, ingest_module_id INTEGER, pipeline_position INTEGER, PRIMARY KEY(ingest_job_id, ingest_module_id), FOREIGN KEY(ingest_job_id) REFERENCES ingest_jobs(ingest_job_id), FOREIGN KEY(ingest_module_id) REFERENCES ingest_modules(ingest_module_id));",
+		"Error creating ingest_job_modules table: %s\n")
+	||
+	attempt_exec
+	("CREATE TABLE reports (obj_id INTEGER PRIMARY KEY, path TEXT NOT NULL, crtime INTEGER NOT NULL, src_module_name TEXT NOT NULL, report_name TEXT NOT NULL, FOREIGN KEY(obj_id) REFERENCES tsk_objects(obj_id));",
             "Error creating reports table: %s\n")
 		||
 		attempt_exec
@@ -619,9 +619,7 @@ int
         return 1;
 
     snprintf(stmt, 1024,
-        "INSERT INTO tsk_vs_info (obj_id, vs_type, img_offset, block_size) VALUES (%lld, %d,%"
-        PRIuOFF ",%d)", objId, vs_info->vstype, vs_info->offset,
-        vs_info->block_size);
+        "INSERT INTO tsk_vs_info (obj_id, vs_type, img_offset, block_size) VALUES (%" PRId64 ", %d,%" PRIuOFF ",%d)", objId, vs_info->vstype, vs_info->offset, vs_info->block_size);
 
     return attempt_exec(stmt,
         "Error adding data to tsk_vs_info table: %s\n");
@@ -674,7 +672,7 @@ int
         "INSERT INTO tsk_fs_info (obj_id, img_offset, fs_type, block_size, block_count, "
         "root_inum, first_inum, last_inum) "
         "VALUES ("
-        "%lld,%" PRIuOFF ",%d,%u,%" PRIuDADDR ","
+        "%" PRId64 ",%" PRIuOFF ",%d,%u,%" PRIuDADDR ","
         "%" PRIuINUM ",%" PRIuINUM ",%" PRIuINUM ")",
         objId, fs_info->offset, (int) fs_info->ftype, fs_info->block_size,
         fs_info->block_count, fs_info->root_inum, fs_info->first_inum,
@@ -840,8 +838,8 @@ int64_t TskDbSqlite::findParObjId(const TSK_FS_FILE * fs_file, const char *paren
     
     // Need to break up 'path' in to the parent folder to match in 'parent_path' and the folder 
     // name to match with the 'name' column in tsk_files table
-    char *parent_name = "";
-    char *parent_path = ""; 
+    const char *parent_name = "";
+    const char *parent_path = "";
     if (TskDb::getParentPathAndName(parentPath, &parent_path, &parent_name)){
         return -1;
     }
@@ -1157,7 +1155,7 @@ int
         foo[1024];
 
     snprintf(foo, 1024,
-        "INSERT INTO tsk_file_layout(obj_id, byte_start, byte_len, sequence) VALUES (%lld, %llu, %llu, %d)",
+        "INSERT INTO tsk_file_layout(obj_id, byte_start, byte_len, sequence) VALUES (%" PRId64 ", %" PRIu64 ", %" PRIu64 ", %d)",
         a_fileObjId, a_byteStart, a_byteLen, a_sequence);
 
     return attempt_exec(foo,
