@@ -1,13 +1,9 @@
+using SleuthKit.Structs;
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Collections.Generic;
-using System.Diagnostics;
-using SleuthKit.Structs;
 
 namespace SleuthKit
 {
-
     /// <summary>
     /// Called when processing a filesystem
     /// </summary>
@@ -34,11 +30,25 @@ namespace SleuthKit
     public delegate ReturnCode ProcessFileDelegate(ref TSK_FS_FILE tskFile, string path);
 
     //typedef TSK_WALK_RET_ENUM(*TSK_FS_DIR_WALK_CB) (TSK_FS_FILE *a_fs_file, const char *a_path, void *a_ptr);
+    /// <summary>
+    /// Callback when walking over directories.
+    /// </summary>
+    /// <param name="file"></param>
+    /// <param name="utf8_path">A pointer to a UTF8 encoded string of the directory. Convert the string to UTF16 by using <see cref="IntPtrExtensions.Utf8ToUtf16(IntPtr)"/></param>
+    /// <param name="some_ptr"></param>
+    /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate WalkReturnEnum DirWalkDelegate(ref TSK_FS_FILE file, string path, IntPtr some_ptr);
+    public delegate WalkReturnEnum DirWalkDelegate(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr some_ptr);
 
+    /// <summary>
+    /// Callback when walking over directories.
+    /// </summary>
+    /// <param name="filePtr"></param>
+    /// <param name="utf8_path">A pointer to a UTF8 encoded string of the directory. Convert the string to UTF16 by using <see cref="IntPtrExtensions.Utf8ToUtf16(IntPtr)"/></param>
+    /// <param name="some_ptr"></param>
+    /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate WalkReturnEnum DirWalkPtrDelegate(IntPtr filePtr, string path, IntPtr some_ptr);
+    public delegate WalkReturnEnum DirWalkPtrDelegate(IntPtr filePtr, IntPtr utf8_path, IntPtr some_ptr);
 
     /// <summary>
     /// Called for each metdata entry during a metadata walk
@@ -63,6 +73,4 @@ namespace SleuthKit
     /// <returns>Value to control the file walk.</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate WalkReturnEnum FileContentWalkDelegate(ref TSK_FS_FILE file, long offset, long address, IntPtr buffer, int length, FileSystemBlockFlags flags, IntPtr dataPtr);
-
 }
-

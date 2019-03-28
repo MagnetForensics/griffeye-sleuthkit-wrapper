@@ -272,7 +272,7 @@ namespace Test.MemoryLeak
                 Count = 0;
             }
 
-            public WalkReturnEnum Callback(ref TSK_FS_FILE file, string directoryPath, IntPtr dataPtr)
+            public WalkReturnEnum Callback(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr dataPtr)
             {
                 if (file.Metadata.HasValue && file.Name.HasValue &&
                     (file.Name.Value.Type == FilesystemNameType.Regular
@@ -355,12 +355,14 @@ namespace Test.MemoryLeak
                 this.externalCancellationToken = externalCancellationToken;
             }
 
-            public WalkReturnEnum Callback(ref TSK_FS_FILE file, string directoryPath, IntPtr dataPtr)
+            public WalkReturnEnum Callback(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr dataPtr)
             {
                 if (file.Metadata.HasValue && file.Name.HasValue &&
                     (file.Name.Value.Type == FilesystemNameType.Regular
                     || file.Name.Value.Type == FilesystemNameType.SymbolicLink))
                 {
+                    var directoryPath = utf8_path.Utf8ToUtf16();
+
                     Tuple<SleuthKit.File, MediaPath> newFile = new Tuple<SleuthKit.File, MediaPath>(
                         fileSystem.OpenFile(file.Metadata.Value.Address),
                         hasVolumes
@@ -396,7 +398,6 @@ namespace Test.MemoryLeak
                 return legalPath.ToString();
             }
         }
-
 
         private class FileEnumerator : IEnumerator<Tuple<SleuthKit.File, MediaPath>>, IDisposable
         {
@@ -529,6 +530,6 @@ namespace Test.MemoryLeak
             }
         }
 
-        #endregion
+        #endregion Other wrapper classes
     }
 }

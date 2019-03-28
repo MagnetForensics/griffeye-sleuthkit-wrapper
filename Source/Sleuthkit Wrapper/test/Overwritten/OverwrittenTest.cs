@@ -20,7 +20,7 @@ namespace Org.SleuthKit.Overwritten
                 PrintHelp();
             }
             else
-            { 
+            {
                 DiskImage image = new DiskImage(new System.IO.FileInfo(args[0]));
                 searchString = args[1];
                 IterateImage(image, DirectoryWalkCallback);
@@ -61,12 +61,13 @@ namespace Org.SleuthKit.Overwritten
             }
         }
 
-        private static WalkReturnEnum DirectoryWalkCallback(IntPtr filePtr, String directoryPath, IntPtr dataPtr)
+        private static WalkReturnEnum DirectoryWalkCallback(IntPtr filePtr, IntPtr utf8_path, IntPtr dataPtr)
         {
             TSK_FS_FILE file = ((TSK_FS_FILE)Marshal.PtrToStructure(filePtr, typeof(TSK_FS_FILE)));
 
             if (file.Name.HasValue && file.Name.Value.ToString().Contains(searchString))
             {
+                var directoryPath = utf8_path.Utf8ToUtf16();
                 String fullpath = directoryPath.Replace('/', '\\') + file.Name.Value;
                 Console.WriteLine(fullpath);
 
@@ -117,8 +118,8 @@ namespace Org.SleuthKit.Overwritten
                             {
                                 Console.WriteLine("  Attribute.NonResidentBlocks:");
                                 foreach (TSK_FS_ATTR_RUN run in attr.NonResidentBlocks)
-                                { 
-                                    Console.WriteLine(String.Format("    Address: {0}, Length: {1}, Offset: {2}, Flags: {3}", 
+                                {
+                                    Console.WriteLine(String.Format("    Address: {0}, Length: {1}, Offset: {2}, Flags: {3}",
                                         run.Address, run.Length, run.Offset, run.Flags));
                                 }
                             }

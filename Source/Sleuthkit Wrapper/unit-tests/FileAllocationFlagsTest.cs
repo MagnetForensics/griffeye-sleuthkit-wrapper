@@ -85,7 +85,7 @@ namespace SleuthkitSharp_UnitTests
                 Count = new Dictionary<FileAllocationFlags, int>();
             }
 
-            public WalkReturnEnum DirWalkCallback(ref TSK_FS_FILE file, string path, IntPtr some_ptr)
+            public WalkReturnEnum DirWalkCallback(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr some_ptr)
             {
                 if (file.AppearsValid)
                 {

@@ -255,7 +255,7 @@
         /// </returns>
         private static WalkReturnEnum FileCount_DirectoryWalkCallback(
             ref TSK_FS_FILE file,
-            string directoryPath,
+            IntPtr utf8_path,
             IntPtr dataPtr)
         {
             if (file.Name.ToString().Contains("jpg"))
@@ -283,9 +283,10 @@
         /// </returns>
         private static WalkReturnEnum FindFiles_DirectoryWalkCallback(
             ref TSK_FS_FILE file,
-            string directoryPath,
+            IntPtr utf8_path,
             IntPtr dataPtr)
         {
+            var directoryPath = utf8_path.Utf8ToUtf16();
             FilePaths.Add(string.Format("{0}{1}", directoryPath, file.Name));
             return WalkReturnEnum.Continue;
         }
