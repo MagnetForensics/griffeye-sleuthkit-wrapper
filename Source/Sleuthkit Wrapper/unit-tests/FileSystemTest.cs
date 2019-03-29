@@ -113,7 +113,7 @@ namespace SleuthkitSharp_UnitTests
         }
 
         // Swedish characters
-        [TestCase(@"\\diskmaskinen\DevDataAnalyze\Bug Reproduction\AN-9401\TestSwedishFolderName.E01")]
+        [TestCase(@"\\diskmaskinen\Diskimages\Regression\AN-9401\TestSwedishFolderName.E01")]
         public void TestSwedishCharacters(String imagePath)
         {
             String labels;
