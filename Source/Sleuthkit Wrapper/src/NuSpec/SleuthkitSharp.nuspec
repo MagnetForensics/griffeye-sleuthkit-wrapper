@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>2.0.3</version>
-    <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann</authors>
+    <version>3.0.0</version>
+    <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson</authors>
     <owners>Safer Society Group</owners>
     <dependencies />
     <licenseUrl>http://www.safersociety.com</licenseUrl>
@@ -11,7 +11,8 @@
     <iconUrl>http://www.safersociety.com</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
-    <releaseNotes>      
+    <releaseNotes>
+      3.0.0 Fix encoding of paths when using tsk_fs_dir_walk
       1.3.1 Reworked nuget package to better handle references to different platforms x86/x64.
       1.4.0 Added logic to detect deleted / overwritten files.
       2.0.0 Updated to sleuthkit 4.3.1, should support vhdi and vmdk. Upgraded libewf to 20160424.

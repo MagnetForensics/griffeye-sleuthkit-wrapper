@@ -12,7 +12,7 @@ namespace SleuthKit
     /// </summary>
     internal class UTF8Marshaler : ICustomMarshaler
     {
-        static UTF8Marshaler marshaler = new UTF8Marshaler();
+        private static UTF8Marshaler marshaler = new UTF8Marshaler();
 
         private Hashtable allocated = new Hashtable();
 
@@ -54,7 +54,7 @@ namespace SleuthKit
 
             //byte[] array = Encoding.UTF8.GetBytes((string)ManagedObj);
             byte[] array = new UTF8Encoding(true).GetBytes((string)ManagedObj);
-            
+
             int size = Marshal.SizeOf(typeof(byte)) * (array.Length + 1);
 
             IntPtr ptr = Marshal.AllocHGlobal(size);
@@ -106,10 +106,10 @@ namespace SleuthKit
             dumper.WriteObject(null, element);
         }
 
-        TextWriter writer;
-        int pos;
-        int level;
-        int depth;
+        private TextWriter writer;
+        private int pos;
+        private int level;
+        private int depth;
 
         private ObjectDumper(int depth)
         {
@@ -272,7 +272,7 @@ namespace SleuthKit
     /// <summary>
     /// Helpful methods for IntPtr
     /// </summary>
-    static class IntPtrExtensions
+    public static class IntPtrExtensions
     {
         /// <summary>
         /// Advances position of the pointer
@@ -308,6 +308,30 @@ namespace SleuthKit
             var offset = Marshal.SizeOf(typeof(T)) * index;
             var offsetPtr = ptr.Increment(offset);
             return (T)Marshal.PtrToStructure(offsetPtr, typeof(T));
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        private static extern Int32 MultiByteToWideChar(UInt32 codePage, UInt32 flags, IntPtr utf8, int utf8len, StringBuilder buffer, int buflen);
+
+        /// <summary>
+        /// Converts a UTF8 string to UTF16.
+        /// </summary>
+        /// <param name="utf8"></param>
+        /// <returns></returns>
+        public static string Utf8ToUtf16(this IntPtr utf8)
+        {
+            int len = MultiByteToWideChar(65001, 0, utf8, -1, null, 0);
+            if (len > 0)
+            {
+                StringBuilder utf16String = new StringBuilder(len);
+                MultiByteToWideChar(65001, 0, utf8, -1, utf16String, len);
+
+                return utf16String.ToString();
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
     }
 }

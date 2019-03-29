@@ -2,6 +2,7 @@
 using SleuthKit;
 using SleuthKit.Structs;
 using System;
+using System.Collections.Generic;
 
 namespace SleuthkitSharp_UnitTests
 {
@@ -67,7 +68,7 @@ namespace SleuthkitSharp_UnitTests
         public void AssertDS3Image(String imagePath)
         {
             String labels;
-            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels);
+            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels, out List<string> directories);
 
             Assert.GreaterOrEqual(fileCount, 1000);
         }
@@ -77,7 +78,7 @@ namespace SleuthkitSharp_UnitTests
         public void AssertDS3PartlyImage(String imagePath)
         {
             String labels;
-            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels);
+            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels, out List<string> directories);
 
             Assert.GreaterOrEqual(fileCount, 100);
         }
@@ -106,31 +107,63 @@ namespace SleuthkitSharp_UnitTests
         public void AssertFailingDS3Image(String imagePath)
         {
             String labels;
-            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels);
+            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels, out List<string> directories);
 
-            Assert.AreEqual(fileCount, 0);
+            Assert.AreEqual(0, fileCount);
         }
 
-        private int CountFilesInImageAndGetLabels(String imagePath, out String labels)
+        // Swedish characters
+        [TestCase(@"\\diskmaskinen\Diskimages\Regression\AN-9401\TestSwedishFolderName.E01")]
+        public void TestSwedishCharacters(String imagePath)
         {
-            DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath));
-            FileCounter counter = new FileCounter();
-            int failCount = 0;
-            labels = String.Empty;
+            String labels;
+            int fileCount = CountFilesInImageAndGetLabels(imagePath, out labels, out List<string> directories);
 
-            try
+            Assert.AreEqual(54, fileCount);
+            Assert.IsTrue(directories.Contains("ÅÄÖ/"));
+        }
+
+        private int CountFilesInImageAndGetLabels(String imagePath, out String labels, out List<string> directories)
+        {
+            using (DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath)))
             {
-                if (image.HasVolumes)
+                FileCounter counter = new FileCounter();
+                int failCount = 0;
+                labels = String.Empty;
+
+                try
                 {
-                    VolumeSystem vs = image.OpenVolumeSystem();
-                    foreach (Volume v in vs.Volumes)
+                    if (image.HasVolumes)
+                    {
+                        using (VolumeSystem vs = image.OpenVolumeSystem())
+                        {
+                            foreach (Volume v in vs.Volumes)
+                            {
+                                try
+                                {
+                                    using (FileSystem fs = v.OpenFileSystem())
+                                    {
+                                        labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
+
+                                        fs.WalkDirectories(counter.DirWalkCallback);
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    failCount++;
+                                }
+                            }
+                        }
+                    }
+                    else
                     {
                         try
                         {
-                            FileSystem fs = v.OpenFileSystem();
-                            labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
-
-                            fs.WalkDirectories(counter.DirWalkCallback);
+                            foreach (FileSystem fs in image.GetFileSystems())
+                            {
+                                labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
+                                fs.WalkDirectories(counter.DirWalkCallback);
+                            }
                         }
                         catch (Exception)
                         {
@@ -138,33 +171,25 @@ namespace SleuthkitSharp_UnitTests
                         }
                     }
                 }
-                else
-                {
-                    try
-                    {
-                        foreach (FileSystem fs in image.GetFileSystems())
-                        {
-                            labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
-                            fs.WalkDirectories(counter.DirWalkCallback);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        failCount++;
-                    }
-                }
-            }
-            catch (Exception) { }
+                catch (Exception) { }
 
-            return counter.FileCount;
+                directories = counter.Directories;
+
+                return counter.FileCount;
+            }
         }
 
         private class FileCounter
         {
             public int FileCount { get; private set; }
 
-            public WalkReturnEnum DirWalkCallback(ref TSK_FS_FILE file, string path, IntPtr some_ptr)
+            public List<string> Directories { get; } = new List<string>();
+
+            public WalkReturnEnum DirWalkCallback(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr some_ptr)
             {
+                var directoryName = utf8_path.Utf8ToUtf16();
+                Directories.Add(directoryName);
+
                 FileCount += file.AppearsValid ? 1 : 0;
                 return WalkReturnEnum.Continue;
             }

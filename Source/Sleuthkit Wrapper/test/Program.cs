@@ -34,7 +34,7 @@
         /// </summary>
         private static readonly Stopwatch WrapperStopwatch = new Stopwatch();
 
-        #endregion
+        #endregion Static Fields
 
         #region Public Methods and Operators
 
@@ -59,7 +59,7 @@
 
             if (flags.Equals("-f"))
             {
-                // read single image 
+                // read single image
                 fileName = args[1];
                 di = new DiskImage(new FileInfo(fileName));
             }
@@ -76,8 +76,8 @@
             }
             else
             {
-                Console.WriteLine("Use ‘–d <split image directory path>’, if you want to extract files " + 
-                    "from a split forensic image. Use ‘–f <image file path>' if you want to extract files " + 
+                Console.WriteLine("Use ‘–d <split image directory path>’, if you want to extract files " +
+                    "from a split forensic image. Use ‘–f <image file path>' if you want to extract files " +
                     "from a single forensic image.");
                 return;
             }
@@ -148,7 +148,7 @@
                     }
                 }
             }
-            
+
             di.Dispose();
 
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -191,7 +191,7 @@
             Console.ReadLine();
         }
 
-        #endregion
+        #endregion Public Methods and Operators
 
         #region Methods
 
@@ -210,8 +210,9 @@
         /// <returns>
         /// Value to control the directory walk.
         /// </returns>
-        private static WalkReturnEnum DirectoryWalkCallback(ref TSK_FS_FILE file, string directoryPath, IntPtr dataPtr)
+        private static WalkReturnEnum DirectoryWalkCallback(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr dataPtr)
         {
+            var directoryPath = utf8_path.Utf8ToUtf16();
             FilePaths.Add(string.Format("{0}{1}", directoryPath, file.Name));
             return WalkReturnEnum.Continue;
         }
@@ -267,7 +268,7 @@
         {
             // Parallel read via a for loop
             Parallel.ForEach(
-                FilePaths, new ParallelOptions() {MaxDegreeOfParallelism = 8},
+                FilePaths, new ParallelOptions() { MaxDegreeOfParallelism = 8 },
                 filePath =>
                 {
                     WrapperStopwatch.Start();
@@ -294,7 +295,7 @@
 
                                     Console.WriteLine("{0}=> {1}", filePath, builder);
                                 }
-                                catch (Exception) 
+                                catch (Exception)
                                 {
                                     Console.WriteLine("{0}=> {1}", filePath, "FAIL");
                                 }
@@ -334,16 +335,16 @@
         }
 
         /// <summary>
-        /// Writes data to a file. 
+        /// Writes data to a file.
         /// </summary>
         /// <param name="fileHandle">
         /// Handle to the file to be written to.
         /// </param>
         /// <param name="buffer">
-        /// Pointer to the buffer containing the data to write to the file. 
+        /// Pointer to the buffer containing the data to write to the file.
         /// </param>
         /// <param name="numberOfBytesToWrite">
-        /// Number of bytes to write to the file. 
+        /// Number of bytes to write to the file.
         /// </param>
         /// <param name="numberOfBytesWritten">
         /// Pointer to the number of bytes written by this function call.
@@ -358,6 +359,6 @@
         private static extern bool WriteFile(
             IntPtr fileHandle, IntPtr buffer, int numberOfBytesToWrite, out int numberOfBytesWritten, IntPtr overlapped);
 
-        #endregion
+        #endregion Methods
     }
 }

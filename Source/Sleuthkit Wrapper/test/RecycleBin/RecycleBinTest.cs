@@ -24,7 +24,7 @@ namespace Org.SleuthKit.RecycleBin
             {
                 PrintHelp();
             }
-            else 
+            else
             {
                 MatchListAndMakeCSV(args[0]);
             }
@@ -101,10 +101,12 @@ namespace Org.SleuthKit.RecycleBin
             }
         }
 
-        private static WalkReturnEnum DirectoryWalkCallback(ref TSK_FS_FILE file, String directoryPath, IntPtr dataPtr)
+        private static WalkReturnEnum DirectoryWalkCallback(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr dataPtr)
         {
             if (true)
             {
+                var directoryPath = utf8_path.Utf8ToUtf16();
+
                 String fullPath = file.Name.HasValue
                     ? StripIllegalPathChars(directoryPath + file.Name).Replace('/', '\\')
                     : StripIllegalPathChars(directoryPath).Replace('/', '\\');
@@ -127,7 +129,7 @@ namespace Org.SleuthKit.RecycleBin
 
                 sb.AppendFormat("\"{0}\",", fullPath);
                 sb.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},",
-                        file.Metadata.HasValue, 
+                        file.Metadata.HasValue,
                         file.Metadata.HasValue ? file.Metadata.Value.AppearsValid : false,
                         file.Metadata.HasValue ? (int)file.Metadata.Value.MetadataType : (int)MetadataType.Undefined,
                         file.Metadata.HasValue ? (int)file.Metadata.Value.MetadataFlags : 0,
@@ -154,7 +156,7 @@ namespace Org.SleuthKit.RecycleBin
                 /*
                 String data = String.Format("\"{0}\",{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{1}",
                     fullPath, inSet,
-                        file.Metadata.HasValue, 
+                        file.Metadata.HasValue,
                         file.Metadata.HasValue ? file.Metadata.Value.AppearsValid : false,
                         file.Metadata.HasValue ? (int)file.Metadata.Value.MetadataType : (int)MetadataType.Undefined,
                         file.Metadata.HasValue ? (int)file.Metadata.Value.MetadataFlags : 0,
@@ -174,17 +176,19 @@ namespace Org.SleuthKit.RecycleBin
 
                 totalFilesHit++;
             }
-           
+
             return WalkReturnEnum.Continue;
         }
 
-        private static WalkReturnEnum DirectoryWalkCallbackCount(ref TSK_FS_FILE file, String directoryPath, IntPtr dataPtr)
+        private static WalkReturnEnum DirectoryWalkCallbackCount(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr dataPtr)
         {
+            var directoryPath = utf8_path.Utf8ToUtf16();
+
             if (IncludeFile(file, directoryPath))
             {
                 totalFilesHit++;
 
-                if (totalFilesHit % 10000 == 0) 
+                if (totalFilesHit % 10000 == 0)
                 {
                     Console.Error.WriteLine(totalFilesHit);
                 }
@@ -303,7 +307,7 @@ namespace Org.SleuthKit.RecycleBin
         #region Autopsy files
 
         #region Compressed test
-        private static readonly HashSet<String> compressedTestFiles = new HashSet<String>() { 
+        private static readonly HashSet<String> compressedTestFiles = new HashSet<String>() {
             @"F1\4702433464_9d2e2baf15_o.jpg",
             @"F1\4785161267_158449de91_o.jpg",
             @"F1\4747603701_5b171aff52_o.jpg",
@@ -311,10 +315,10 @@ namespace Org.SleuthKit.RecycleBin
             @"F1\4808792113_eaf0ed2b86_o.jpg",
             //@"F2\5532570472_95af583e49_o.jpg",
         };
-        #endregion
+        #endregion Compressed test
 
         #region DPI Recycle Bin
-        private static readonly HashSet<String> autopsyDPIRecycleBinFiles = new HashSet<String>() { 
+        private static readonly HashSet<String> autopsyDPIRecycleBinFiles = new HashSet<String>() {
             @"$Recycle.Bin\S-1-5-21-1498053637-1786027632-3261794003-500\desktop.ini",
             @"$Recycle.Bin\S-1-5-21-2717849448-3706580534-1929909759-1029\$IQP7E8I.exe",
             @"$Recycle.Bin\S-1-5-21-2717849448-3706580534-1929909759-1029\$RQP7E8I.exe",
@@ -1590,14 +1594,14 @@ namespace Org.SleuthKit.RecycleBin
             @"$Recycle.Bin\S-1-5-21-2717849448-3706580534-1929909759-500\$RZWK51V.dll",
             @"$Recycle.Bin\S-1-5-21-2717849448-3706580534-1929909759-500\$RZVVWUE.config",
             @"$Recycle.Bin\S-1-5-21-2717849448-3706580534-1929909759-500\desktop.ini",
-            @"$Recycle.Bin\S-1-5-21-2717849448-3706580534-1929909759-500\desktop.ini",        
+            @"$Recycle.Bin\S-1-5-21-2717849448-3706580534-1929909759-500\desktop.ini",
         };
 
-        #endregion
+        #endregion DPI Recycle Bin
 
         #region K3 All files
 
-        private static readonly HashSet<String> autopsyKFiles = new HashSet<String>() { 
+        private static readonly HashSet<String> autopsyKFiles = new HashSet<String>() {
             @"$AttrDef",
             @"$BadClus",
             @"$BadClus:$Bad",
@@ -16014,84 +16018,83 @@ namespace Org.SleuthKit.RecycleBin
             @"$OrphanFiles\530098.jpg",
             @"$OrphanFiles\530099.jpg",
             @"$Unalloc\Unalloc_14457_143360_916307968",
-            @"$Unalloc\Unalloc_14457_919769088_1344270336",            
+            @"$Unalloc\Unalloc_14457_919769088_1344270336",
         };
 
-        #endregion
+        #endregion K3 All files
 
         #region Alloc files
-        private static readonly HashSet<String> allocFiles = new HashSet<String>() { 
-            @"F1\00\00\00\26.dat", 
-            @"F1\00\00\00\35.dat", 
-            @"F1\00\00\00\36.dat", 
-            @"F1\00\00\00\38.dat", 
-            @"F1\00\00\00\51.dat", 
-            @"F1\00\00\00\66.dat", 
-            @"F1\00\00\00\69.dat", 
-            @"F1\00\00\00\74.dat", 
-            @"F1\00\00\00\76.dat", 
-            @"F1\00\00\00\7e.dat", 
-            @"F1\00\00\00\8f.dat", 
-            @"F1\00\00\00\99.dat", 
-            @"F1\00\00\00\a3.dat", 
-            @"F1\00\00\00\ba.dat", 
-            @"F1\00\00\00\d7.dat", 
-            @"F1\00\00\00\e1.dat", 
-            @"F1\00\00\00\ec.dat", 
-            @"F1\00\00\01\24.dat", 
-            @"F1\00\00\01\25.dat", 
-            @"F1\00\00\01\2e.dat", 
-            @"F1\00\00\01\37.dat", 
-            @"F1\00\00\01\3f.dat", 
-            @"F1\00\00\01\45.dat", 
-            @"F1\00\00\01\62.dat", 
-            @"F1\00\00\01\70.dat", 
-            @"F1\00\00\01\7a.dat", 
-            @"F1\00\00\01\7b.dat", 
-            @"F1\00\00\01\80.dat", 
-            @"F1\00\00\01\8d.dat", 
-            @"F1\00\00\01\9d.dat", 
-            @"F1\00\00\01\9f.dat", 
-            @"F1\00\00\01\a3.dat", 
-            @"F1\00\00\01\b3.dat", 
-            @"F1\00\00\01\b4.dat", 
-            @"F1\00\00\01\ca.dat", 
-            @"F1\00\00\01\e3.dat", 
-            @"F1\00\00\01\e9.dat", 
-            @"F1\00\00\01\ea.dat", 
-            @"F1\00\00\01\eb.dat", 
-            @"F1\00\00\01\ec.dat", 
-            @"F1\00\00\01\f5.dat", 
-            @"F1\00\00\02\19.dat", 
-            @"F1\00\00\02\1c.dat", 
-            @"F1\00\00\02\24.dat", 
-            @"F1\00\00\02\2f.dat", 
-            @"F1\00\00\02\38.dat", 
-            @"F1\00\00\02\42.dat", 
-            @"F1\00\00\02\64.dat", 
-            @"F1\00\00\02\7b.dat", 
-            @"F1\00\00\02\93.dat", 
-            @"F1\00\00\02\9e.dat", 
-            @"F1\00\00\02\a8.dat", 
-            @"F1\00\00\02\ae.dat", 
-            @"F1\00\00\02\bb.dat", 
-            @"F1\00\00\02\c0.dat", 
-            @"F1\00\00\02\c7.dat", 
-            @"F1\00\00\02\cb.dat", 
-            @"F1\00\00\02\d6.dat", 
-            @"F1\00\00\02\d9.dat", 
-            @"F1\00\00\02\ee.dat", 
-            @"F1\00\00\03\1a.dat", 
-            @"F1\00\00\03\46.dat", 
-            @"F1\00\00\03\50.dat", 
-            @"F1\00\00\03\5c.dat", 
-            @"F1\00\00\03\76.dat", 
-            @"F1\00\00\03\7b.dat", 
+        private static readonly HashSet<String> allocFiles = new HashSet<String>() {
+            @"F1\00\00\00\26.dat",
+            @"F1\00\00\00\35.dat",
+            @"F1\00\00\00\36.dat",
+            @"F1\00\00\00\38.dat",
+            @"F1\00\00\00\51.dat",
+            @"F1\00\00\00\66.dat",
+            @"F1\00\00\00\69.dat",
+            @"F1\00\00\00\74.dat",
+            @"F1\00\00\00\76.dat",
+            @"F1\00\00\00\7e.dat",
+            @"F1\00\00\00\8f.dat",
+            @"F1\00\00\00\99.dat",
+            @"F1\00\00\00\a3.dat",
+            @"F1\00\00\00\ba.dat",
+            @"F1\00\00\00\d7.dat",
+            @"F1\00\00\00\e1.dat",
+            @"F1\00\00\00\ec.dat",
+            @"F1\00\00\01\24.dat",
+            @"F1\00\00\01\25.dat",
+            @"F1\00\00\01\2e.dat",
+            @"F1\00\00\01\37.dat",
+            @"F1\00\00\01\3f.dat",
+            @"F1\00\00\01\45.dat",
+            @"F1\00\00\01\62.dat",
+            @"F1\00\00\01\70.dat",
+            @"F1\00\00\01\7a.dat",
+            @"F1\00\00\01\7b.dat",
+            @"F1\00\00\01\80.dat",
+            @"F1\00\00\01\8d.dat",
+            @"F1\00\00\01\9d.dat",
+            @"F1\00\00\01\9f.dat",
+            @"F1\00\00\01\a3.dat",
+            @"F1\00\00\01\b3.dat",
+            @"F1\00\00\01\b4.dat",
+            @"F1\00\00\01\ca.dat",
+            @"F1\00\00\01\e3.dat",
+            @"F1\00\00\01\e9.dat",
+            @"F1\00\00\01\ea.dat",
+            @"F1\00\00\01\eb.dat",
+            @"F1\00\00\01\ec.dat",
+            @"F1\00\00\01\f5.dat",
+            @"F1\00\00\02\19.dat",
+            @"F1\00\00\02\1c.dat",
+            @"F1\00\00\02\24.dat",
+            @"F1\00\00\02\2f.dat",
+            @"F1\00\00\02\38.dat",
+            @"F1\00\00\02\42.dat",
+            @"F1\00\00\02\64.dat",
+            @"F1\00\00\02\7b.dat",
+            @"F1\00\00\02\93.dat",
+            @"F1\00\00\02\9e.dat",
+            @"F1\00\00\02\a8.dat",
+            @"F1\00\00\02\ae.dat",
+            @"F1\00\00\02\bb.dat",
+            @"F1\00\00\02\c0.dat",
+            @"F1\00\00\02\c7.dat",
+            @"F1\00\00\02\cb.dat",
+            @"F1\00\00\02\d6.dat",
+            @"F1\00\00\02\d9.dat",
+            @"F1\00\00\02\ee.dat",
+            @"F1\00\00\03\1a.dat",
+            @"F1\00\00\03\46.dat",
+            @"F1\00\00\03\50.dat",
+            @"F1\00\00\03\5c.dat",
+            @"F1\00\00\03\76.dat",
+            @"F1\00\00\03\7b.dat",
             @"F1\00\00\03\7f.dat",
         };
-        #endregion
+        #endregion Alloc files
 
-        #endregion
-
+        #endregion Autopsy files
     }
 }
