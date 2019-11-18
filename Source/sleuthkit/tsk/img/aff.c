@@ -27,22 +27,22 @@ aff_read(TSK_IMG_INFO * img_info, TSK_OFF_T offset, char *buf, size_t len)
 
     if (tsk_verbose)
         tsk_fprintf(stderr,
-            "aff_read: byte offset: %" PRIuOFF " len: %" PRIuOFF
+            "aff_read: byte offset: %" PRIdOFF " len: %" PRId64
             "\n", offset, len);
 
     if (offset > img_info->size) {
         tsk_error_reset();
         tsk_error_set_errno(TSK_ERR_IMG_READ_OFF);
-        tsk_error_set_errstr("aff_read - %" PRIuOFF, offset);
+        tsk_error_set_errstr("aff_read - %" PRIdOFF, offset);
         return -1;
     }
 
     if (aff_info->seek_pos != offset) {
-        if (af_seek(aff_info->af_file, offset, SEEK_SET) != offset) {
+        if (af_seek(aff_info->af_file, offset, SEEK_SET) != (uint64_t)offset) {
             tsk_error_reset();
             // @@@ ADD more specific error messages
             tsk_error_set_errno(TSK_ERR_IMG_SEEK);
-            tsk_error_set_errstr("aff_read - %" PRIuOFF " - %s", offset,
+            tsk_error_set_errstr("aff_read - %" PRIdOFF " - %s", offset,
                 strerror(errno));
             return -1;
 
@@ -55,7 +55,7 @@ aff_read(TSK_IMG_INFO * img_info, TSK_OFF_T offset, char *buf, size_t len)
         // @@@ Add more specific error message
         tsk_error_reset();
         tsk_error_set_errno(TSK_ERR_IMG_READ);
-        tsk_error_set_errstr("aff_read - offset: %" PRIuOFF " - len: %"
+        tsk_error_set_errstr("aff_read - offset: %" PRIdOFF " - len: %"
             PRIuSIZE " - %s", offset, len, strerror(errno));
         return -1;
     }
@@ -66,7 +66,7 @@ aff_read(TSK_IMG_INFO * img_info, TSK_OFF_T offset, char *buf, size_t len)
         // @@@ We could improve this if there is an AFF call
         // to see if the data exists or not
         if ((af_eof(aff_info->af_file) == 0) &&
-            (offset + len < img_info->size)) {
+            (offset + (TSK_OFF_T)len < img_info->size)) {
             memset(buf, 0, len);
             cnt = len;
         }
@@ -102,7 +102,7 @@ aff_imgstat(TSK_IMG_INFO * img_info, FILE * hFile)
         break;
     }
 
-    tsk_fprintf(hFile, "\nSize in bytes: %" PRIuOFF "\n", img_info->size);
+    tsk_fprintf(hFile, "\nSize in bytes: %" PRIdOFF "\n", img_info->size);
 
     // we won't have the rest of the info for the non-AFF formats.
     if (img_info->itype == TSK_IMG_TYPE_AFF_ANY)

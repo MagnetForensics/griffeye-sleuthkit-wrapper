@@ -58,7 +58,7 @@ tsk_fs_blkcat(TSK_FS_INFO * fs, TSK_FS_BLKCAT_FLAG_ENUM lclflags,
     TSK_DADDR_T addr, TSK_DADDR_T read_num_units)
 {
     char *buf;
-    int i;
+    TSK_DADDR_T i;
 
     if (lclflags & TSK_FS_BLKCAT_STAT) {
         stats(fs);
@@ -88,7 +88,7 @@ tsk_fs_blkcat(TSK_FS_INFO * fs, TSK_FS_BLKCAT_FLAG_ENUM lclflags,
     if (lclflags & TSK_FS_BLKCAT_HTML) {
         tsk_printf("<html>\n");
         tsk_printf("<head>\n");
-        tsk_printf("<title>Unit: %" PRIuDADDR "   Size: %" PRIuOFF
+        tsk_printf("<title>Unit: %" PRIuDADDR "   Size: %" PRIuDADDR
             " bytes</title>\n", addr, read_num_units * fs->block_size);
         tsk_printf("</head>\n");
         tsk_printf("<body>\n");
@@ -116,7 +116,6 @@ tsk_fs_blkcat(TSK_FS_INFO * fs, TSK_FS_BLKCAT_FLAG_ENUM lclflags,
             return 1;
         }
 
-
         /* do a hexdump like printout */
         if (lclflags & TSK_FS_BLKCAT_HEX) {
             TSK_OFF_T idx1, idx2;
@@ -125,10 +124,10 @@ tsk_fs_blkcat(TSK_FS_INFO * fs, TSK_FS_BLKCAT_FLAG_ENUM lclflags,
 
                 /* Print the offset */
                 if (lclflags & TSK_FS_BLKCAT_HTML)
-                    tsk_printf("<tr><td>%" PRIuOFF "</td>",
+                    tsk_printf("<tr><td>%" PRIdOFF "</td>",
                         i * fs->block_size + idx1);
                 else
-                    tsk_printf("%" PRIuOFF "\t",
+                    tsk_printf("%" PRIdOFF "\t",
                         i * fs->block_size + idx1);
 
 
@@ -174,7 +173,6 @@ tsk_fs_blkcat(TSK_FS_INFO * fs, TSK_FS_BLKCAT_FLAG_ENUM lclflags,
                 tsk_printf("\n");
             }
         }
-
 
         /* print in all ASCII */
         else if (lclflags & TSK_FS_BLKCAT_ASCII) {

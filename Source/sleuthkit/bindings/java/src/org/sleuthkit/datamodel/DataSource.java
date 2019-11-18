@@ -1,7 +1,7 @@
 /*
  * Sleuth Kit Data Model
  *
- * Copyright 2011-2017 Basis Technology Corp.
+ * Copyright 2011-2018 Basis Technology Corp.
  * Contact: carrier <at> sleuthkit <dot> org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,14 +22,7 @@ package org.sleuthkit.datamodel;
  * A data source (e.g., an image, a local disk, a virtual directory of logical
  * files, etc.).
  */
-public interface DataSource {
-
-	/**
-	 * Gets the object id of this data source.
-	 *
-	 * @return The object id.
-	 */
-	long getId();
+public interface DataSource extends Content {
 
 	/**
 	 * Gets the ASCII-printable identifier for the device associated with the
@@ -46,6 +39,15 @@ public interface DataSource {
 	 * @return The time zone.
 	 */
 	String getTimeZone();
+	
+	/**
+	 * Set the name for this data source.
+	 * 
+	 * @param newName       The new name for the data source
+	 * 
+	 * @throws TskCoreException Thrown if an error occurs while updating the database
+	 */
+	void setDisplayName(String newName) throws TskCoreException;
 
 	/**
 	 * Gets the size of the contents of the data source in bytes. This size can
@@ -64,4 +66,21 @@ public interface DataSource {
 	 */
 	long getContentSize(SleuthkitCase sleuthkitCase) throws TskCoreException;
 
+	/**
+	 * Sets the acquisition details field in the case database.
+	 * 
+	 * @param details The acquisition details
+	 * 
+	 * @throws TskCoreException Thrown if the data can not be written
+	 */
+	void setAcquisitionDetails(String details) throws TskCoreException;
+	
+	/**
+	 * Gets the acquisition details field from the case database.
+	 * 
+	 * @return The acquisition details
+	 * 
+	 * @throws TskCoreException Thrown if the data can not be read
+	 */
+	String getAcquisitionDetails() throws TskCoreException;
 }

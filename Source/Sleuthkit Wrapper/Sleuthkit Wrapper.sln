@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sleuthkit-sharp", "src\sleuthkit-sharp.csproj", "{828A2D64-EFAD-496C-A369-7C8658AE4FFA}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -39,7 +39,6 @@ Global
 		{9E62327F-3E3D-4F98-9200-1535073B2186}.Release|x86.ActiveCfg = Release|x86
 		{9E62327F-3E3D-4F98-9200-1535073B2186}.Release|x86.Build.0 = Release|x86
 		{DF313F6E-4C87-41F9-B6BF-2416B472E7C8}.Debug|x64.ActiveCfg = Debug|x64
-		{DF313F6E-4C87-41F9-B6BF-2416B472E7C8}.Debug|x64.Build.0 = Debug|x64
 		{DF313F6E-4C87-41F9-B6BF-2416B472E7C8}.Debug|x86.ActiveCfg = Debug|Win32
 		{DF313F6E-4C87-41F9-B6BF-2416B472E7C8}.Debug|x86.Build.0 = Debug|Win32
 		{DF313F6E-4C87-41F9-B6BF-2416B472E7C8}.Release|x64.ActiveCfg = Release|x64
