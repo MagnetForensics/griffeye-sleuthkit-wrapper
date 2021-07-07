@@ -3,6 +3,7 @@ using SleuthKit;
 using SleuthKit.Structs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SleuthkitSharp_UnitTests
 {
@@ -123,7 +124,18 @@ namespace SleuthkitSharp_UnitTests
             Assert.IsTrue(directories.Contains("ÅÄÖ/"));
         }
 
-        private int CountFilesInImageAndGetLabels(String imagePath, out String labels, out List<string> directories)
+        [Test]
+        public void AndroidFileSystem()
+        {
+            var imagePath = @"\\diskmaskinen\Diskimages\Regression\AN-12189\2picstest.E01";
+            int fileCount = CountFilesInImageAndGetLabels(imagePath, out _, out _, FileSystemType.FATAndroid);
+
+            Assert.That(fileCount, Is.EqualTo(7));
+
+        }
+
+        private int CountFilesInImageAndGetLabels(String imagePath, out String labels, out List<string> directories,
+            FileSystemType fileSystem = FileSystemType.Autodetect)
         {
             using (DiskImage image = new DiskImage(new System.IO.FileInfo(imagePath)))
             {
@@ -141,7 +153,7 @@ namespace SleuthkitSharp_UnitTests
                             {
                                 try
                                 {
-                                    using (FileSystem fs = v.OpenFileSystem())
+                                    using (FileSystem fs = v.OpenFileSystem(fileSystem))
                                     {
                                         labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
 
@@ -159,11 +171,9 @@ namespace SleuthkitSharp_UnitTests
                     {
                         try
                         {
-                            foreach (FileSystem fs in image.GetFileSystems())
-                            {
-                                labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
-                                fs.WalkDirectories(counter.DirWalkCallback);
-                            }
+                            var fs = image.OpenFileSystem(fileSystem);
+                            labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
+                            fs.WalkDirectories(counter.DirWalkCallback);
                         }
                         catch (Exception)
                         {
@@ -189,7 +199,6 @@ namespace SleuthkitSharp_UnitTests
             {
                 var directoryName = utf8_path.Utf8ToUtf16();
                 Directories.Add(directoryName);
-
                 FileCount += file.AppearsValid ? 1 : 0;
                 return WalkReturnEnum.Continue;
             }

@@ -652,6 +652,12 @@ namespace SleuthKit
         ExFAT = 0x0000000a,
 
         /// <summary>
+        /// TSK_FS_TYPE_ANDROID, FAT android file system
+        /// </summary>
+        [Description("Android FAT")]
+        FATAndroid = 0x0000000c,
+
+        /// <summary>
         /// TSK_FS_TYPE_FAT_DETECT, FAT auto detection
         /// </summary>
         [Description("Autodetect FAT")]

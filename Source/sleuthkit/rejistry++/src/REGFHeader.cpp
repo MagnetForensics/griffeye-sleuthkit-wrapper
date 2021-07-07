@@ -28,6 +28,8 @@
 // Local includes
 #include "REGFHeader.h"
 #include "RejistryException.h"
+#include <memory>
+
 
 namespace Rejistry {
 

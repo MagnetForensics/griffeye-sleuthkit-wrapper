@@ -30,6 +30,7 @@
 #include "DBRecord.h"
 #include "RejistryException.h"
 #include "REGFHeader.h"
+#include <memory>
 
 namespace Rejistry {
     const std::string DBRecord::MAGIC = "db";

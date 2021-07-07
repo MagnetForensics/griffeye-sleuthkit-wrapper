@@ -821,30 +821,31 @@ fatxxfs_open(FATFS_INFO *fatfs)
     tsk_init_lock(&fatfs->dir_lock);
     fatfs->inum2par = NULL;
 
-	// Test to see if this is the odd Android case where the FAT entries have no short name
-	//
-	// If there are no entries found with the normal short name
-	// and we find more entries by removing the short name test for allocated directories, then assume
-	// this is the case where we have no short names
-	fatfs->subtype = TSK_FATFS_SUBTYPE_SPEC;
-	test_dir1 = tsk_fs_dir_open_meta(fs, fs->root_inum);
+    if (fatfs->subtype != TSK_FATFS_SUBTYPE_ANDROID_1) {
+        // Test to see if this is the odd Android case where the FAT entries have no short name
+        //
+        // If there are no entries found with the normal short name
+        // and we find more entries by removing the short name test for allocated directories, then assume
+        // this is the case where we have no short names
+        fatfs->subtype = TSK_FATFS_SUBTYPE_SPEC;
+        test_dir1 = tsk_fs_dir_open_meta(fs, fs->root_inum);
 
-	if (test_dir1 != NULL && test_dir1->names_used <= 4){ // At most four automatic directories ($MBR, $FAT1, $FAT1, $OrphanFiles)
-	    TSK_FS_DIR * test_dir2; //  to see if it's the Android FAT version
+        if (test_dir1 != NULL && test_dir1->names_used <= 4) { // At most four automatic directories ($MBR, $FAT1, $FAT1, $OrphanFiles)
+            TSK_FS_DIR* test_dir2; //  to see if it's the Android FAT version
 
-		fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
-		test_dir2 = tsk_fs_dir_open_meta(fs, fs->root_inum);
+            fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
+            test_dir2 = tsk_fs_dir_open_meta(fs, fs->root_inum);
 
-		if (test_dir2 != NULL && test_dir2->names_used > test_dir1->names_used){
-			fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
-		}
-		else{
-			fatfs->subtype = TSK_FATFS_SUBTYPE_SPEC;
-		}
-		tsk_fs_dir_close(test_dir2);
-	}
-	tsk_fs_dir_close(test_dir1);
-
+            if (test_dir2 != NULL && test_dir2->names_used > test_dir1->names_used) {
+                fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
+            }
+            else {
+                fatfs->subtype = TSK_FATFS_SUBTYPE_SPEC;
+            }
+            tsk_fs_dir_close(test_dir2);
+        }
+        tsk_fs_dir_close(test_dir1);
+    }
     return 0;
 }
 

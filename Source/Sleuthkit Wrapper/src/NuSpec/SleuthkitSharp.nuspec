@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>3.1.0</version>
-    <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson</authors>
+    <version>3.2.0</version>
+    <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård</authors>
     <owners>Safer Society Group</owners>
     <dependencies />
     <licenseUrl>http://www.safersociety.com</licenseUrl>
@@ -12,7 +12,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
     <releaseNotes>
-	  3.1.0 Updated Sleuthkit to version 4.7.0
+      3.2.0 Added TSK_FS_TYPE_ANDROID that does not check 8.3 filenames
+      3.1.0 Updated Sleuthkit to version 4.7.0
       3.0.0 Fix encoding of paths when using tsk_fs_dir_walk
       1.3.1 Reworked nuget package to better handle references to different platforms x86/x64.
       1.4.0 Added logic to detect deleted / overwritten files.

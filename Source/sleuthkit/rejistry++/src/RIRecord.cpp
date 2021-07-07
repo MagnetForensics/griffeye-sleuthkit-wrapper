@@ -30,6 +30,7 @@
 #include "RIRecord.h"
 #include "RejistryException.h"
 #include "REGFHeader.h"
+#include <memory>
 
 namespace Rejistry {
     const std::string RIRecord::MAGIC = "ri";

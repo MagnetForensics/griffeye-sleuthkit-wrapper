@@ -32,6 +32,7 @@
 #include "RejistryException.h"
 #include "DirectSubkeyListRecord.h"
 #include "EmptySubkeyList.h"
+#include <memory>
 
 namespace Rejistry {
 

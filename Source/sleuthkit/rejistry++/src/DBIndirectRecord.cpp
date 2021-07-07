@@ -25,7 +25,8 @@
  * \file DBIndirectRecord.cpp
  *
  */
-#include<algorithm>
+#include <algorithm>
+#include <memory>
 
 // Local includes
 #include "DBIndirectRecord.h"

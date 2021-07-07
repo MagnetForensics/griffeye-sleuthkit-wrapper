@@ -229,7 +229,7 @@ fatfs_cleanup_ascii(char *str)
     if (!fatfs_ptr_arg_is_null(str, "str", func_name)) {
         int i;
         for (i = 0; str[i] != '\0'; i++) {
-            if ((unsigned char) (str[i]) > 0x7e) {
+            if ((unsigned char) (str[i]) > 0x7e || (unsigned char)(str[i]) < 0x20) {
                 str[i] = '^';
             }
         }

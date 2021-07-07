@@ -9,6 +9,7 @@
 */
 
 #include "LogicalImagerRuleBase.h"
+#include <stdexcept>
 
 LogicalImagerRuleBase::LogicalImagerRuleBase() {
 }

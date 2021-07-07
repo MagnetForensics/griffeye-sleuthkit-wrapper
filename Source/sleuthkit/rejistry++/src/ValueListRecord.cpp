@@ -27,6 +27,7 @@
  */
 #include <algorithm>
 #include <cstring>
+#include <memory>
 
 // Local includes
 #include "ValueListRecord.h"

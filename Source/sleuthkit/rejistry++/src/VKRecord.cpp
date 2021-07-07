@@ -30,6 +30,7 @@
 #include "VKRecord.h"
 #include "RejistryException.h"
 #include "REGFHeader.h"
+#include <memory>
 
 namespace Rejistry {
 
