@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>3.2.0</version>
+    <version>3.3.0</version>
     <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård</authors>
     <owners>Safer Society Group</owners>
     <dependencies />
@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
     <releaseNotes>
+		3.3.0 Updated nuget package to support net6.0
       3.2.0 Added TSK_FS_TYPE_ANDROID that does not check 8.3 filenames
       3.1.0 Updated Sleuthkit to version 4.7.0
       3.0.0 Fix encoding of paths when using tsk_fs_dir_walk
@@ -25,23 +26,41 @@
     <copyright></copyright>
   </metadata>
   <files>
-    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="lib\net45\" />
-    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="build\x86" />
-    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="build\x64" />
+    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="lib\netstandard2.0\" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="build\netstandard2.0\x64\" />
+    <file src="..\bin\x86\Release\sleuthkit-sharp.*" target="build\netstandard2.0\x86\" />
 
-    <file src="..\..\..\..\Lib\x86\ewf.net.dll" target="CopyToOutput\x86" />
-    <file src="..\..\..\..\Lib\x86\libewf.dll" target="CopyToOutput\x86" />
-    <file src="..\..\..\..\Lib\x86\libvhdi.dll" target="CopyToOutput\x86" />
-    <file src="..\..\..\..\Lib\x86\libvmdk.dll" target="CopyToOutput\x86" />
-    <file src="..\..\..\..\Lib\x86\libtsk4.dll" target="CopyToOutput\x86" />
-    <file src="..\..\..\..\Lib\x86\zlib.dll" target="CopyToOutput\x86" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="ref\net6.0\" />
 
-    <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="CopyToOutput\x64" />
-    <file src="..\..\..\..\Lib\x64\libewf.dll" target="CopyToOutput\x64" />
-    <file src="..\..\..\..\Lib\x64\libvhdi.dll" target="CopyToOutput\x64" />
-    <file src="..\..\..\..\Lib\x64\libvmdk.dll" target="CopyToOutput\x64" />
-    <file src="..\..\..\..\Lib\x64\libtsk4.dll" target="CopyToOutput\x64" />
-    <file src="..\..\..\..\Lib\x64\zlib.dll" target="CopyToOutput\x64" />
+	  <file src="..\..\..\..\Lib\x86\ewf.net.dll" target="FilesToCopy\x86" />
+	  <file src="..\..\..\..\Lib\x86\libewf.dll" target="FilesToCopy\x86" />
+	  <file src="..\..\..\..\Lib\x86\libvhdi.dll" target="FilesToCopy\x86" />
+	  <file src="..\..\..\..\Lib\x86\libvmdk.dll" target="FilesToCopy\x86" />
+	  <file src="..\..\..\..\Lib\x86\libtsk4.dll" target="FilesToCopy\x86" />
+	  <file src="..\..\..\..\Lib\x86\zlib.dll" target="FilesToCopy\x86" />
+
+	  <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="FilesToCopy\x64" />
+	  <file src="..\..\..\..\Lib\x64\libewf.dll" target="FilesToCopy\x64" />
+	  <file src="..\..\..\..\Lib\x64\libvhdi.dll" target="FilesToCopy\x64" />
+	  <file src="..\..\..\..\Lib\x64\libvmdk.dll" target="FilesToCopy\x64" />
+	  <file src="..\..\..\..\Lib\x64\libtsk4.dll" target="FilesToCopy\x64" />
+	  <file src="..\..\..\..\Lib\x64\zlib.dll" target="FilesToCopy\x64" />
+
+    <file src="..\bin\x86\Release\sleuthkit-sharp.dll" target="runtimes\win-x86\lib\net6.0" />
+    <file src="..\..\..\..\Lib\x86\ewf.net.dll" target="runtimes\win-x86\lib\net6.0" />
+    <file src="..\..\..\..\Lib\x86\libewf.dll" target="runtimes\win-x86\native" />
+    <file src="..\..\..\..\Lib\x86\libvhdi.dll" target="runtimes\win-x86\native" />
+    <file src="..\..\..\..\Lib\x86\libvmdk.dll" target="runtimes\win-x86\native" />
+    <file src="..\..\..\..\Lib\x86\libtsk4.dll" target="runtimes\win-x86\native" />
+    <file src="..\..\..\..\Lib\x86\zlib.dll" target="runtimes\win-x86\native" />
+
+    <file src="..\bin\x64\Release\sleuthkit-sharp.dll" target="runtimes\win-x64\lib\net6.0" />
+    <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="runtimes\win-x64\lib\net6.0" />
+    <file src="..\..\..\..\Lib\x64\libewf.dll" target="runtimes\win-x64\native\" />
+    <file src="..\..\..\..\Lib\x64\libvhdi.dll" target="runtimes\win-x64\native\" />
+    <file src="..\..\..\..\Lib\x64\libvmdk.dll" target="runtimes\win-x64\native\" />
+    <file src="..\..\..\..\Lib\x64\libtsk4.dll" target="runtimes\win-x64\native\" />
+    <file src="..\..\..\..\Lib\x64\zlib.dll" target="runtimes\win-x64\native\" />
     
     <file src="SleuthkitSharp.targets" target="build" />
   </files>
