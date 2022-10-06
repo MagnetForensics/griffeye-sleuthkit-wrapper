@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>3.3.3</version>
+    <version>3.3.4</version>
     <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård</authors>
     <owners>Safer Society Group</owners>
     <dependencies />
@@ -10,6 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
     <releaseNotes>
+      3.3.4 Fix SleuthkitSharp.targets copy x64 as default
       3.3.3 Update zlib to version 1.2.12.0
       3.3.2 Fix SleuthkitSharp.targets not copying files when on .netstandard2.0
       3.3.1 Copy x64 instead of x86 to lib folder

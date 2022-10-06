@@ -1,36 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<Id>SleuthkitSharp</Id>	
-	<RootNamespace>SleuthKit</RootNamespace>
+  <Id>SleuthkitSharp</Id>	
+  <RootNamespace>SleuthKit</RootNamespace>
   <TargetFramework>netstandard2.0</TargetFramework>	
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
   <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	<Platforms>x64;x86</Platforms>  
-	<Company>Griffeye Technologies</Company>    
-  <Version>3.3.3</Version>
-	<LangVersion>Latest</LangVersion>
+  <Platforms>x64;x86</Platforms>  
+  <Company>Griffeye Technologies</Company>    
+  <Version>3.3.4</Version>
+  <LangVersion>Latest</LangVersion>
   <Authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård</Authors>
   <Description>A wrapper of sleuthkit for C#</Description>  
   </PropertyGroup>	
-	
-	<ItemGroup Condition="'$(Platform)' == 'x64'">
+  
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
     <Reference Include="ewf.net, Version=1.0.5156.25405, Culture=neutral, PublicKeyToken=c0e8495fa322da2d, processorArchitecture=amd64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Lib\x64\ewf.net.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Platform)' != 'x64'">
-    <Reference Include="ewf.net, Version=1.0.5156.25405, Culture=neutral, PublicKeyToken=c0e8495fa322da2d, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Lib\x86\ewf.net.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Platform)' != 'x86'">
+    <Reference Include="ewf.net, Version=1.0.5156.25405, Culture=neutral, PublicKeyToken=c0e8495fa322da2d, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Lib\x64\ewf.net.dll</HintPath>
+    </Reference>
   </ItemGroup>	
-  	
-  <PropertyGroup Condition=" '$(Platform)' == 'x64' ">
-    <DefineConstants>Bit64</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' != 'x64' ">
+    
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <DefineConstants>Bit32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' != 'x86' ">
+    <DefineConstants>Bit64</DefineConstants>
   </PropertyGroup>
 </Project>
