@@ -4,17 +4,17 @@ When upgrading libewf and sleuthkit, just replace the contents of their folder w
 
 After that some changes are necessary to get the builds working.
 
-LIBEWF:
+LIBEWF (Library to access the Expert Witness Compression Format (EWF)):
 Use the version here: https://github.com/sleuthkit/libewf_64bit
 
-1. Open the solution in the latest Visual Studio version that is supported by the builders
+1. Open the solution (libewf\msvscpp\libewf.sln) in the latest Visual Studio version that is supported by the builders
 2. Disable build of pyewf project (and dokan and ewfmount if they exist in the solution)
 3. Change build output of bzip2 project to static library if it exists
 
-LIBVMDK:
+LIBVMDK (Library to access the VMware Virtual Disk (VMDK) format):
 Use the version here: https://github.com/sleuthkit/libvmdk_64bit
 
-LIBVHDI:
+LIBVHDI (Library to access the Virtual Hard Disk (VHD) image format):
 Use the version here: https://github.com/sleuthkit/libvhdi_64bit
 
 SLEUTHKIT:
