@@ -8,7 +8,7 @@
   <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<Platforms>x64;x86</Platforms>  
 	<Company>Griffeye Technologies</Company>    
-  <Version>3.3.1</Version>
+  <Version>3.3.2</Version>
 	<LangVersion>Latest</LangVersion>
   <Authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård</Authors>
   <Description>A wrapper of sleuthkit for C#</Description>  
