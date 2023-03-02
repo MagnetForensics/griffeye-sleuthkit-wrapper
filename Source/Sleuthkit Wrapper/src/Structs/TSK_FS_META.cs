@@ -8,11 +8,7 @@ namespace SleuthKit.Structs
     /// represents TSK_FS_META
     /// </summary>
     [StructLayout(LayoutKind.Explicit, 
-#if Bit32
-    Size = 220
-#elif Bit64
     Size = 252
-#endif
 )]
     public struct TSK_FS_META
     {
@@ -141,41 +137,25 @@ namespace SleuthKit.Structs
         /// <summary>
         /// size of content  buffer
         /// </summary>
-#if Bit32
-        [FieldOffset(188)]
-#elif Bit64
         [FieldOffset(192)]
-#endif
         UIntPtr content_len;
 
         /// <summary>
         /// The content type
         /// </summary>
-#if Bit32
-        [FieldOffset(192)]
-#elif Bit64
         [FieldOffset(200)]
-#endif
         FileSystemMetaContentType content_type;
 
         /// <summary>
         /// internal Optional callback used for any internal cleanup needed before freeing content_ptr
         /// </summary>
-#if Bit32
-        [FieldOffset(196)]
-#elif Bit64
         [FieldOffset(204)]
-#endif
         IntPtr reset_content_ptr;
 
         /// <summary>
         /// Sequence number for file (NTFS only, is incremented when entry is reallocated) 
         /// </summary>
-#if Bit32
-        [FieldOffset(200)]
-#elif Bit64
         [FieldOffset(212)]
-#endif
         uint seq;
 
         /// <summary>
@@ -184,42 +164,26 @@ namespace SleuthKit.Structs
         /// load this data when a file is loaded.  It may not be loaded until needed by one
         /// of the APIs. Most file systems will have only one attribute, but NTFS will have several. 
         /// </summary>
-#if Bit32
-        [FieldOffset(204)]
-#elif Bit64
         [FieldOffset(224)]
-#endif
         IntPtr attr_ptr; //TSK_FS_ATTRLIST *attr;
 
         /// <summary>
         /// State of the data in the TSK_FS_META::attr structure
         /// </summary>
-#if Bit32
-        [FieldOffset(208)]
-#elif Bit64
         [FieldOffset(232)]
-#endif
         MetadataAttributeFlags attr_state;
 
         /// <summary>
         /// Name of file stored in metadata (FAT and NTFS Only)
         /// </summary>
-#if Bit32
-        [FieldOffset(212)]
-#elif Bit64
         [FieldOffset(240)]
-#endif
         IntPtr name2;  //TSK_FS_META_NAME_LIST* name2;   ///< 
 
         //char* link;             
         /// <summary>
         /// Name of target file if this is a symbolic link
         /// </summary>
-#if Bit32
-        [FieldOffset(216)]
-#elif Bit64
         [FieldOffset(248)]
-#endif
         IntPtr link;
 
         #endregion

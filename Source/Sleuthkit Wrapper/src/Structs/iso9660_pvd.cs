@@ -8,11 +8,7 @@ using System.Threading.Tasks;
 namespace SleuthKit.Structs
 {
     [StructLayout(LayoutKind.Explicit,
-#if Bit32
-        Size = 2052
-#elif Bit64
         Size = 2056
-#endif
     )]
     public struct iso9660_pvd
     {

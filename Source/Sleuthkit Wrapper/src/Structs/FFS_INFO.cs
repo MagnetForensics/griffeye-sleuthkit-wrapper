@@ -8,22 +8,14 @@ using System.Threading.Tasks;
 namespace SleuthKit.Structs
 {
     [StructLayout(LayoutKind.Explicit,
-#if Bit32
-    Size = 360
-#elif Bit64
     Size = 528
-#endif
     )]
     public struct FFS_INFO
     {
         [FieldOffset(0)]
         TSK_FS_INFO fs_info;
-
-#if Bit32
-        [FieldOffset(288)]
-#elif Bit64
+        
         [FieldOffset(424)]
-#endif
         IntPtr sb_ptr;
 
         internal TSK_FS_INFO tsk_fs_info
