@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>3.4.1</version>
+    <version>3.5.0</version>
     <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård</authors>
     <owners>Safer Society Group</owners>
     <dependencies />
@@ -10,6 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
     <releaseNotes>
+      3.5.0 Updated Sleuthkit to version 4.10.2
       3.4.1 Drop x86 support
       3.4.0 Updated Sleuthkit to version 4.9.0
       3.3.4 Fix SleuthkitSharp.targets copy x64 as default
@@ -34,13 +35,14 @@
 
     <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="ref\net6.0\" />
 
-
     <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="FilesToCopy\x64" />
     <file src="..\..\..\..\Lib\x64\libewf.dll" target="FilesToCopy\x64" />
     <file src="..\..\..\..\Lib\x64\libvhdi.dll" target="FilesToCopy\x64" />
     <file src="..\..\..\..\Lib\x64\libvmdk.dll" target="FilesToCopy\x64" />
     <file src="..\..\..\..\Lib\x64\libtsk4.dll" target="FilesToCopy\x64" />
     <file src="..\..\..\..\Lib\x64\zlib.dll" target="FilesToCopy\x64" />
+    <file src="..\..\..\..\Lib\x64\libcrypto-1_1-x64.dll" target="FilesToCopy\x64" />
+    <file src="..\..\..\..\Lib\x64\libssl-1_1-x64.dll" target="FilesToCopy\x64" />
 
     <file src="..\bin\x64\Release\sleuthkit-sharp.dll" target="runtimes\win-x64\lib\net6.0" />
     <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="runtimes\win-x64\lib\net6.0" />
@@ -49,6 +51,8 @@
     <file src="..\..\..\..\Lib\x64\libvmdk.dll" target="runtimes\win-x64\native\" />
     <file src="..\..\..\..\Lib\x64\libtsk4.dll" target="runtimes\win-x64\native\" />
     <file src="..\..\..\..\Lib\x64\zlib.dll" target="runtimes\win-x64\native\" />
+    <file src="..\..\..\..\Lib\x64\libcrypto-1_1-x64.dll" target="runtimes\win-x64\native\" />
+    <file src="..\..\..\..\Lib\x64\libssl-1_1-x64.dll" target="runtimes\win-x64\native\" />
     
     <file src="SleuthkitSharp.targets" target="build" />
   </files>

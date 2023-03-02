@@ -1,7 +1,7 @@
 /*
  * SleuthKit Java Bindings
  *
- * Copyright 2011-2018 Basis Technology Corp.
+ * Copyright 2011-2020 Basis Technology Corp.
  * Contact: carrier <at> sleuthkit <dot> org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,6 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static org.sleuthkit.datamodel.SleuthkitCase.closeStatement;
 import org.sleuthkit.datamodel.TskData.FileKnown;
 import org.sleuthkit.datamodel.TskData.TSK_FS_META_FLAG_ENUM;
 import org.sleuthkit.datamodel.TskData.TSK_FS_META_TYPE_ENUM;
@@ -80,6 +79,11 @@ public abstract class AbstractFile extends AbstractContent {
 	 */
 	protected String md5Hash;
 	private boolean md5HashDirty = false;
+	/*
+	 * SHA-256 hash
+	 */
+	protected String sha256Hash;
+	private boolean sha256HashDirty = false;
 	private String mimeType;
 	private boolean mimeTypeDirty = false;
 	private static final Logger LOGGER = Logger.getLogger(AbstractFile.class.getName());
@@ -115,6 +119,8 @@ public abstract class AbstractFile extends AbstractContent {
 	 * @param gid
 	 * @param md5Hash            md5sum of the file, or null or "NULL" if not
 	 *                           present
+	 * @param sha256Hash         sha256 hash of the file, or null or "NULL" if
+	 *                           not present
 	 * @param knownState         knownState status of the file, or null if
 	 *                           unknown (default)
 	 * @param parentPath
@@ -135,7 +141,7 @@ public abstract class AbstractFile extends AbstractContent {
 			long ctime, long crtime, long atime, long mtime,
 			short modes,
 			int uid, int gid,
-			String md5Hash, FileKnown knownState,
+			String md5Hash, String sha256Hash, FileKnown knownState,
 			String parentPath,
 			String mimeType,
 			String extension) {
@@ -160,6 +166,7 @@ public abstract class AbstractFile extends AbstractContent {
 		this.modes = TskData.TSK_FS_META_MODE_ENUM.valuesOf(modes);
 
 		this.md5Hash = md5Hash;
+		this.sha256Hash = sha256Hash;
 		if (knownState == null) {
 			this.knownState = FileKnown.UNKNOWN;
 		} else {
@@ -473,9 +480,31 @@ public abstract class AbstractFile extends AbstractContent {
 	}
 
 	/**
-	 * Sets the known state for this file.
-	 * Passed in value will be ignored if it is "less" than the current
-	 * state.  A NOTABLE file cannot be downgraded to KNOWN.
+	 * Sets the SHA-256 hash for this file.
+	 *
+	 * IMPORTANT: The SHA-256 hash is set for this AbstractFile object, but it
+	 * is not saved to the case database until AbstractFile.save is called.
+	 *
+	 * @param sha256Hash The SHA-256 hash of the file.
+	 */
+	public void setSha256Hash(String sha256Hash) {
+		this.sha256Hash = sha256Hash;
+		this.sha256HashDirty = true;
+	}
+
+	/**
+	 * Get the SHA-256 hash value as calculated, if present
+	 *
+	 * @return SHA-256 hash string, if it is present or null if it is not
+	 */
+	public String getSha256Hash() {
+		return this.sha256Hash;
+	}
+
+	/**
+	 * Sets the known state for this file. Passed in value will be ignored if it
+	 * is "less" than the current state. A NOTABLE file cannot be downgraded to
+	 * KNOWN.
 	 *
 	 * IMPORTANT: The known state is set for this AbstractFile object, but it is
 	 * not saved to the case database until AbstractFile.save is called.
@@ -540,7 +569,7 @@ public abstract class AbstractFile extends AbstractContent {
 	 *
 	 * @throws TskCoreException if there was an error querying the case
 	 *                          database.
-	 * 
+	 *
 	 * To obtain the data source as a DataSource object, use:
 	 * getSleuthkitCase().getDataSource(getDataSourceObjectId());
 	 */
@@ -605,6 +634,67 @@ public abstract class AbstractFile extends AbstractContent {
 			fileOffset -= rangeLength;
 		}
 		return imgOffset;
+	}
+
+	/**
+	 * Converts a file offset and length into a series of TskFileRange objects
+	 * whose offsets are relative to the image.  This method will only work on
+	 * files with layout ranges.
+	 *
+	 * @param fileOffset The byte offset in this file to map.
+	 * @param length     The length of bytes starting at fileOffset requested.
+	 *
+	 * @return The TskFileRange objects whose offsets are relative to the image.
+	 *         The sum total of lengths in these ranges will equal the length
+	 *         requested or will run until the end of this file.
+	 *
+	 * @throws TskCoreException
+	 */
+	public List<TskFileRange> convertToImgRanges(long fileOffset, long length) throws TskCoreException {
+		if (fileOffset < 0 || length < 0) {
+			throw new TskCoreException("fileOffset and length must be non-negative");
+		}
+
+		List<TskFileRange> thisRanges = getRanges();
+		List<TskFileRange> toRet = new ArrayList<>();
+
+		long requestedEnd = fileOffset + length;
+
+		// the number of bytes counted from the beginning of this file
+		long bytesCounted = 0;
+
+		for (int curRangeIdx = 0; curRangeIdx < thisRanges.size(); curRangeIdx++) {
+			// if we exceeded length of requested, then we are done
+			if (bytesCounted >= requestedEnd) {
+				break;
+			}
+
+			TskFileRange curRange = thisRanges.get(curRangeIdx);
+			long curRangeLen = curRange.getByteLen();
+			// the bytes counted when we reach the end of this range
+			long curRangeEnd = bytesCounted + curRangeLen;
+
+			// if fileOffset is less than current range's end and we have not 
+			// gone past the end we requested, then grab at least part of this 
+			// range.
+			if (fileOffset < curRangeEnd) {
+				// offset into range to be returned to user (0 if fileOffset <= bytesCounted)
+				long rangeOffset = Math.max(0, fileOffset - bytesCounted);
+
+				// calculate the new TskFileRange start by adding on the offset into the current range
+				long newRangeStart = curRange.getByteStart() + rangeOffset;
+
+				// how much this current range exceeds the length requested (or 0 if within the length requested)
+				long rangeOvershoot = Math.max(0, curRangeEnd - requestedEnd);
+				
+				long newRangeLen = curRangeLen - rangeOffset - rangeOvershoot;
+				toRet.add(new TskFileRange(newRangeStart, newRangeLen, toRet.size()));
+			}
+
+			bytesCounted = curRangeEnd;
+		}
+
+		return toRet;
 	}
 
 	/**
@@ -818,7 +908,7 @@ public abstract class AbstractFile extends AbstractContent {
 		if (isDir()) {
 			return 0;
 		}
-		
+
 		// If the file is empty, just return that zero bytes were read.
 		if (getSize() == 0) {
 			return 0;
@@ -891,7 +981,7 @@ public abstract class AbstractFile extends AbstractContent {
 	 * the case db path or an absolute path. When set, subsequent invocations of
 	 * read() will read the file in the local path.
 	 *
-	 * @param localPath  local path to be set
+	 * @param localPath local path to be set
 	 */
 	void setLocalFilePath(String localPath) {
 
@@ -1056,7 +1146,7 @@ public abstract class AbstractFile extends AbstractContent {
 				+ "\t" + "metaAddr " + metaAddr + "\t" + "metaSeq " + metaSeq + "\t" + "metaFlags " + metaFlags //NON-NLS
 				+ "\t" + "metaType " + metaType + "\t" + "modes " + modes //NON-NLS
 				+ "\t" + "parentPath " + parentPath + "\t" + "size " + size //NON-NLS
-				+ "\t" + "knownState " + knownState + "\t" + "md5Hash " + md5Hash //NON-NLS
+				+ "\t" + "knownState " + knownState + "\t" + "md5Hash " + md5Hash + "\t" + "sha256Hash " + sha256Hash //NON-NLS
 				+ "\t" + "localPathSet " + localPathSet + "\t" + "localPath " + localPath //NON-NLS
 				+ "\t" + "localAbsPath " + localAbsPath + "\t" + "localFile " + localFile //NON-NLS
 				+ "]\t";
@@ -1100,7 +1190,7 @@ public abstract class AbstractFile extends AbstractContent {
 	public void save() throws TskCoreException {
 
 		// No fields have been updated
-		if (!(md5HashDirty || mimeTypeDirty || knownStateDirty)) {
+		if (!(md5HashDirty || sha256HashDirty || mimeTypeDirty || knownStateDirty)) {
 			return;
 		}
 
@@ -1113,6 +1203,12 @@ public abstract class AbstractFile extends AbstractContent {
 				queryStr += ", ";
 			}
 			queryStr += "md5 = '" + this.getMd5Hash() + "'";
+		}
+		if (sha256HashDirty) {
+			if (!queryStr.isEmpty()) {
+				queryStr += ", ";
+			}
+			queryStr += "sha256 = '" + this.getSha256Hash() + "'";
 		}
 		if (knownStateDirty) {
 			if (!queryStr.isEmpty()) {
@@ -1129,6 +1225,7 @@ public abstract class AbstractFile extends AbstractContent {
 
 			connection.executeUpdate(statement, queryStr);
 			md5HashDirty = false;
+			sha256HashDirty = false;
 			mimeTypeDirty = false;
 			knownStateDirty = false;
 		} catch (SQLException ex) {
@@ -1136,6 +1233,15 @@ public abstract class AbstractFile extends AbstractContent {
 		} finally {
 			getSleuthkitCase().releaseSingleUserCaseWriteLock();
 		}
+	}
+
+	@Override
+	public BlackboardArtifact newArtifact(int artifactTypeID) throws TskCoreException {
+		// don't let them make more than 1 GEN_INFO
+		if (artifactTypeID == BlackboardArtifact.ARTIFACT_TYPE.TSK_GEN_INFO.getTypeID()) {
+			return getGenInfoArtifact(true);
+		}
+		return getSleuthkitCase().newBlackboardArtifact(artifactTypeID, getId(), dataSourceObjectId);
 	}
 
 	/**
@@ -1176,7 +1282,7 @@ public abstract class AbstractFile extends AbstractContent {
 			TSK_FS_NAME_TYPE_ENUM dirType, TSK_FS_META_TYPE_ENUM metaType, TSK_FS_NAME_FLAG_ENUM dirFlag, short metaFlags,
 			long size, long ctime, long crtime, long atime, long mtime, short modes, int uid, int gid, String md5Hash, FileKnown knownState,
 			String parentPath) {
-		this(db, objId, db.getDataSourceObjectId(objId), attrType, (int) attrId, name, fileType, metaAddr, metaSeq, dirType, metaType, dirFlag, metaFlags, size, ctime, crtime, atime, mtime, modes, uid, gid, md5Hash, knownState, parentPath, null, null);
+		this(db, objId, db.getDataSourceObjectId(objId), attrType, (int) attrId, name, fileType, metaAddr, metaSeq, dirType, metaType, dirFlag, metaFlags, size, ctime, crtime, atime, mtime, modes, uid, gid, md5Hash, null, knownState, parentPath, null, null);
 	}
 
 	/**
@@ -1221,7 +1327,7 @@ public abstract class AbstractFile extends AbstractContent {
 			String name, TskData.TSK_DB_FILES_TYPE_ENUM fileType, long metaAddr, int metaSeq, TSK_FS_NAME_TYPE_ENUM dirType, TSK_FS_META_TYPE_ENUM metaType,
 			TSK_FS_NAME_FLAG_ENUM dirFlag, short metaFlags, long size, long ctime, long crtime, long atime, long mtime, short modes,
 			int uid, int gid, String md5Hash, FileKnown knownState, String parentPath, String mimeType) {
-		this(db, objId, dataSourceObjectId, attrType, (int) attrId, name, fileType, metaAddr, metaSeq, dirType, metaType, dirFlag, metaFlags, size, ctime, crtime, atime, mtime, modes, uid, gid, md5Hash, knownState, parentPath, null, null);
+		this(db, objId, dataSourceObjectId, attrType, (int) attrId, name, fileType, metaAddr, metaSeq, dirType, metaType, dirFlag, metaFlags, size, ctime, crtime, atime, mtime, modes, uid, gid, md5Hash, null, knownState, parentPath, null, null);
 	}
 
 	/**

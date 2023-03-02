@@ -79,24 +79,32 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libtsk.lib;zlib.lib;libewf.lib;libvhdi.lib;libvmdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libtsk.lib;libcrypto.lib;libssl.lib;zlib.lib;libewf.lib;libvhdi.lib;libvmdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>src\Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>copy /y "$(SolutionDir)..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+      <Command>
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvhdi.20200810.0.0\lib\native\lib\x64\libvhdi.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvhdi.20200810.0.0\lib\native\lib\x64\libvhdi.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvmdk.20200810.0.0\lib\native\lib\x64\libvmdk.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvmdk.20200810.0.0\lib\native\lib\x64\libvmdk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\libewf.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\libewf.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\ewf.net.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\libewf.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\libewf.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\ewf.net.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\zlib.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\zlib.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\sleuthkit\win32\$(PlatformName)\Release\libtsk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"</Command>
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\zlib.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\zlib.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\openssl-vc140-vc141-x86_64.1.1.5\build\native\lib\vc141\x64\libcrypto.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\openssl-vc140-vc141-x86_64.1.1.5\build\native\lib\vc141\x64\libcrypto-1_1-x64.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\openssl-vc140-vc141-x86_64.1.1.5\build\native\lib\vc141\x64\libssl.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\openssl-vc140-vc141-x86_64.1.1.5\build\native\lib\vc141\x64\libssl-1_1-x64.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+
+        copy /y "$(SolutionDir)..\sleuthkit\win32\x64\Release\libtsk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -116,25 +124,32 @@ copy /y "$(SolutionDir)..\sleuthkit\win32\$(PlatformName)\Release\libtsk.lib" "$
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>src\Exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>libtsk.lib;zlib.lib;libewf.lib;libvhdi.lib;libvmdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libtsk.lib;libcrypto.lib;libssl.lib;zlib.lib;libewf.lib;libvhdi.lib;libvmdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>mscvrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>copy /y "$(SolutionDir)..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libvhdi\msvscpp\$(PlatformName)\Release\libvhdi.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+      <Command>
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvhdi.20200810.0.0\lib\native\lib\x64\libvhdi.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvhdi.20200810.0.0\lib\native\lib\x64\libvhdi.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libvmdk\libvmdk\msvscpp\$(PlatformName)\Release\libvmdk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvmdk.20200810.0.0\lib\native\lib\x64\libvmdk.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvmdk.20200810.0.0\lib\native\lib\x64\libvmdk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\libewf.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\libewf.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\ewf.net.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\libewf.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\libewf.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\ewf.net.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\zlib.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\libewf\msvscpp\$(PlatformName)\Release\zlib.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-copy /y "$(SolutionDir)..\sleuthkit\win32\$(PlatformName)\Release\libtsk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-</Command>
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\zlib.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\zlib.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\openssl-vc140-vc141-x86_64.1.1.5\build\native\lib\vc141\x64\libcrypto.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\openssl-vc140-vc141-x86_64.1.1.5\build\native\lib\vc141\x64\libcrypto-1_1-x64.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\openssl-vc140-vc141-x86_64.1.1.5\build\native\lib\vc141\x64\libssl.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\openssl-vc140-vc141-x86_64.1.1.5\build\native\lib\vc141\x64\libssl-1_1-x64.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+
+        copy /y "$(SolutionDir)..\sleuthkit\win32\x64\Release\libtsk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

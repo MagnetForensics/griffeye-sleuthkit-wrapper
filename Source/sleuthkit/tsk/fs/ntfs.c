@@ -658,7 +658,7 @@ ntfs_make_data_run(NTFS_INFO * ntfs, TSK_OFF_T start_vcn,
          * An address offset of more than eight bytes will not fit in the
          * 64-bit addr_offset field (and is likely corrupt)
          */
-        if (NTFS_RUNL_LENSZ(run) > 8) {
+        if (NTFS_RUNL_OFFSZ(run) > 8) {
             tsk_error_reset();
             tsk_error_set_errno(TSK_ERR_FS_INODE_COR);
             tsk_error_set_errstr
@@ -805,9 +805,9 @@ ntfs_make_data_run(NTFS_INFO * ntfs, TSK_OFF_T start_vcn,
 typedef struct {
     char *uncomp_buf;           // Buffer for uncompressed data
     char *comp_buf;             // buffer for compressed data
-    size_t comp_len;            // number of bytes used in compressed data
+    size_t comp_len;            // number of bytes used in compressed data buffer
     size_t uncomp_idx;          // Index into buffer for next byte
-    size_t buf_size_b;          // size of buffer in bytes (1 compression unit)
+    size_t buf_size_b;          // size of both buffers in bytes (1 compression unit)
 } NTFS_COMP_INFO;
 
 
@@ -869,8 +869,7 @@ ntfs_uncompress_done(NTFS_COMP_INFO * comp)
 
 
  /**
-  * Uncompress the block of data in comp->comp_buf,
-  * which has a size of comp->comp_len.
+  * Uncompress the block of data in comp->comp_buf.
   * Store the result in the comp->uncomp_buf.
   *
   * @param comp Compression unit structure
@@ -909,6 +908,12 @@ ntfs_uncompress_compunit(NTFS_COMP_INFO * comp)
 
         blk_size = (sb_header & 0x0FFF) + 3;
 
+        if (tsk_verbose)
+            tsk_fprintf(stderr,
+                "ntfs_uncompress_compunit: Start compression block (length=%" PRIuSIZE " index=%" PRIuSIZE 
+                " compressed buffer size=%" PRIuSIZE ")\n",
+                blk_size, cl_index, comp->comp_len);
+
         // this seems to indicate end of block
         if (blk_size == 3)
             break;
@@ -917,15 +922,11 @@ ntfs_uncompress_compunit(NTFS_COMP_INFO * comp)
         if (blk_end > comp->comp_len) {
             tsk_error_set_errno(TSK_ERR_FS_FWALK);
             tsk_error_set_errstr
-                ("ntfs_uncompress_compunit: Block length longer than buffer length: %"
+                ("ntfs_uncompress_compunit: Compression block length longer than buffer length: %"
                 PRIuSIZE "", blk_end);
             return 1;
         }
 
-        if (tsk_verbose)
-            tsk_fprintf(stderr,
-                "ntfs_uncompress_compunit: Block size is %" PRIuSIZE "\n",
-                blk_size);
 
         /* The MSB identifies if the block is compressed */
         iscomp = ((sb_header & 0x8000) != 0);
@@ -936,8 +937,10 @@ ntfs_uncompress_compunit(NTFS_COMP_INFO * comp)
 
         // the 4096 size seems to occur at the same times as no compression
         if ((iscomp) && (blk_size - 2 != 4096)) {
+            if (tsk_verbose)
+                tsk_fprintf(stderr, "ntfs_uncompress_compunit: Compression block is compressed\n");
 
-            // cycle through the block
+            // cycle through the token groups in the block
             while (cl_index < blk_end) {
                 int a;
 
@@ -947,7 +950,7 @@ ntfs_uncompress_compunit(NTFS_COMP_INFO * comp)
 
                 if (tsk_verbose)
                     tsk_fprintf(stderr,
-                        "ntfs_uncompress_compunit: New Tag: %x\n", header);
+                        "ntfs_uncompress_compunit: Token Group Header: %x\n", header);
 
                 for (a = 0; a < 8 && cl_index < blk_end; a++) {
 
@@ -958,8 +961,8 @@ ntfs_uncompress_compunit(NTFS_COMP_INFO * comp)
                     if ((header & NTFS_TOKEN_MASK) == NTFS_SYMBOL_TOKEN) {
                         if (tsk_verbose)
                             tsk_fprintf(stderr,
-                                "ntfs_uncompress_compunit: Symbol Token: %"
-                                PRIuSIZE "\n", cl_index);
+                                "ntfs_uncompress_compunit: Symbol Token: (offset %"
+                                PRIuSIZE ")\n", cl_index);
 
                         if (comp->uncomp_idx >= comp->buf_size_b) {
                             tsk_error_set_errno(TSK_ERR_FS_FWALK);
@@ -1029,8 +1032,8 @@ ntfs_uncompress_compunit(NTFS_COMP_INFO * comp)
 
                         if (tsk_verbose)
                             tsk_fprintf(stderr,
-                                "ntfs_uncompress_compunit: Phrase Token: %"
-                                PRIuSIZE "\t%d\t%d\t%x\n", cl_index,
+                                "ntfs_uncompress_compunit: Phrase Token: (offset %"
+                                PRIuSIZE ")\tLen: %d\tPrevOffset: %d\tHeader=%x\n", cl_index-2,
                                 length, offset, pheader);
 
                         /* Sanity checks on values */
@@ -1083,6 +1086,9 @@ ntfs_uncompress_compunit(NTFS_COMP_INFO * comp)
 
         // this block contains uncompressed data
         else {
+            if (tsk_verbose)
+                tsk_fprintf(stderr, "ntfs_uncompress_compunit: Block size is not compressed\n");
+
             while (cl_index < blk_end && cl_index < comp->comp_len) {
                 /* This seems to happen only with corrupt data -- such as
                  * when an unallocated file is being processed... */
@@ -1375,6 +1381,11 @@ ntfs_attr_walk_special(const TSK_FS_ATTR * fs_attr,
                     || ((len_idx == fs_attr_run->len - 1)
                         && (fs_attr_run->next == NULL))) {
                     size_t i;
+
+
+                    if (tsk_verbose)
+                        tsk_fprintf(stderr,
+                            "ntfs_proc_compunit: Decompressing at file offset %"PRIdOFF"\n", off);
 
                     // decompress the unit
                     if (ntfs_proc_compunit(ntfs, &comp, comp_unit,
@@ -3397,7 +3408,7 @@ ntfs_get_sds(TSK_FS_INFO * fs, uint32_t secid)
     sii_sds_ent_size = tsk_getu32(fs->endian, sii->sec_desc_size);
 
     // Check that we do not go out of bounds.
-    if ((uint32_t) sii_sds_file_off > ntfs->sds_data.size) {
+    if (sii_sds_file_off > ntfs->sds_data.size) {
         tsk_error_reset();
         tsk_error_set_errno(TSK_ERR_FS_GENFS);
         tsk_error_set_errstr("ntfs_get_sds: SII offset too large (%" PRIu64

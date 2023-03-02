@@ -224,6 +224,7 @@ public interface TimelineEventType extends Comparable<TimelineEventType> {
 			builder.add(CALL_LOG, DEVICES_ATTACHED, EMAIL,
 					EXIF, GPS_BOOKMARK, GPS_LAST_KNOWN_LOCATION, GPS_TRACKPOINT,
 					GPS_ROUTE, GPS_SEARCH, GPS_TRACK, INSTALLED_PROGRAM, LOG_ENTRY, MESSAGE,
+					METADATA_LAST_PRINTED, METADATA_LAST_SAVED, METADATA_CREATED, PROGRAM_EXECUTION,
 					RECENT_DOCUMENTS, REGISTRY);
 
 			return builder.build();
@@ -391,7 +392,7 @@ public interface TimelineEventType extends Comparable<TimelineEventType> {
 			getBundle().getString("MiscTypes.recentDocuments.name"), // NON-NLS
 			MISC_TYPES,
 			new BlackboardArtifact.Type(TSK_RECENT_OBJECT),
-			new Type(TSK_DATETIME),
+			new Type(TSK_DATETIME_ACCESSED),
 			new Type(TSK_PATH));
 
 	TimelineEventType INSTALLED_PROGRAM = new TimelineEventArtifactTypeImpl(19,
@@ -467,7 +468,7 @@ public interface TimelineEventType extends Comparable<TimelineEventType> {
 			getBundle().getString("WebTypes.webFormAutoFill.name"),//NON-NLS
 			WEB_ACTIVITY,
 			new BlackboardArtifact.Type(TSK_WEB_FORM_AUTOFILL),
-			new Type(TSK_DATETIME_ACCESSED),
+			new Type(TSK_DATETIME_CREATED),
 			artf -> {
 				final BlackboardAttribute name = getAttributeSafe(artf, new Type(TSK_NAME));
 				final BlackboardAttribute value = getAttributeSafe(artf, new Type(TSK_VALUE));
@@ -526,7 +527,49 @@ public interface TimelineEventType extends Comparable<TimelineEventType> {
 			MISC_TYPES,
 			new BlackboardArtifact.Type(TSK_GPS_TRACK),
 			new Type(TSK_NAME));
+	
+	TimelineEventType METADATA_LAST_PRINTED = new TimelineEventArtifactTypeImpl(33,
+			getBundle().getString("MiscTypes.metadataLastPrinted.name"),// NON-NLS
+			MISC_TYPES,
+			new BlackboardArtifact.Type(TSK_METADATA),
+			new BlackboardAttribute.Type(TSK_LAST_PRINTED_DATETIME),
+            artf -> {return getBundle().getString("MiscTypes.metadataLastPrinted.name");},
+	        new EmptyExtractor(),
+	        new EmptyExtractor());
 
+
+	TimelineEventType METADATA_LAST_SAVED = new TimelineEventArtifactTypeImpl(34,
+			getBundle().getString("MiscTypes.metadataLastSaved.name"),// NON-NLS
+			MISC_TYPES,
+			new BlackboardArtifact.Type(TSK_METADATA),
+			new BlackboardAttribute.Type(TSK_DATETIME_MODIFIED),
+            artf -> {return getBundle().getString("MiscTypes.metadataLastSaved.name");},
+	        new EmptyExtractor(),
+	       new EmptyExtractor());
+
+	TimelineEventType METADATA_CREATED = new TimelineEventArtifactTypeImpl(35,
+			getBundle().getString("MiscTypes.metadataCreated.name"),// NON-NLS
+			MISC_TYPES,
+			new BlackboardArtifact.Type(TSK_METADATA),
+			new BlackboardAttribute.Type(TSK_DATETIME_CREATED),
+            artf -> {return getBundle().getString("MiscTypes.metadataCreated.name");},
+	        new EmptyExtractor(),
+	        new EmptyExtractor());
+
+	TimelineEventType PROGRAM_EXECUTION = new TimelineEventArtifactTypeImpl(36,
+			getBundle().getString("MiscTypes.programexecuted.name"),// NON-NLS
+			MISC_TYPES,
+			new BlackboardArtifact.Type(TSK_PROG_RUN),
+			new Type(TSK_DATETIME),
+			new AttributeExtractor(new Type(TSK_PROG_NAME)),
+            artf -> {
+	                 String userName = stringValueOf(getAttributeSafe(artf, new Type(TSK_USER_NAME)));
+				     if (userName != null) {
+					    return userName;
+				     }
+	                 return "";},
+			new AttributeExtractor(new Type(TSK_COMMENT)));
+			
 	static SortedSet<? extends TimelineEventType> getCategoryTypes() {
 		return ROOT_EVENT_TYPE.getChildren();
 	}

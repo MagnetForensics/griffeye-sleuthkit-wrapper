@@ -33,6 +33,9 @@
       copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libtsk4.dll" "$(SolutionDir)\unit-tests\bin\$(Platform)\$(Configuration)\"
       copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\zlib.dll" "$(SolutionDir)\unit-tests\bin\$(Platform)\$(Configuration)\"
       copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\ewf.net.dll" "$(SolutionDir)\unit-tests\bin\$(Platform)\$(Configuration)\"
+
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libcrypto-1_1-x64.dll" "$(SolutionDir)\unit-tests\bin\$(Platform)\$(Configuration)\"
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libssl-1_1-x64.dll" "$(SolutionDir)\unit-tests\bin\$(Platform)\$(Configuration)\"
     </PreBuildEvent>
   </PropertyGroup>
 </Project>

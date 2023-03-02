@@ -1,35 +1,19 @@
-The folders libewf, zlib, bzip2 and and sleuthkit contains the release contents of their respective projects.
-
-When upgrading libewf and sleuthkit, just replace the contents of their folder with the new release contents.
-
-After that some changes are necessary to get the builds working.
-
-LIBEWF (Library to access the Expert Witness Compression Format (EWF)):
-Use the version here: https://github.com/sleuthkit/libewf_64bit
-
-1. Open the solution (libewf\msvscpp\libewf.sln) in the latest Visual Studio version that is supported by the builders
-2. Disable build of pyewf project (and dokan and ewfmount if they exist in the solution)
-3. Change build output of bzip2 project to static library if it exists
-4. Build in Release
-
-LIBVMDK (Library to access the VMware Virtual Disk (VMDK) format):
-Use the version here: https://github.com/sleuthkit/libvmdk_64bit
-Open and build libvmdk\libvmdk\msvscpp\libvmdk.sln in Release
-
-LIBVHDI (Library to access the Virtual Hard Disk (VHD) image format):
-Use the version here: https://github.com/sleuthkit/libvhdi_64bit
-Open and build libvhdi\msvscpp\libvhdi.sln in Release
-
+Since 4.10.2 the depencencies libvmdk, libvhdi, libewf no longer needs to be build. They are fetched from nuget.
 
 SLEUTHKIT:
 
-1. Open the solution in the latest Visual Studio version that is supported by the builders and update the toolset if required.
+1. When upgrading sleuthkit, just replace the contents of their folder with the new release contents.
+2. Open the solution in the latest Visual Studio version that is supported by the builders and update the toolset if required.
    Make sure you adjust 4 xcopy rows in libtsk.vcxproj if toolset is changed.
-   Possibly discard changes to Source\sleuthkit\tools\logicalimager\LogicalImagerRuleBase.cpp
+   xcopy /E /Y "$(VCInstallDir)\redist\$(PlatformTarget)\Microsoft.VC140.CRT" "$(OutDir)"
+   to
+   xcopy /E /Y "$(VCToolsRedistInstallDir)$(PlatformTarget)\Microsoft.VC143.CRT" "$(OutDir)"
+
    Apply patches with our changes
       git am Source/0001-make-a-few-changes-from-original-sleuthkit-source.patch
-2. Disable build of the libtsk_jni project. Remove it from solution file.
-3. Run SetEnvironmentVaraiblesForSleuthkit.ps1 to set environment variables for build
+      git am Source/0002-add-includes-needed-by-new-platformtoolset.patch
+3. Disable build of the libtsk_jni project. Remove it from solution file.
+4. Run SetEnvironmentVaraiblesForSleuthkit.ps1 to set environment variables for build, step might not be needed anymore!?
 
 
 SLEUTHKIT SHARP:

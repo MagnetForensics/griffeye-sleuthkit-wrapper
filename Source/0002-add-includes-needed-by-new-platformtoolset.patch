@@ -1,0 +1,172 @@
+From 8a43a4fc19742a9ad0e4467c2982605ee0538cd8 Mon Sep 17 00:00:00 2001
+From: Sven Claesson <sven.claesson@griffeye.com>
+Date: Thu, 2 Mar 2023 13:27:40 +0100
+Subject: [PATCH] add includes needed by new platformtoolset
+
+---
+ .../sleuthkit/rejistry++/msvcpp/Rejistry++/Rejistry++.vcxproj  | 2 +-
+ Source/sleuthkit/rejistry++/msvcpp/Rejistry/Rejistry.vcxproj   | 2 +-
+ Source/sleuthkit/rejistry++/src/DBIndirectRecord.cpp           | 3 ++-
+ Source/sleuthkit/rejistry++/src/DBRecord.cpp                   | 1 +
+ Source/sleuthkit/rejistry++/src/DirectSubkeyListRecord.cpp     | 1 +
+ Source/sleuthkit/rejistry++/src/NKRecord.cpp                   | 1 +
+ Source/sleuthkit/rejistry++/src/REGFHeader.cpp                 | 2 ++
+ Source/sleuthkit/rejistry++/src/RIRecord.cpp                   | 1 +
+ Source/sleuthkit/rejistry++/src/RegistryByteBuffer.h           | 1 +
+ Source/sleuthkit/rejistry++/src/VKRecord.cpp                   | 1 +
+ Source/sleuthkit/rejistry++/src/ValueListRecord.cpp            | 1 +
+ Source/sleuthkit/tools/logicalimager/LogicalImagerRuleBase.cpp | 1 +
+ 12 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/Source/sleuthkit/rejistry++/msvcpp/Rejistry++/Rejistry++.vcxproj b/Source/sleuthkit/rejistry++/msvcpp/Rejistry++/Rejistry++.vcxproj
+index 23644da..ab849e4 100644
+--- a/Source/sleuthkit/rejistry++/msvcpp/Rejistry++/Rejistry++.vcxproj
++++ b/Source/sleuthkit/rejistry++/msvcpp/Rejistry++/Rejistry++.vcxproj
+@@ -29,7 +29,7 @@
+   <PropertyGroup Label="Globals">
+     <ProjectGuid>{C41ACD23-6D88-4999-B79D-7E7828B2DBDE}</ProjectGuid>
+     <RootNamespace>rejistry</RootNamespace>
+-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+diff --git a/Source/sleuthkit/rejistry++/msvcpp/Rejistry/Rejistry.vcxproj b/Source/sleuthkit/rejistry++/msvcpp/Rejistry/Rejistry.vcxproj
+index 3ff1f7a..e669696 100644
+--- a/Source/sleuthkit/rejistry++/msvcpp/Rejistry/Rejistry.vcxproj
++++ b/Source/sleuthkit/rejistry++/msvcpp/Rejistry/Rejistry.vcxproj
+@@ -32,7 +32,7 @@
+   <PropertyGroup Label="Globals">
+     <ProjectGuid>{22509FFC-8EEB-460F-B733-08F0A3EA3EB7}</ProjectGuid>
+     <RootNamespace>rejistry</RootNamespace>
+-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+diff --git a/Source/sleuthkit/rejistry++/src/DBIndirectRecord.cpp b/Source/sleuthkit/rejistry++/src/DBIndirectRecord.cpp
+index 538edba..c72f704 100644
+--- a/Source/sleuthkit/rejistry++/src/DBIndirectRecord.cpp
++++ b/Source/sleuthkit/rejistry++/src/DBIndirectRecord.cpp
+@@ -25,7 +25,8 @@
+  * \file DBIndirectRecord.cpp
+  *
+  */
+-#include<algorithm>
++#include <algorithm>
++#include <memory>
+ 
+ // Local includes
+ #include "DBIndirectRecord.h"
+diff --git a/Source/sleuthkit/rejistry++/src/DBRecord.cpp b/Source/sleuthkit/rejistry++/src/DBRecord.cpp
+index 5b0c48f..d59700f 100644
+--- a/Source/sleuthkit/rejistry++/src/DBRecord.cpp
++++ b/Source/sleuthkit/rejistry++/src/DBRecord.cpp
+@@ -30,6 +30,7 @@
+ #include "DBRecord.h"
+ #include "RejistryException.h"
+ #include "REGFHeader.h"
++#include <memory>
+ 
+ namespace Rejistry {
+     const std::string DBRecord::MAGIC = "db";
+diff --git a/Source/sleuthkit/rejistry++/src/DirectSubkeyListRecord.cpp b/Source/sleuthkit/rejistry++/src/DirectSubkeyListRecord.cpp
+index 46edfed..46a76a2 100644
+--- a/Source/sleuthkit/rejistry++/src/DirectSubkeyListRecord.cpp
++++ b/Source/sleuthkit/rejistry++/src/DirectSubkeyListRecord.cpp
+@@ -30,6 +30,7 @@
+ #include "DirectSubkeyListRecord.h"
+ #include "REGFHeader.h"
+ #include "RejistryException.h"
++#include <memory>
+ 
+ namespace Rejistry {
+     
+diff --git a/Source/sleuthkit/rejistry++/src/NKRecord.cpp b/Source/sleuthkit/rejistry++/src/NKRecord.cpp
+index 90b43fb..8e566dd 100644
+--- a/Source/sleuthkit/rejistry++/src/NKRecord.cpp
++++ b/Source/sleuthkit/rejistry++/src/NKRecord.cpp
+@@ -32,6 +32,7 @@
+ #include "RejistryException.h"
+ #include "DirectSubkeyListRecord.h"
+ #include "EmptySubkeyList.h"
++#include <memory>
+ 
+ namespace Rejistry {
+ 
+diff --git a/Source/sleuthkit/rejistry++/src/REGFHeader.cpp b/Source/sleuthkit/rejistry++/src/REGFHeader.cpp
+index eb5ddc2..24a9f62 100644
+--- a/Source/sleuthkit/rejistry++/src/REGFHeader.cpp
++++ b/Source/sleuthkit/rejistry++/src/REGFHeader.cpp
+@@ -28,6 +28,8 @@
+ // Local includes
+ #include "REGFHeader.h"
+ #include "RejistryException.h"
++#include <memory>
++
+ 
+ namespace Rejistry {
+ 
+diff --git a/Source/sleuthkit/rejistry++/src/RIRecord.cpp b/Source/sleuthkit/rejistry++/src/RIRecord.cpp
+index 2ebd7cb..b1d4f2a 100644
+--- a/Source/sleuthkit/rejistry++/src/RIRecord.cpp
++++ b/Source/sleuthkit/rejistry++/src/RIRecord.cpp
+@@ -30,6 +30,7 @@
+ #include "RIRecord.h"
+ #include "RejistryException.h"
+ #include "REGFHeader.h"
++#include <memory>
+ 
+ namespace Rejistry {
+     const std::string RIRecord::MAGIC = "ri";
+diff --git a/Source/sleuthkit/rejistry++/src/RegistryByteBuffer.h b/Source/sleuthkit/rejistry++/src/RegistryByteBuffer.h
+index d924c6d..75a16de 100644
+--- a/Source/sleuthkit/rejistry++/src/RegistryByteBuffer.h
++++ b/Source/sleuthkit/rejistry++/src/RegistryByteBuffer.h
+@@ -29,6 +29,7 @@
+ #define _REJISTRY_REGISTRYBYTEBUFFER_H
+ 
+ #include <cstdint>
++#include <string>
+ 
+ // Local includes
+ #include "ByteBuffer.h"
+diff --git a/Source/sleuthkit/rejistry++/src/VKRecord.cpp b/Source/sleuthkit/rejistry++/src/VKRecord.cpp
+index afdad95..c68e761 100644
+--- a/Source/sleuthkit/rejistry++/src/VKRecord.cpp
++++ b/Source/sleuthkit/rejistry++/src/VKRecord.cpp
+@@ -30,6 +30,7 @@
+ #include "VKRecord.h"
+ #include "RejistryException.h"
+ #include "REGFHeader.h"
++#include <memory>
+ 
+ namespace Rejistry {
+ 
+diff --git a/Source/sleuthkit/rejistry++/src/ValueListRecord.cpp b/Source/sleuthkit/rejistry++/src/ValueListRecord.cpp
+index cdfce00..f699393 100644
+--- a/Source/sleuthkit/rejistry++/src/ValueListRecord.cpp
++++ b/Source/sleuthkit/rejistry++/src/ValueListRecord.cpp
+@@ -27,6 +27,7 @@
+  */
+ #include <algorithm>
+ #include <cstring>
++#include <memory>
+ 
+ // Local includes
+ #include "ValueListRecord.h"
+diff --git a/Source/sleuthkit/tools/logicalimager/LogicalImagerRuleBase.cpp b/Source/sleuthkit/tools/logicalimager/LogicalImagerRuleBase.cpp
+index 4523403..f627bae 100644
+--- a/Source/sleuthkit/tools/logicalimager/LogicalImagerRuleBase.cpp
++++ b/Source/sleuthkit/tools/logicalimager/LogicalImagerRuleBase.cpp
+@@ -9,6 +9,7 @@
+ */
+ 
+ #include "LogicalImagerRuleBase.h"
++#include <stdexcept>
+ 
+ LogicalImagerRuleBase::LogicalImagerRuleBase() {
+ }
+-- 
+2.38.1.windows.1
+
