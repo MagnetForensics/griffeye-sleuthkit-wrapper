@@ -491,7 +491,12 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_INFO_FLAG_HAVE_NANOSEC, Nano second field in times will be set.
         /// </summary>
-        HasNanoSec = 0x02
+        HasNanoSec = 0x02,
+
+        /// <summary>
+        /// TSK_FS_INFO_FLAG_ENCRYPTED, File system is encrypted
+        /// </summary>
+        Encrypted = 0x04
     };
 
     internal enum FileReadFlag
@@ -721,14 +726,31 @@ namespace SleuthKit
         ISO9660 = 0x00000800,
 
         /// <summary>
-        /// TSK_FS_TYPE_HFS, HFS file system
+        /// TSK_FS_TYPE_HFS, HFS+/HFSX file system
         /// </summary>
         HFS = 0x00001000,
+
+        /// <summary>
+        /// TSK_FS_TYPE_HFS_DETECT, HFS auto detection
+        /// </summary>
+        [Description("Autodetect HFS")]
+        HFSdetect = 0x00009000,
 
         /// <summary>
         /// TSK_FS_TYPE_YAFFS2, YAFFS2 file system
         /// </summary>
         Yaffs2 = 0x00004000,
+
+        /// <summary>
+        /// APFS file system
+        /// </summary>
+        Apfs = 0x00010000,
+
+        /// <summary>
+        /// APFS auto detection
+        /// </summary>
+        [Description("Autodetect APFS")]
+        ApfsAutodetect = 0x00010000,
 
         /// <summary>
         /// TSK_FS_TYPE_UNSUPP, Unsupported file system

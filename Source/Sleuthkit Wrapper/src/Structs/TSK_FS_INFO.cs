@@ -8,9 +8,9 @@ namespace SleuthKit.Structs
     /// </summary>
     [StructLayout(LayoutKind.Explicit,
 #if Bit32
-    Size = 280
+    Size = 288
 #elif Bit64
-    Size = 408
+    Size = 424
 #endif
 )]
     public struct TSK_FS_INFO
@@ -326,42 +326,42 @@ namespace SleuthKit.Structs
 #elif Bit64
         [FieldOffset(328)]
 #endif
-        private IntPtr istat_ptr;
+        private IntPtr decrypt_block_ptr;
 
 #if Bit32
         [FieldOffset(240)]
 #elif Bit64
         [FieldOffset(336)]
 #endif
-        private IntPtr dir_open_meta_ptr;
+        private IntPtr istat_ptr;
 
 #if Bit32
         [FieldOffset(244)]
 #elif Bit64
         [FieldOffset(344)]
 #endif
-        private IntPtr jopen_ptr;
+        private IntPtr dir_open_meta_ptr;
 
 #if Bit32
         [FieldOffset(248)]
 #elif Bit64
         [FieldOffset(352)]
 #endif
-        private IntPtr jblk_walk_ptr;
+        private IntPtr jopen_ptr;
 
 #if Bit32
         [FieldOffset(252)]
 #elif Bit64
         [FieldOffset(360)]
 #endif
-        private IntPtr jentry_walk_ptr;
+        private IntPtr jblk_walk_ptr;
 
 #if Bit32
         [FieldOffset(256)]
 #elif Bit64
         [FieldOffset(368)]
 #endif
-        private IntPtr fsstat_ptr;
+        private IntPtr jentry_walk_ptr;
 
         /*
         public fsstatDelegate fsstat;
@@ -375,28 +375,42 @@ namespace SleuthKit.Structs
 #elif Bit64
         [FieldOffset(376)]
 #endif
-        private IntPtr name_cmp_ptr;
+        private IntPtr fsstat_ptr;
 
 #if Bit32
         [FieldOffset(264)]
 #elif Bit64
         [FieldOffset(384)]
 #endif
-        private IntPtr fscheck_ptr;
+        private IntPtr name_cmp_ptr;
 
 #if Bit32
         [FieldOffset(268)]
 #elif Bit64
         [FieldOffset(392)]
 #endif
-        private IntPtr close_ptr;
+        private IntPtr fscheck_ptr;
 
 #if Bit32
         [FieldOffset(272)]
 #elif Bit64
         [FieldOffset(400)]
 #endif
+        private IntPtr close_ptr;
+
+#if Bit32
+        [FieldOffset(276)]
+#elif Bit64
+        [FieldOffset(408)]
+#endif
         private IntPtr fread_owner_sid_ptr;
+        
+#if Bit32
+        [FieldOffset(280)]
+#elif Bit64
+        [FieldOffset(416)]
+#endif
+        private IntPtr impl_ptr;
 
         #endregion methods
 

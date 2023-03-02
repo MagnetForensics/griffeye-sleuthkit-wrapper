@@ -1,0 +1,149 @@
+From edfd0d5924a941b199c4adabad86d83599c549ba Mon Sep 17 00:00:00 2001
+From: Sven Claesson <sven.claesson@griffeye.com>
+Date: Fri, 24 Feb 2023 13:27:17 +0100
+Subject: [PATCH] make a few changes from original sleuthkit source
+
+---
+ Source/sleuthkit/samples/callback-style.cpp |  6 ++-
+ Source/sleuthkit/tsk/fs/fatfs.c             | 14 ++++--
+ Source/sleuthkit/tsk/fs/fatfs_utils.c       |  2 +-
+ Source/sleuthkit/tsk/fs/fatxxfs.c           | 48 +++++++++++----------
+ Source/sleuthkit/tsk/fs/tsk_fs.h            |  1 +
+ 5 files changed, 43 insertions(+), 28 deletions(-)
+
+diff --git a/Source/sleuthkit/samples/callback-style.cpp b/Source/sleuthkit/samples/callback-style.cpp
+index 8dad337..209a1bc 100644
+--- a/Source/sleuthkit/samples/callback-style.cpp
++++ b/Source/sleuthkit/samples/callback-style.cpp
+@@ -143,7 +143,11 @@ static TSK_WALK_RET_ENUM
+ dir_act(TSK_FS_FILE * fs_file, const char *path, void * /*ptr*/)
+ {
+ 	fprintf(stdout,
+-		"file systems file name: %s\n", fs_file->name->name);
++        "file systems file name: %s ", fs_file->name->name);
++    fprintf(stdout,
++        "metadata file name: %s ", fs_file->meta->name2->name);
++    fprintf(stdout,
++        "shrt file name: %s\n", fs_file->name->shrt_name);
+ 
+     /* Ignore NTFS System files */
+     if ((TSK_FS_TYPE_ISNTFS(fs_file->fs_info->ftype))
+diff --git a/Source/sleuthkit/tsk/fs/fatfs.c b/Source/sleuthkit/tsk/fs/fatfs.c
+index fe3ab17..19a5ed6 100644
+--- a/Source/sleuthkit/tsk/fs/fatfs.c
++++ b/Source/sleuthkit/tsk/fs/fatfs.c
+@@ -58,7 +58,15 @@ fatfs_open(TSK_IMG_INFO *a_img_info, TSK_OFF_T a_offset, TSK_FS_TYPE_ENUM a_ftyp
+         return NULL;
+ 	}
+     fs = &(fatfs->fs_info);
+-    fs->ftype = a_ftype;
++    if (a_ftype == TSK_FS_TYPE_ANDROID)
++    {
++        fs->ftype = TSK_FS_TYPE_FAT_DETECT;
++        fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
++    }
++    else
++    {
++        fs->ftype = a_ftype;
++    }
+     fs->img_info = a_img_info;
+     fs->offset = a_offset;
+     fs->dev_bsize = a_img_info->sector_size;
+@@ -126,8 +134,8 @@ fatfs_open(TSK_IMG_INFO *a_img_info, TSK_OFF_T a_offset, TSK_FS_TYPE_ENUM a_ftyp
+     }
+ 
+ 	// Attempt to open the file system as one of the FAT types.
+-    if ((a_ftype == TSK_FS_TYPE_FAT_DETECT && (fatxxfs_open(fatfs) == 0 || exfatfs_open(fatfs) == 0)) ||
+-		(a_ftype == TSK_FS_TYPE_EXFAT && exfatfs_open(fatfs) == 0) ||
++    if ((fs->ftype == TSK_FS_TYPE_FAT_DETECT && (fatxxfs_open(fatfs) == 0 || exfatfs_open(fatfs) == 0)) ||
++        (fs->ftype == TSK_FS_TYPE_EXFAT && exfatfs_open(fatfs) == 0) ||
+ 		(fatxxfs_open(fatfs) == 0)) {
+     	return (TSK_FS_INFO*)fatfs;
+ 	} 
+diff --git a/Source/sleuthkit/tsk/fs/fatfs_utils.c b/Source/sleuthkit/tsk/fs/fatfs_utils.c
+index 42e7fe5..9e7017e 100644
+--- a/Source/sleuthkit/tsk/fs/fatfs_utils.c
++++ b/Source/sleuthkit/tsk/fs/fatfs_utils.c
+@@ -229,7 +229,7 @@ fatfs_cleanup_ascii(char *str)
+     if (!fatfs_ptr_arg_is_null(str, "str", func_name)) {
+         int i;
+         for (i = 0; str[i] != '\0'; i++) {
+-            if ((unsigned char) (str[i]) > 0x7e) {
++            if ((unsigned char) (str[i]) > 0x7e || (unsigned char)(str[i]) < 0x20) {
+                 str[i] = '^';
+             }
+         }
+diff --git a/Source/sleuthkit/tsk/fs/fatxxfs.c b/Source/sleuthkit/tsk/fs/fatxxfs.c
+index 72e407d..1e0c747 100644
+--- a/Source/sleuthkit/tsk/fs/fatxxfs.c
++++ b/Source/sleuthkit/tsk/fs/fatxxfs.c
+@@ -821,29 +821,31 @@ fatxxfs_open(FATFS_INFO *fatfs)
+     tsk_init_lock(&fatfs->dir_lock);
+     fatfs->inum2par = NULL;
+ 
+-	// Test to see if this is the odd Android case where the FAT entries have no short name
+-	//
+-	// If there are no entries found with the normal short name
+-	// and we find more entries by removing the short name test for allocated directories, then assume
+-	// this is the case where we have no short names
+-	fatfs->subtype = TSK_FATFS_SUBTYPE_SPEC;
+-	test_dir1 = tsk_fs_dir_open_meta(fs, fs->root_inum);
+-
+-	if (test_dir1 != NULL && test_dir1->names_used <= 4){ // At most four automatic directories ($MBR, $FAT1, $FAT1, $OrphanFiles)
+-	    TSK_FS_DIR * test_dir2; //  to see if it's the Android FAT version
+-
+-		fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
+-		test_dir2 = tsk_fs_dir_open_meta(fs, fs->root_inum);
+-
+-		if (test_dir2 != NULL && test_dir2->names_used > test_dir1->names_used){
+-			fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
+-		}
+-		else{
+-			fatfs->subtype = TSK_FATFS_SUBTYPE_SPEC;
+-		}
+-		tsk_fs_dir_close(test_dir2);
+-	}
+-	tsk_fs_dir_close(test_dir1);
++    if (fatfs->subtype != TSK_FATFS_SUBTYPE_ANDROID_1) {
++        // Test to see if this is the odd Android case where the FAT entries have no short name
++        //
++        // If there are no entries found with the normal short name
++        // and we find more entries by removing the short name test for allocated directories, then assume
++        // this is the case where we have no short names
++        fatfs->subtype = TSK_FATFS_SUBTYPE_SPEC;
++        test_dir1 = tsk_fs_dir_open_meta(fs, fs->root_inum);
++
++        if (test_dir1 != NULL && test_dir1->names_used <= 4) { // At most four automatic directories ($MBR, $FAT1, $FAT1, $OrphanFiles)
++            TSK_FS_DIR* test_dir2; //  to see if it's the Android FAT version
++
++            fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
++            test_dir2 = tsk_fs_dir_open_meta(fs, fs->root_inum);
++
++            if (test_dir2 != NULL && test_dir2->names_used > test_dir1->names_used) {
++                fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
++            }
++            else {
++                fatfs->subtype = TSK_FATFS_SUBTYPE_SPEC;
++            }
++            tsk_fs_dir_close(test_dir2);
++        }
++        tsk_fs_dir_close(test_dir1);
++    }
+ 
+     return 0;
+ }
+diff --git a/Source/sleuthkit/tsk/fs/tsk_fs.h b/Source/sleuthkit/tsk/fs/tsk_fs.h
+index 2158584..833261c 100644
+--- a/Source/sleuthkit/tsk/fs/tsk_fs.h
++++ b/Source/sleuthkit/tsk/fs/tsk_fs.h
+@@ -798,6 +798,7 @@ extern "C" {
+         TSK_FS_TYPE_FAT16 = 0x00000004, ///< FAT16 file system
+         TSK_FS_TYPE_FAT32 = 0x00000008, ///< FAT32 file system
+         TSK_FS_TYPE_EXFAT = 0x0000000a, ///< exFAT file system
++        TSK_FS_TYPE_ANDROID = 0x0000000c, ///< FAT android file system
+         TSK_FS_TYPE_FAT_DETECT = 0x0000000e,    ///< FAT auto detection
+         TSK_FS_TYPE_FFS1 = 0x00000010,  ///< UFS1 (FreeBSD, OpenBSD, BSDI ...)
+         TSK_FS_TYPE_FFS1B = 0x00000020, ///< UFS1b (Solaris - has no type)
+-- 
+2.38.1.windows.1
+

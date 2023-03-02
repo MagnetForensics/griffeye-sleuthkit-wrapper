@@ -54,7 +54,6 @@
     <ProjectGuid>{52251CB2-65A3-421B-9CB4-7DAC13BB3758}</ProjectGuid>
     <RootNamespace>ifind</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

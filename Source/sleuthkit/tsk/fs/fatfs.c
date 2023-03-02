@@ -58,7 +58,7 @@ fatfs_open(TSK_IMG_INFO *a_img_info, TSK_OFF_T a_offset, TSK_FS_TYPE_ENUM a_ftyp
         return NULL;
 	}
     fs = &(fatfs->fs_info);
-    if (a_ftype == TSK_FS_TYPE_ANDROID) 
+    if (a_ftype == TSK_FS_TYPE_ANDROID)
     {
         fs->ftype = TSK_FS_TYPE_FAT_DETECT;
         fatfs->subtype = TSK_FATFS_SUBTYPE_ANDROID_1;
@@ -135,7 +135,7 @@ fatfs_open(TSK_IMG_INFO *a_img_info, TSK_OFF_T a_offset, TSK_FS_TYPE_ENUM a_ftyp
 
 	// Attempt to open the file system as one of the FAT types.
     if ((fs->ftype == TSK_FS_TYPE_FAT_DETECT && (fatxxfs_open(fatfs) == 0 || exfatfs_open(fatfs) == 0)) ||
-		(fs->ftype == TSK_FS_TYPE_EXFAT && exfatfs_open(fatfs) == 0) ||
+        (fs->ftype == TSK_FS_TYPE_EXFAT && exfatfs_open(fatfs) == 0) ||
 		(fatxxfs_open(fatfs) == 0)) {
     	return (TSK_FS_INFO*)fatfs;
 	} 

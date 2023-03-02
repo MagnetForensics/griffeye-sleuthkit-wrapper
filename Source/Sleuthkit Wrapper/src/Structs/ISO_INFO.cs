@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SleuthKit.Structs
 {
     [StructLayout(LayoutKind.Explicit, 
 #if Bit32        
-        Size = 304
+        Size = 312
 #elif Bit64
-        Size = 448
+        Size = 456
 #endif
     )]
     public struct ISO_INFO
@@ -19,10 +15,12 @@ namespace SleuthKit.Structs
         [FieldOffset(0)]
         TSK_FS_INFO fs_info;
 
+        // Skipping som properties
+
 #if Bit32
-        [FieldOffset(288)]
+        [FieldOffset(296)]
 #elif Bit64
-        [FieldOffset(416)]
+        [FieldOffset(432)]
 #endif
         IntPtr pvd_ptr;
 

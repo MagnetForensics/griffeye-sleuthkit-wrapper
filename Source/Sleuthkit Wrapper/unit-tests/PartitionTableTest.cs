@@ -17,7 +17,7 @@
         [Test]
         public void LibewfRegressionTest()
         {
-            FileInfo file = new FileInfo(@"\\diskmaskinen\diskimages\Regression\AN-3871\image-clone4.E01");
+            FileInfo file = new FileInfo(@"\\diskmaskinen.netcleantech.local\diskimages\Regression\AN-3871\image-clone4.E01");
             //DOS Partition Table
             //Offset Sector: 0
             //Units are in 512-byte sectors

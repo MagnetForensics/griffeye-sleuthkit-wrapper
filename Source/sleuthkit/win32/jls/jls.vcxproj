@@ -54,7 +54,6 @@
     <ProjectGuid>{C52F935E-1FD2-443C-A181-27908DAB3BC8}</ProjectGuid>
     <RootNamespace>jls</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

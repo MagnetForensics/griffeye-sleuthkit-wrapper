@@ -20,8 +20,13 @@ Use the version here: https://github.com/sleuthkit/libvhdi_64bit
 SLEUTHKIT:
 
 1. Open the solution in the latest Visual Studio version that is supported by the builders and update the toolset if required.
-2. Disable build of the libtsk_jni project
+   Make sure you adjust 4 xcopy rows in libtsk.vcxproj if toolset is changed.
+   Possibly discard changes to Source\sleuthkit\tools\logicalimager\LogicalImagerRuleBase.cpp
+   Apply patches with our changes
+      git am Source/0001-make-a-few-changes-from-original-sleuthkit-source.patch
+2. Disable build of the libtsk_jni project. Remove it from solution file.
 3. Run SetEnvironmentVaraiblesForSleuthkit.ps1 to set environment variables for build
+
 	
 	
 SLEUTHKIT SHARP:
@@ -55,4 +60,4 @@ copy /y "Lib\x64\libtsk4.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Relea
 copy /y "Lib\x64\zlib.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
 copy /y "Lib\x64\ewf.net.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
 copy /y "Source\Sleuthkit Wrapper\src\bin\x64\Release\sleuthkit-sharp.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
-	
+

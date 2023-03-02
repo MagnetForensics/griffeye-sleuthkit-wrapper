@@ -15,9 +15,11 @@ namespace SleuthKit.Structs
         private ulong offset;     ///< Offset (in blocks) of this run in the file
 
         private ulong addr;       ///< Starting block address (in file system) of run
-
+        
         private ulong len;        ///< Number of blocks in run (0 when entry is not in use)
         
+        private ulong crypto_id;  ///< Starting block number used for XTS encryption IV
+
         private AttributeRunFlags flags;        ///< Flags for run
 
         public bool HasNext

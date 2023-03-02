@@ -54,7 +54,6 @@
     <ProjectGuid>{5594DC0E-191C-4F2A-83FE-97F53A9C1222}</ProjectGuid>
     <RootNamespace>posixcppsample</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

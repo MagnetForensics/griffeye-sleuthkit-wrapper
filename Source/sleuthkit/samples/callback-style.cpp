@@ -143,7 +143,7 @@ static TSK_WALK_RET_ENUM
 dir_act(TSK_FS_FILE * fs_file, const char *path, void * /*ptr*/)
 {
 	fprintf(stdout,
-		"file systems file name: %s ", fs_file->name->name);
+        "file systems file name: %s ", fs_file->name->name);
     fprintf(stdout,
         "metadata file name: %s ", fs_file->meta->name2->name);
     fprintf(stdout,

@@ -54,7 +54,6 @@
     <ProjectGuid>{A15F1E4F-951A-403E-B746-2A6D63D9C416}</ProjectGuid>
     <RootNamespace>mmcat</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

@@ -54,7 +54,6 @@
     <ProjectGuid>{671D843F-4DFA-4CB8-8BC9-D44E7F4ECF1E}</ProjectGuid>
     <RootNamespace>img_cat</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

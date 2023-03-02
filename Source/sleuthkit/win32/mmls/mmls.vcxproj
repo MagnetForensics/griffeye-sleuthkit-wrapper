@@ -54,7 +54,6 @@
     <ProjectGuid>{712DD83B-786E-485E-83C7-7197DD851B78}</ProjectGuid>
     <RootNamespace>mmls</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

@@ -54,7 +54,6 @@
     <ProjectGuid>{48D98A0A-BF9C-4D7E-9AF8-E4CAE8437997}</ProjectGuid>
     <RootNamespace>blkls</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

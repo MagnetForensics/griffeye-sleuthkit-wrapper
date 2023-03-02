@@ -54,7 +54,6 @@
     <ProjectGuid>{3B32F1BE-9686-4DC9-8197-F734D146E9F8}</ProjectGuid>
     <RootNamespace>callbackcppsample</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

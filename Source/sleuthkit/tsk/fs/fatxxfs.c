@@ -846,6 +846,7 @@ fatxxfs_open(FATFS_INFO *fatfs)
         }
         tsk_fs_dir_close(test_dir1);
     }
+
     return 0;
 }
 

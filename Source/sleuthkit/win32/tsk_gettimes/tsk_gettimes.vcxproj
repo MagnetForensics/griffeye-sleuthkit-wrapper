@@ -54,7 +54,6 @@
     <ProjectGuid>{11A8927C-F971-4104-A286-5DC11C25E2EC}</ProjectGuid>
     <RootNamespace>tsk_gettimes</RootNamespace>
     <Keyword>ManagedCProj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

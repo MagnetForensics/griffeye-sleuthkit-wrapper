@@ -20,206 +20,206 @@ namespace SleuthKit.Structs
         TSK_FS_INFO fs_info;
 
 #if Bit32
-        [FieldOffset(280)]
-#elif Bit64
-        [FieldOffset(408)]
-#endif
-        IntPtr fs_ptr;
-
-#if Bit32
-        [FieldOffset(284)]
-#elif Bit64
-        [FieldOffset(416)]
-#endif
-        char is_case_sensitive;
-
-#if Bit32
         [FieldOffset(288)]
 #elif Bit64
         [FieldOffset(424)]
 #endif
+        IntPtr fs_ptr;
+
+#if Bit32
+        [FieldOffset(292)]
+#elif Bit64
+        [FieldOffset(432)]
+#endif
+        char is_case_sensitive;
+
+#if Bit32
+        [FieldOffset(296)]
+#elif Bit64
+        [FieldOffset(440)]
+#endif
         tsk_lock_t protection_lock;
-
-#if Bit32
-        [FieldOffset(312)]
-#elif Bit64
-        [FieldOffset(464)]
-#endif
-        IntPtr blockmap_file_ptr;
-
-#if Bit32
-        [FieldOffset(316)]
-#elif Bit64
-        [FieldOffset(472)]
-#endif
-        IntPtr blockmap_attr_ptr;
 
 #if Bit32
         [FieldOffset(320)]
 #elif Bit64
         [FieldOffset(480)]
 #endif
+        IntPtr blockmap_file_ptr;
+
+#if Bit32
+        [FieldOffset(324)]
+#elif Bit64
+        [FieldOffset(488)]
+#endif
+        IntPtr blockmap_attr_ptr;
+
+#if Bit32
+        [FieldOffset(328)]
+#elif Bit64
+        [FieldOffset(496)]
+#endif
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 4096)]
         byte[] blockmap_cache;
 
 #if Bit32
-        [FieldOffset(4416)]
-#elif Bit64
-        [FieldOffset(4576)]
-#endif
-        long blockmap_cache_start;
-
-#if Bit32
         [FieldOffset(4424)]
-#elif Bit64
-        [FieldOffset(4584)]
-#endif
-        UIntPtr blockmap_cache_len;
-
-#if Bit32
-        [FieldOffset(4428)]
 #elif Bit64
         [FieldOffset(4592)]
 #endif
-        IntPtr catalog_file_ptr;
+        long blockmap_cache_start;
 
 #if Bit32
         [FieldOffset(4432)]
 #elif Bit64
         [FieldOffset(4600)]
 #endif
-        IntPtr catalog_attr_ptr;
+        UIntPtr blockmap_cache_len;
 
 #if Bit32
         [FieldOffset(4436)]
 #elif Bit64
         [FieldOffset(4608)]
 #endif
+        IntPtr catalog_file_ptr;
+
+#if Bit32
+        [FieldOffset(4440)]
+#elif Bit64
+        [FieldOffset(4616)]
+#endif
+        IntPtr catalog_attr_ptr;
+
+#if Bit32
+        [FieldOffset(4442)]
+#elif Bit64
+        [FieldOffset(4624)]
+#endif
         tsk_lock_t catalog_header; //TODO: type
-
-#if Bit32
-        [FieldOffset(4544)]
-#elif Bit64
-        [FieldOffset(4720)]
-#endif
-        IntPtr extents_file_ptr;
-
-#if Bit32
-        [FieldOffset(4548)]
-#elif Bit64
-        [FieldOffset(4728)]
-#endif
-        IntPtr extents_attr_ptr;
 
 #if Bit32
         [FieldOffset(4552)]
 #elif Bit64
         [FieldOffset(4736)]
 #endif
-        tsk_lock_t extents_header; //TODO: type
+        IntPtr extents_file_ptr;
 
 #if Bit32
-        [FieldOffset(4664)]
+        [FieldOffset(4556)]
 #elif Bit64
-        [FieldOffset(4848)]
+        [FieldOffset(4744)]
 #endif
-        long hfs_wrapper_offset;
+        IntPtr extents_attr_ptr;
+
+#if Bit32
+        [FieldOffset(4560)]
+#elif Bit64
+        [FieldOffset(4752)]
+#endif
+        tsk_lock_t extents_header; //TODO: type
 
 #if Bit32
         [FieldOffset(4672)]
 #elif Bit64
-        [FieldOffset(4856)]
+        [FieldOffset(4864)]
 #endif
-        long root_crtime;
+        long hfs_wrapper_offset;
 
 #if Bit32
         [FieldOffset(4680)]
 #elif Bit64
-        [FieldOffset(4864)]
+        [FieldOffset(4872)]
 #endif
-        long meta_crtime;
+        long root_crtime;
 
 #if Bit32
         [FieldOffset(4688)]
 #elif Bit64
-        [FieldOffset(4872)]
+        [FieldOffset(4880)]
 #endif
-        long metadir_crtime;
+        long meta_crtime;
 
 #if Bit32
         [FieldOffset(4696)]
 #elif Bit64
-        [FieldOffset(4880)]
+        [FieldOffset(4888)]
 #endif
-        bool has_root_crtime;
-
-#if Bit32
-        [FieldOffset(4697)]
-#elif Bit64
-        [FieldOffset(4881)]
-#endif
-        bool has_meta_crtime;
-
-#if Bit32
-        [FieldOffset(4698)]
-#elif Bit64
-        [FieldOffset(4882)]
-#endif
-        bool has_meta_dir_crtime;
+        long metadir_crtime;
 
 #if Bit32
         [FieldOffset(4704)]
 #elif Bit64
-        [FieldOffset(4888)]
+        [FieldOffset(4896)]
 #endif
-        ulong meta_inum;
+        bool has_root_crtime;
+
+#if Bit32
+        [FieldOffset(4705)]
+#elif Bit64
+        [FieldOffset(4897)]
+#endif
+        bool has_meta_crtime;
+
+#if Bit32
+        [FieldOffset(4706)]
+#elif Bit64
+        [FieldOffset(4898)]
+#endif
+        bool has_meta_dir_crtime;
 
 #if Bit32
         [FieldOffset(4712)]
 #elif Bit64
-        [FieldOffset(4896)]
+        [FieldOffset(4904)]
 #endif
-        ulong meta_dir_inum;
+        ulong meta_inum;
 
 #if Bit32
         [FieldOffset(4720)]
 #elif Bit64
-        [FieldOffset(4904)]
-#endif
-        IntPtr meta_dir_ptr;
-
-#if Bit32
-        [FieldOffset(4724)]
-#elif Bit64
         [FieldOffset(4912)]
 #endif
-        IntPtr dir_meta_dir_ptr;
+        ulong meta_dir_inum;
 
 #if Bit32
         [FieldOffset(4728)]
 #elif Bit64
         [FieldOffset(4920)]
 #endif
+        IntPtr meta_dir_ptr;
+
+#if Bit32
+        [FieldOffset(4732)]
+#elif Bit64
+        [FieldOffset(4928)]
+#endif
+        IntPtr dir_meta_dir_ptr;
+
+#if Bit32
+        [FieldOffset(4736)]
+#elif Bit64
+        [FieldOffset(4936)]
+#endif
         tsk_lock_t metadata_dir_cache_lock;
 
 #if Bit32
-        [FieldOffset(4752)]
+        [FieldOffset(4760)]
 #elif Bit64
-        [FieldOffset(4960)]
+        [FieldOffset(4966)]
 #endif
         bool has_extents_file;
 
 #if Bit32
-        [FieldOffset(4753)]
+        [FieldOffset(4761)]
 #elif Bit64
-        [FieldOffset(4961)]
+        [FieldOffset(4977)]
 #endif
         bool has_startup_file;
 
 #if Bit32
-        [FieldOffset(4754)]
+        [FieldOffset(4762)]
 #elif Bit64
-        [FieldOffset(4962)]
+        [FieldOffset(4978)]
 #endif
         bool has_attributes_file;
 

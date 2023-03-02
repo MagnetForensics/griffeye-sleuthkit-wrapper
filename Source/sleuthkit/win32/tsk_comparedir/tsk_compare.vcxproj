@@ -54,7 +54,6 @@
     <ProjectName>tsk_comparedir</ProjectName>
     <ProjectGuid>{8EE881F4-78DC-49C7-8845-E842358AC0FA}</ProjectGuid>
     <RootNamespace>tsk_compare</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

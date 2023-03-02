@@ -59,6 +59,11 @@ namespace SleuthKit.Structs
         uint par_seq;
 
         /// <summary>
+        /// Time entry was added to a directory(APFS only)
+        /// </summary>
+        ulong date_added;
+
+        /// <summary>
         /// File type information (directory, file, etc.)
         /// </summary>
         FilesystemNameType type;

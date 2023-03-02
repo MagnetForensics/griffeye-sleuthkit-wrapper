@@ -9,9 +9,9 @@ namespace SleuthKit.Structs
 {
     [StructLayout(LayoutKind.Explicit,
 #if Bit32
-    Size = 352
+    Size = 360
 #elif Bit64
-    Size = 512
+    Size = 528
 #endif
     )]
     public struct FFS_INFO
@@ -20,9 +20,9 @@ namespace SleuthKit.Structs
         TSK_FS_INFO fs_info;
 
 #if Bit32
-        [FieldOffset(280)]
+        [FieldOffset(288)]
 #elif Bit64
-        [FieldOffset(408)]
+        [FieldOffset(424)]
 #endif
         IntPtr sb_ptr;
 

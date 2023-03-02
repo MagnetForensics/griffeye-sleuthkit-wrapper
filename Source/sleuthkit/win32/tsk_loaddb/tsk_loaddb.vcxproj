@@ -53,7 +53,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{96AFC6D4-A3DC-44D4-8F55-F74E1D21798C}</ProjectGuid>
     <RootNamespace>tsk_loaddb</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">

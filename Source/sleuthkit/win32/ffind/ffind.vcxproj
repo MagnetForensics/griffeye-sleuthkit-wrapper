@@ -54,7 +54,6 @@
     <ProjectGuid>{7C132953-1700-42FF-9F61-A814C9F2C758}</ProjectGuid>
     <RootNamespace>ffind</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoLibs|Win32'" Label="Configuration">
