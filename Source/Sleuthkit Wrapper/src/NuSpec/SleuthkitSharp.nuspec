@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>3.5.0</version>
+    <version>3.6.0</version>
     <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård</authors>
     <owners>Safer Society Group</owners>
     <dependencies />
@@ -10,6 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
     <releaseNotes>
+      3.6.0 Updated Sleuthkit to version 4.12.0
       3.5.0 Updated Sleuthkit to version 4.10.2
       3.4.1 Drop x86 support
       3.4.0 Updated Sleuthkit to version 4.9.0
