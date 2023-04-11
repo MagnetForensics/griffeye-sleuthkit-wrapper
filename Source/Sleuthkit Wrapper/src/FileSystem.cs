@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace SleuthKit
 {
@@ -17,6 +18,8 @@ namespace SleuthKit
         internal FileSystemHandle _handle;
         private TSK_FS_INFO _struct;
         private Volume _volume;
+        private readonly PoolVolumeInfo _poolVolumeInfo;
+        private static readonly SemaphoreSlim poolLock = new SemaphoreSlim(1);
 
         private byte[] _bitmap;
         private byte[] Bitmap
@@ -41,7 +44,7 @@ namespace SleuthKit
         /// <param name="diskImage"></param>
         /// <param name="type"></param>
         /// <param name="offset"></param>
-        internal FileSystem(DiskImage diskImage, FileSystemType type, long offset)
+        internal FileSystem(DiskImage diskImage, FileSystemType type, ulong offset)
         {
             this._image = diskImage;
             this._volume = null; //no luck on this, no volume system!
@@ -61,7 +64,26 @@ namespace SleuthKit
             this._handle = NativeMethods.tsk_fs_open_vol(volume._ptr_volinfo, fstype);
             this._struct = _handle.GetStruct();
         }
+        
+        internal FileSystem(Pool pool, PoolVolumeInfo poolVolumeInfo, FileSystemType fstype)
+        {
+            try
+            {
+                this._poolVolumeInfo = poolVolumeInfo;
+                this._image = null;
+                this._volume = null;
 
+                WaitForLockWhenWithinPool();
+                var tskImgInfo = pool.GetImageInfo(poolVolumeInfo.Block);
+                this._handle = NativeMethods.tsk_fs_open_img(tskImgInfo, 0, fstype);
+                this._struct = _handle.GetStruct();
+            }
+            finally
+            {
+                ReleaseLockWhenWithinPool();
+            }
+        }
+        
         #endregion Constructors
 
         #region Properties
@@ -72,6 +94,8 @@ namespace SleuthKit
             {
                 switch (_struct.FilesystemType)
                 {
+                    case FileSystemType.Apfs:
+                        return _poolVolumeInfo.Description;
                     case FileSystemType.ext2:
                     case FileSystemType.ext3:
                     case FileSystemType.ext4:
@@ -218,6 +242,17 @@ namespace SleuthKit
             }
         }
 
+        /// <summary>
+        /// If this file system is within a pool
+        /// </summary>
+        public bool WithinPool
+        {
+            get
+            {
+                return this._poolVolumeInfo != null;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -229,16 +264,25 @@ namespace SleuthKit
         /// <returns></returns>
         public File OpenFile(string path, Directory parent = null)
         {
+            WaitForLockWhenWithinPool();
             File file = null;
-            var fh = NativeMethods.tsk_fs_file_open(this._handle, IntPtr.Zero, path);
+
+            FileHandle fh;
+            var utf8String = new Utf8String(path); // path here is utf-16
+            fh = NativeMethods.tsk_fs_file_open(this._handle, IntPtr.Zero, utf8String.IntPtr);
+
             if (!fh.IsInvalid)
             {
-                file = new File(this, fh, parent, null);
+                file = new File(this, fh, parent, null, utf8String);
             }
             else
             {
+                utf8String.Dispose();
                 fh.Close();
             }
+
+            ReleaseLockWhenWithinPool();
+
             return file;
         }
 
@@ -249,17 +293,35 @@ namespace SleuthKit
         /// <returns></returns>
         public File OpenFile(long address, Directory parent = null, String name = null)
         {
+            WaitForLockWhenWithinPool();
             File file = null;
             var fh = NativeMethods.tsk_fs_file_open_meta(this._handle, IntPtr.Zero, address);
             if (!fh.IsInvalid)
             {
-                file = new File(this, fh, parent, name);
+                file = new File(this, fh, parent, name, null);
             }
             else
             {
                 fh.Close();
             }
+
+            ReleaseLockWhenWithinPool();
             return file;
+        }
+
+        public void WaitForLockWhenWithinPool()
+        {
+            if (WithinPool)
+            {
+                poolLock.Wait();
+            }
+        }
+        public void ReleaseLockWhenWithinPool()
+        {
+            if (WithinPool)
+            {
+                poolLock.Release();
+            }
         }
 
         /// <summary>

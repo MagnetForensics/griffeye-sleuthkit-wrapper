@@ -52,6 +52,15 @@ namespace SleuthKit
             Init(_files);
         }
 
+        internal DiskImage(DiskImageHandle handle)
+        {
+            _handle = handle;
+            if (!this._handle.IsInvalid)
+            {
+                this._struct = this._handle.GetStruct();
+            }
+        }
+
         /// <summary>
         /// Initializes sleuthkit with the specified image files (calls tsk_img_open_* methods)
         /// </summary>
@@ -223,10 +232,10 @@ namespace SleuthKit
         /// <summary>
         /// Opens a filesystem - for images with no partition table, i.e. volume images, or most SD cards and thumb drives that are formatted  .
         /// </summary>
-        /// <param name="fstype"></param>
+        /// <param name="fileSystemType"></param>
         /// <param name="offset"></param>
         /// <returns></returns>
-        public FileSystem OpenFileSystem(FileSystemType fileSystemType = FileSystemType.Autodetect, long offset = 0)
+        public FileSystem OpenFileSystem(FileSystemType fileSystemType = FileSystemType.Autodetect, ulong offset = 0)
         {
             FileSystem fs = new FileSystem(this, fileSystemType, offset);
 

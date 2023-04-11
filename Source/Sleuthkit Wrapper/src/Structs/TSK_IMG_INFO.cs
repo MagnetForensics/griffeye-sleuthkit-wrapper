@@ -16,7 +16,7 @@ namespace SleuthKit.Structs
         /// <summary>
         /// Set to TSK_IMG_INFO_TAG when struct is alloc
         /// </summary>
-        internal uint tag;
+        internal StructureMagic tag;
 
         /// <summary>
         /// Type of disk image format

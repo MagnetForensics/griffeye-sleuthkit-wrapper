@@ -93,6 +93,16 @@ namespace SleuthkitSharp_UnitTests
             Assert.AreEqual(5346, fileCount.FileCount);
             Assert.AreEqual(4630, fileCount.MetadataIsValidCount);
         }
+        
+        //APFS
+        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\APFS\apfs.dmg", 23)]
+        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\APFS\unencrypted_apfs.dmg", 15)]
+        public void AssertApfsImage(String imagePath, int expectedFileCount)
+        {
+            var fileCount = CountFilesInImageAndGetLabels(imagePath, out var labels, out List<string> directories);
+
+            Assert.AreEqual(expectedFileCount, fileCount.FileCount);
+        }
 
         //EnCase\Logical - All failing
         [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Logical\DSIII_disk_Ext4_dd_BlockSize512_dd_EnCase_Compressed.Lx01")]
@@ -131,7 +141,7 @@ namespace SleuthkitSharp_UnitTests
             Assert.AreEqual(54, fileCount.FileCount);
             Assert.IsTrue(directories.Contains("ÅÄÖ/"));
         }
-
+        
         [Test]
         public void AndroidFileSystem()
         {
@@ -159,6 +169,30 @@ namespace SleuthkitSharp_UnitTests
                         {
                             foreach (Volume v in vs.Volumes)
                             {
+                                using (var openPool = v.OpenPool(fileSystem))
+                                {
+                                    if (openPool != null)
+                                    {
+                                        foreach (var tskPoolVolumeInfo in openPool.GetVolumeInfos())
+                                        {
+                                            try
+                                            {
+                                                using (FileSystem fs = openPool.OpenFileSystem(tskPoolVolumeInfo))
+                                                {
+                                                    labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
+
+                                                    fs.WalkDirectories(counter.DirWalkCallback);
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                failCount++;
+                                            }
+                                        }
+
+                                    }
+                                }
+                                
                                 try
                                 {
                                     using (FileSystem fs = v.OpenFileSystem(fileSystem))
@@ -205,6 +239,8 @@ namespace SleuthkitSharp_UnitTests
 
             public List<string> Directories { get; } = new List<string>();
 
+            public List<string> Files { get; } = new List<string>();
+
             public WalkReturnEnum DirWalkCallback(ref TSK_FS_FILE file, IntPtr utf8_path, IntPtr some_ptr)
             {
                 var directoryName = utf8_path.Utf8ToUtf16();
@@ -214,6 +250,12 @@ namespace SleuthkitSharp_UnitTests
 
                 MetadataIsValidCount += metadataValid ? 1 : 0;
                 FileCount += file.AppearsValid ? 1 : 0;
+                var tskFsName = file.Name;
+                if (tskFsName != null)
+                {
+                    Files.Add(tskFsName.Value.GetName());
+                }
+
                 return WalkReturnEnum.Continue;
             }
 

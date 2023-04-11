@@ -2,14 +2,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>3.6.0</version>
-    <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård</authors>
+    <version>3.6.1</version>
+    <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård, Sven Claesson</authors>
     <owners>Safer Society Group</owners>
     <dependencies />
     <projectUrl>http://www.safersociety.com</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
     <releaseNotes>
+      3.6.1 Implement APFS and pool support
       3.6.0 Updated Sleuthkit to version 4.12.0
       3.5.0 Updated Sleuthkit to version 4.10.2
       3.4.1 Drop x86 support

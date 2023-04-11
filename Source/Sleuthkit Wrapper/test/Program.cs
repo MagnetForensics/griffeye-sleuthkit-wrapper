@@ -106,22 +106,64 @@
                 {
                     foreach (Volume v in vs.Volumes)
                     {
-                        hasVolumes = true;
-                        using (FileSystem fs = v.OpenFileSystem())
+                        var withinPool = false;
+                        using (var openPool = v.OpenPool())
                         {
-                            String volumeName = fs.Label;
-
-                            if (fs.WalkDirectories(DirectoryWalkCallback))
+                            if (openPool != null)
                             {
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("Volume \"{0}\" ({1} @ {2}):", volumeName, fs.Type, v.Address);
+                                withinPool = true;
+                                foreach (var tskPoolVolumeInfo in openPool.GetVolumeInfos())
+                                {
+                                    using (FileSystem fs = openPool.OpenFileSystem(tskPoolVolumeInfo))
+                                    {
+                                        String volumeName = fs.Label;
+                                        if (fs.WalkDirectories(DirectoryWalkCallback))
+                                        {
+                                            Console.ForegroundColor = ConsoleColor.Yellow;
+                                            Console.WriteLine("Volume \"{0}\" ({1} @ {2}):", volumeName, fs.Type, v.Address);
+                                            Console.ResetColor();
+
+                                            // temporarily pause to read console output. Press any key to continue
+                                            Console.WriteLine("Press any key to continue...");
+                                            Console.ReadLine();
+
+                                            ProcessFiles(fs);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                        hasVolumes = true;
+                        if (!withinPool)
+                        {
+                            try
+                            {
+                                using (FileSystem fs = v.OpenFileSystem())
+                                {
+                                    String volumeName = fs.Label;
+
+                                    if (fs.WalkDirectories(DirectoryWalkCallback))
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Yellow;
+                                        Console.WriteLine("Volume \"{0}\" ({1} @ {2}):", volumeName, fs.Type, v.Address);
+                                        Console.ResetColor();
+
+                                        // temporarily pause to read console output. Press any key to continue
+                                        Console.WriteLine("Press any key to continue...");
+                                        Console.ReadLine();
+
+                                        ProcessFiles(fs);
+                                    }
+                                }
+
+                            }
+                            catch
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Volume \"{0}\" could not be opened", v.Description);
                                 Console.ResetColor();
-
-                                // temporarily pause to read console output. Press any key to continue
-                                Console.WriteLine("Press any key to continue...");
-                                Console.ReadLine();
-
-                                ProcessFiles(fs);
                             }
                         }
                     }
@@ -295,7 +337,7 @@
 
                                     Console.WriteLine("{0}=> {1}", filePath, builder);
                                 }
-                                catch (Exception)
+                                catch (Exception ex)
                                 {
                                     Console.WriteLine("{0}=> {1}", filePath, "FAIL");
                                 }

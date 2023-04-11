@@ -19,4 +19,20 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+      del /q "$(SolutionDir)\test\bin\$(PlatformName)\$(ConfigurationName)\*"
+
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libvhdi.dll" "$(SolutionDir)\test\bin\$(Platform)\$(Configuration)\"
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libvmdk.dll" "$(SolutionDir)\test\bin\$(Platform)\$(Configuration)\"
+
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libewf.dll" "$(SolutionDir)\test\bin\$(Platform)\$(Configuration)\"
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libtsk4.dll" "$(SolutionDir)\test\bin\$(Platform)\$(Configuration)\"
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\zlib.dll" "$(SolutionDir)\test\bin\$(Platform)\$(Configuration)\"
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\ewf.net.dll" "$(SolutionDir)\test\bin\$(Platform)\$(Configuration)\"
+
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libcrypto-1_1-x64.dll" "$(SolutionDir)\test\bin\$(Platform)\$(Configuration)\"
+      copy /y "$(SolutionDir)\..\..\Lib\$(Platform)\libssl-1_1-x64.dll" "$(SolutionDir)\test\bin\$(Platform)\$(Configuration)\"
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>

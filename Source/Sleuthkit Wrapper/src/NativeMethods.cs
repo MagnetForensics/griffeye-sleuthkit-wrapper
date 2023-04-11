@@ -68,7 +68,7 @@ namespace SleuthKit
 
         //TSK_FS_INFO *tsk_fs_open_img(TSK_IMG_INFO * a_img_info, TSK_OFF_T a_offset, TSK_FS_TYPE_ENUM a_ftype)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern FileSystemHandle tsk_fs_open_img(DiskImageHandle image, long offset, FileSystemType fstype);
+        internal static extern FileSystemHandle tsk_fs_open_img(DiskImageHandle image, ulong offset, FileSystemType fstype);
 
         //TSK_FS_INFO *tsk_fs_open_vol(const TSK_VS_PART_INFO * a_part_info, TSK_FS_TYPE_ENUM a_ftype)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
@@ -81,6 +81,21 @@ namespace SleuthKit
         //void tsk_fs_close(TSK_FS_INFO * a_fs)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void tsk_fs_close(IntPtr fsptr);
+
+        // TSK_POOL_INFO *tsk_pool_open_sing(const TSK_VS_PART_INFO *part,TSK_POOL_TYPE_ENUM type)
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern PoolHandle tsk_pool_open_sing(IntPtr volinfo, FileSystemType fstype);
+
+        //TSK_POOL_INFO *tsk_pool_open_img_sing(TSK_IMG_INFO *img, TSK_OFF_T offset, TSK_POOL_TYPE_ENUM type)
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern PoolHandle tsk_pool_open_img_sing(DiskImageHandle poolinfo, long offset, FileSystemType fstype);
+
+        //void tsk_pool_close(TSK_POOL_INFO * pool)
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void tsk_pool_close(IntPtr poolptr);
+
+        [DllImport(NativeLibrary, CharSet = CharSet.Unicode)]
+        public static extern IntPtr get_img_info(ref TSK_POOL_INFO pool, ulong pvol_block);
 
         #region block stuff
 
@@ -98,7 +113,7 @@ namespace SleuthKit
 
         //TSK_FS_FILE *tsk_fs_file_open(TSK_FS_INFO * a_fs, TSK_FS_FILE * a_fs_file, const char *a_path)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern FileHandle tsk_fs_file_open(FileSystemHandle fs, [In] IntPtr should_be_zero, [In] string utf8path);
+        internal static extern FileHandle tsk_fs_file_open(FileSystemHandle fs, [In] IntPtr should_be_zero, [In] IntPtr utf8path);
 
         //TSK_FS_FILE *tsk_fs_file_open_meta(TSK_FS_INFO * a_fs, TSK_FS_FILE * a_fs_file, TSK_INUM_T a_addr)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
@@ -209,6 +224,15 @@ namespace SleuthKit
         }
 
         /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="ptr"></param>
+        internal DiskImageHandle(IntPtr ptr)
+            : base(ptr, true)
+        {
+        }
+
+        /// <summary>
         /// invalid if pointer is zero
         /// </summary>
         public override bool IsInvalid
@@ -256,7 +280,7 @@ namespace SleuthKit
         /// <param name="fstype"></param>
         /// <param name="offset"></param>
         /// <returns></returns>
-        internal FileSystemHandle OpenFileSystemHandle(FileSystemType fstype = FileSystemType.Autodetect, long offset = 0)
+        internal FileSystemHandle OpenFileSystemHandle(FileSystemType fstype = FileSystemType.Autodetect, ulong offset = 0)
         {
             return NativeMethods.tsk_fs_open_img(this, offset, fstype);
         }
@@ -307,6 +331,52 @@ namespace SleuthKit
                 return new TSK_VS_INFO();
             else
                 return ((TSK_VS_INFO)Marshal.PtrToStructure(this.handle, typeof(TSK_VS_INFO)));
+        }
+    }
+
+    public class PoolHandle : SafeHandle
+    {
+        /// <summary>
+        /// ctor
+        /// </summary>
+        public PoolHandle()
+            : base(IntPtr.Zero, true)
+        {
+        }
+        
+        /// <summary>
+        /// invalid if pointer is zero
+        /// </summary>
+        public override bool IsInvalid
+        {
+            get
+            {
+                return base.handle == IntPtr.Zero;
+            }
+        }
+        
+        /// <summary>
+        /// closes handle
+        /// </summary>
+        /// <returns></returns>
+        protected override bool ReleaseHandle()
+        {
+            NativeMethods.tsk_pool_close(this.handle);
+            base.SetHandleAsInvalid();
+            return true;
+        }
+
+
+        internal TSK_POOL_INFO GetStruct()
+        {
+            if (this.IsInvalid)
+            {
+                return new TSK_POOL_INFO();
+            }
+            else
+            {
+                return ((TSK_POOL_INFO)Marshal.PtrToStructure(this.handle, typeof(TSK_POOL_INFO)));
+            }
         }
     }
 

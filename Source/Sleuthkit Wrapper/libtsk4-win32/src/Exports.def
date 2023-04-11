@@ -23,6 +23,10 @@ EXPORTS
 	tsk_fs_read
 	tsk_fs_read_block
 	tsk_fs_close
+
+	tsk_pool_open_sing
+	tsk_pool_open_img_sing
+	tsk_pool_close
 	
 	tsk_fs_attrlist_get
 	tsk_fs_block_get

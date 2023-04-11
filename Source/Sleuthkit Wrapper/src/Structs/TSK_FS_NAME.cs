@@ -102,6 +102,7 @@ namespace SleuthKit.Structs
                         ns--; //trim it
                     }
                     str = Encoding.UTF8.GetString(local, 0, ns);
+                    str = TrimAfterZeroChar(str);
                 }
                 return str;
             }
@@ -121,9 +122,21 @@ namespace SleuthKit.Structs
                     var local = new byte[short_name_size.ToUInt32()];
                     Marshal.Copy(ptr_short_name, local, 0, local.Length);
                     str = Encoding.UTF8.GetString(local);
+                    str = TrimAfterZeroChar(str);
                 }
                 return str;
             }
+        }
+
+        private string TrimAfterZeroChar(string str)
+        {
+            var indexOf = str.IndexOf('\0');
+            if (indexOf > 0)
+            {
+                return str.Substring(0, indexOf);
+            }
+
+            return str;
         }
 
         /// <summary>

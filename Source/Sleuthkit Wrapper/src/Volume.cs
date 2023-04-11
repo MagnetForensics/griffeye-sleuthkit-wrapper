@@ -141,7 +141,7 @@ namespace SleuthKit
         /// <summary>
         /// Opens the filesystem on this volume, if any
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="fileSystemType"></param>
         /// <returns></returns>
         public FileSystem OpenFileSystem(FileSystemType fileSystemType = FileSystemType.Autodetect)
         {
@@ -161,6 +161,23 @@ namespace SleuthKit
             {
                 return fs;
             }
+        }
+
+        /// <summary>
+        /// Open pool on this volume, if any
+        /// </summary>
+        /// <param name="fileSystemType"></param>
+        /// <returns></returns>
+        public Pool OpenPool(FileSystemType fileSystemType = FileSystemType.Autodetect)
+        {
+            var p = new Pool(this, fileSystemType);
+            if (p._handle.IsInvalid)
+            {
+                p._handle.Close();
+                p = null;
+            }
+
+            return p;
         }
 
         /// <summary>

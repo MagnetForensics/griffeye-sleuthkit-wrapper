@@ -9,6 +9,11 @@ namespace SleuthKit
     internal enum StructureMagic : uint
     {
         /// <summary>
+        /// TSK_IMG_INFO_TAG
+        /// </summary>
+        ImageInfoTag = 0x39204231,
+
+        /// <summary>
         /// TSK_FS_FILE_TAG
         /// </summary>
         FilesystemFileTag = 0x11212212,
@@ -36,7 +41,17 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_DIR_TAG
         /// </summary>
-        FilesystemDirectoryTag = 0x97531246
+        FilesystemDirectoryTag = 0x97531246,
+
+        /// <summary>
+        /// TSK_POOL_INFO_TAG
+        /// </summary>
+        PoolInfoTag = 0x504F4C4C,
+
+        /// <summary>
+        /// TSK_POOL_VOL_INFO_TAG 
+        /// </summary>
+        PoolVolumeInfoTag = 0x50564F4C,
     }
 
     /// <summary>
@@ -94,6 +109,11 @@ namespace SleuthKit
         /// TSK_VS_TYPE_GPT, GPT partition table
         /// </summary>
         GPT = 0x0010,
+
+        /// <summary>
+        /// TSK_VS_TYPE_APFS, APFS pool NON-NLS
+        /// </summary>
+        APFS = 0x0020,
 
         /// <summary>
         /// TSK_VS_TYPE_DBFILLER, fake partition table type for loaddb (for images that do not have a volume system)
@@ -218,6 +238,42 @@ namespace SleuthKit
         /// TSK_FS_META_CONTENT_TYPE_EXT4_EXTENTS, Ext4 with extents instead of individual pointers
         /// </summary>
         Ext4Extents = 0x1
+    }
+
+    /// <summary>
+    /// Managed version of TSK_POOL_TYPE_ENUM.
+    /// </summary>
+    public enum PoolTypeEnum
+    {
+        /// <summary>
+        /// TSK_POOL_TYPE_DETECT = 0x0000,  /// Use autodetection methods
+        /// </summary>
+        Detect = 0x0,
+
+        /// <summary>
+        /// TSK_POOL_TYPE_APFS = 0x0001,    /// APFS Pooled Volumes
+        /// </summary>
+        APFS = 0x0001,
+
+        /// <summary>
+        /// TSK_POOL_TYPE_LVM = 0x0002,    /// Linux LVM volume group
+        /// </summary>
+        LinuxLvm = 0x0002,
+
+        /// <summary>
+        /// TSK_POOL_TYPE_UNSUPP = 0xffff,  /// Unsupported pool container type
+        /// </summary>
+        Unsupported = 0xffff
+    }
+
+    /// <summary>
+    /// Managed version of TSK_POOL_VOLUME_FLAGS
+    /// </summary>
+    public enum PoolVolumeFlags
+    {
+        Encrypted = 0x0001,
+
+        CaseSensitive = 0x0002
     }
 
     /// <summary>
@@ -842,6 +898,11 @@ namespace SleuthKit
         /// TSK_IMG_TYPE_EXTERNAL, external defined format which at least implements TSK_IMG_INFO, used by pytsk
         /// </summary>
         External = 0x1000,
+
+        /// <summary>
+        ///  Pool (internal use) NON-NLS
+        /// </summary>
+        POOL = 0x4000,
 
         /// <summary>
         /// TSK_IMG_TYPE_UNSUPP, Unsupported disk image type

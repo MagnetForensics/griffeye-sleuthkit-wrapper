@@ -109,6 +109,7 @@ namespace SleuthKit
         private FileHandle _handle;
         private TSK_FS_FILE _struct;
         private Directory _parentDir;
+        private Utf8String _utf8String;
         private string path;
         #endregion
 
@@ -119,12 +120,14 @@ namespace SleuthKit
         /// <param name="fh"></param>
         /// <param name="parent"></param>
         /// <param name="name"></param>
-        internal File(FileSystem fs, FileHandle fh, Directory parent, string name)
+        /// <param name="utf8String"></param>
+        internal File(FileSystem fs, FileHandle fh, Directory parent, string name, Utf8String utf8String)
         {
             this._fs = fs;
             this._handle = fh;
             this._struct = fh.GetStruct();
             this._parentDir = parent;
+            this._utf8String = utf8String;
 
             if (name == null)
             {
@@ -163,7 +166,15 @@ namespace SleuthKit
         /// </summary>
         public void Dispose()
         {
+            _fs.WaitForLockWhenWithinPool();
             this._handle.Dispose();
+            if (_utf8String != null)
+            {
+                this._utf8String.Dispose();
+                _utf8String = null;
+            }
+            this._handle = null;
+            _fs.ReleaseLockWhenWithinPool();
         }
 
 
@@ -225,32 +236,42 @@ namespace SleuthKit
         /// <param name="amt">The amt.</param>
         /// <returns></returns>
         /// <exception cref="SleuthKit.NtfsCompressionException">If a compressed file is corrupt</exception>
-        /// <exception cref="System.IO.IOException">If the file reading files for another reason</exception>
+        /// <exception cref="System.IO.IOException">If the file reading fails for another reason</exception>
         public int ReadBytes(long offset, byte[] buffer, int amt)
         {
-            int bytesRead = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
-
-            //On error, check for EOF
-            if (bytesRead == -1)
+            try
             {
-                uint errorCode = NativeMethods.tsk_error_get_errno();
-                if (errorCode == 0x08000005)
-                {
-                    return 0; //EOF reached
-                }
-                else
-                {
-                    IntPtr ptrToMessage = NativeMethods.tsk_error_get_errstr();
-                    String errorMessage = Marshal.PtrToStringAnsi(ptrToMessage);
-                    String ioExceptionMessage = String.Format("{0} (0x{1,8:X8})", errorMessage, errorCode);
-                    if (errorMessage.Contains("ntfs_uncompress_compunit"))
-                        throw new NtfsCompressionException(String.Format("The compressed NTFS file was corrupt and could not be decompressed. Full error: {0}", ioExceptionMessage));
-                    else
-                        throw new IOException(ioExceptionMessage);
-                }
-            }
+                FileSystem.WaitForLockWhenWithinPool();
+                int bytesRead = NativeMethods.tsk_fs_file_read(this._handle, offset, buffer, amt, FileReadFlag.None);
 
-            return bytesRead;
+                //On error, check for EOF
+                if (bytesRead == -1)
+                {
+                    uint errorCode = NativeMethods.tsk_error_get_errno();
+                    if (errorCode == 0x08000005)
+                    {
+                        return 0; //EOF reached
+                    }
+                    else
+                    {
+                        IntPtr ptrToMessage = NativeMethods.tsk_error_get_errstr();
+                        String errorMessage = Marshal.PtrToStringAnsi(ptrToMessage);
+                        String ioExceptionMessage = String.Format("{0} (0x{1,8:X8})", errorMessage, errorCode);
+                        if (errorMessage.Contains("ntfs_uncompress_compunit"))
+                            throw new NtfsCompressionException(String.Format(
+                                "The compressed NTFS file was corrupt and could not be decompressed. Full error: {0}",
+                                ioExceptionMessage));
+                        else
+                            throw new IOException(ioExceptionMessage);
+                    }
+                }
+
+                return bytesRead;
+            }
+            finally
+            {
+                FileSystem.ReleaseLockWhenWithinPool();
+            }
         }
 
         /// <summary>
