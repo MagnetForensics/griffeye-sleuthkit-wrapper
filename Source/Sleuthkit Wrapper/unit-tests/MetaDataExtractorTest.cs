@@ -20,7 +20,7 @@
         [Test]
         public void ExtractTest()
         {
-            string fileName = @"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\USB-disk-image-FAT.E01";
+            string fileName = @"\\winfiles.griffeye.net\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\USB-disk-image-FAT.E01";
 
             // fill up dictionary with the expected values.
             IDictionary<string, string> expected = new Dictionary<string, string>();

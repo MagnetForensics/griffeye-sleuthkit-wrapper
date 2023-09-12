@@ -12,7 +12,7 @@ namespace SleuthkitSharp_UnitTests
         [Test]
         public void TestFileAllocationFlags()
         {
-            const string path = @"\\netcleantech.local\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\G-Recycle-2.E01";
+            const string path = @"\\winfiles.griffeye.net\dfs\TestData\Automatic Tests\Griffeye\SleuthkitWrapper\G-Recycle-2.E01";
             Dictionary<FileAllocationFlags, int> result = CountFilesPerFlagsInImage(path);
 
             Assert.AreEqual(329, result[FileAllocationFlags.None]);

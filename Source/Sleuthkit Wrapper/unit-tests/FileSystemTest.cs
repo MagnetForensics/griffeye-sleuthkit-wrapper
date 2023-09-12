@@ -11,61 +11,61 @@ namespace SleuthkitSharp_UnitTests
     internal class FileSystemTest
     {
         //000
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\000\DSIII_disk_Ext4_Guymager_SplitSize2047MiB.000")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\000\DSIII_disk_Ext4_Guymager_SplitSize2047MiB.000")]
 
         //DD
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\DD\DSIII_disk_Ext4_Guymager.dd")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\DD\DSIII_disk_Ext4_Guymager.dd")]
 
         //DMG
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\DMG\DSIII_USB_HFSplus_DiskUtility.dmg")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\DMG\DSIII_USB_HFSplus_DiskUtility.dmg")]
 
         //E01 other than EnCase
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\E01_OtherThanEnCase\DSIII_disk_Ext4_Guymager_Exx.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\E01_OtherThanEnCase\DSIII_disk_FAT_OSF.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\E01_OtherThanEnCase\DSIII_disk_FAT_OSF_BestCompressed.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\E01_OtherThanEnCase\DSIII_disk_NTFS_OSF.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\E01_OtherThanEnCase\DSIII_disk_NTFS_OSF_BestCompressed.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\E01_OtherThanEnCase\DSIII_USB_exFAT_OSF.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\E01_OtherThanEnCase\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\E01_OtherThanEnCase\DSIII_disk_Ext4_Guymager_Exx.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\E01_OtherThanEnCase\DSIII_disk_FAT_OSF.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\E01_OtherThanEnCase\DSIII_disk_FAT_OSF_BestCompressed.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\E01_OtherThanEnCase\DSIII_disk_NTFS_OSF.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\E01_OtherThanEnCase\DSIII_disk_NTFS_OSF_BestCompressed.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\E01_OtherThanEnCase\DSIII_USB_exFAT_OSF.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\E01_OtherThanEnCase\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.E01")]
 
         //EnCase\Evidence
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_disk_Ext4_dd_BlockSize512_dd_EnCase_Uncompressed.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_disk_Ext4_Guymager_dd_EnCase_Compressed.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_disk_FAT_dd_BlockSize512_raw_EnCase_Uncompressed.E01")]
-        //[TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_disk_NTFS_OSF_img_EnCase_Uncompressed.Ex01")]
-        //[TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_disks_ISO_EnCase_compressed.Ex01")]
-        //[TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Compressed.Ex01")]
-        //[TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Compressed.E01")]
-        //[TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Compressed.Ex01")]
-        //[TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Uncompressed.E01")]
-        //[TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Uncompressed.Ex01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_disk_Ext4_dd_BlockSize512_dd_EnCase_Uncompressed.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_disk_Ext4_Guymager_dd_EnCase_Compressed.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_disk_FAT_dd_BlockSize512_raw_EnCase_Uncompressed.E01")]
+        //[TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_disk_NTFS_OSF_img_EnCase_Uncompressed.Ex01")]
+        //[TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_DVD_ISO9660_disks_ISO_EnCase_compressed.Ex01")]
+        //[TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Compressed.Ex01")]
+        //[TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Compressed.E01")]
+        //[TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Compressed.Ex01")]
+        //[TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Uncompressed.E01")]
+        //[TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Evidence\DSIII_DVD_ISO9660_EnCase_Uncompressed.Ex01")]
 
         //IMG
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_disk_Ext2_dd_SingleBlock.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_disk_Ext4_dd_SingleBlock.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_disk_FAT_dd_BlockSize512.iso")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_disk_FAT_dd_BlockSize2048.iso")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_disk_FAT_OSF.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_disk_NTFS_dd_BlockSize512.iso")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_disk_NTFS_OSF.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_DVD_ISO9660_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_exFAT_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_exFAT_OSF.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_exFATHFSplus_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_Ext2_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_Ext3_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_Ext4_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_FAT_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_HFSplus_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_HFSplus_OSF.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_NTFS_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_NTFSExt4FATExt2_disks_FourPartitions.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_UFS1-44BSD_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_UFS2_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_disk_Ext2_dd_SingleBlock.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_disk_Ext4_dd_SingleBlock.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_disk_FAT_dd_BlockSize512.iso")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_disk_FAT_dd_BlockSize2048.iso")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_disk_FAT_OSF.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_disk_NTFS_dd_BlockSize512.iso")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_disk_NTFS_OSF.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_DVD_ISO9660_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_exFAT_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_exFAT_OSF.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_exFATHFSplus_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_Ext2_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_Ext3_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_Ext4_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_FAT_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_HFSplus_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_HFSplus_OSF.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_NTFS_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_NTFSExt4FATExt2_disks_FourPartitions.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_UFS1-44BSD_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_UFS2_disks.img")]
 
         //RAW
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\RAW\DSIII_disk_FAT_dd_BlockSize512.raw")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\RAW\DSIII_disk_FAT_dd_BlockSize512.raw")]
         public void AssertDS3Image(String imagePath)
         {
             var fileCount = CountFilesInImageAndGetLabels(imagePath, out var labels, out List<string> directories);
@@ -75,7 +75,7 @@ namespace SleuthkitSharp_UnitTests
         }
 
         //IMG
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII-partly_folders_YAFFS2_YAFFEY.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII-partly_folders_YAFFS2_YAFFEY.img")]
         public void AssertDS3PartlyImage(String imagePath)
         {
             var fileCount = CountFilesInImageAndGetLabels(imagePath, out var labels, out List<string> directories);
@@ -85,7 +85,7 @@ namespace SleuthkitSharp_UnitTests
 
 
         //RAW
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\IMG\DSIII_USB_Ext4_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_Ext4_disks.img")]
         public void AssertDS3ImageExactCount(String imagePath)
         {
             var fileCount = CountFilesInImageAndGetLabels(imagePath, out var labels, out List<string> directories);
@@ -95,8 +95,8 @@ namespace SleuthkitSharp_UnitTests
         }
         
         //APFS
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\APFS\apfs.dmg", 23)]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\APFS\unencrypted_apfs.dmg", 15)]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\APFS\apfs.dmg", 23)]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\APFS\unencrypted_apfs.dmg", 15)]
         public void AssertApfsImage(String imagePath, int expectedFileCount)
         {
             var fileCount = CountFilesInImageAndGetLabels(imagePath, out var labels, out List<string> directories);
@@ -105,25 +105,25 @@ namespace SleuthkitSharp_UnitTests
         }
 
         //EnCase\Logical - All failing
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Logical\DSIII_disk_Ext4_dd_BlockSize512_dd_EnCase_Compressed.Lx01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Logical\DSIII_disk_Ext4_Guymager_dd_EnCase_Uncompressed.Lx01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Logical\DSIII_disk_FAT_dd_BlockSize512_raw_EnCase_Compressed.Lx01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Logical\DSIII_disk_NTFS_OSF_img_EnCase_Compressed.L01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Logical\DSIII_DVD_ISO9660_disks_ISO_EnCase_Unompressed.L01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\EnCase\Logical\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Uncompressed.L01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Logical\DSIII_disk_Ext4_dd_BlockSize512_dd_EnCase_Compressed.Lx01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Logical\DSIII_disk_Ext4_Guymager_dd_EnCase_Uncompressed.Lx01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Logical\DSIII_disk_FAT_dd_BlockSize512_raw_EnCase_Compressed.Lx01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Logical\DSIII_disk_NTFS_OSF_img_EnCase_Compressed.L01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Logical\DSIII_DVD_ISO9660_disks_ISO_EnCase_Unompressed.L01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\EnCase\Logical\DSIII_USB_UFS1-44BSD_disks_img_EnCase_Uncompressed.L01")]
 
         //NOK - Still not supported
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\NOK\DSIII_disk_FAT_OSF.aff")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\NOK\DSIII_disk_NTFS_OSF.aff")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\NOK\DSIII_USB_exFAT_OSF.aff")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\NOK\DSIII_USB_HFS_disks.img")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\NOK\DSIII_USB_HFS_disks_img_EnCase_Uncompressed.E01")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\NOK\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.aff")]
-        //[TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\NOK\DSIII-partly_folders_YAFFS2_YAFFEY_img_EnCase_Uncompressed.Ex01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\NOK\DSIII_disk_FAT_OSF.aff")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\NOK\DSIII_disk_NTFS_OSF.aff")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\NOK\DSIII_USB_exFAT_OSF.aff")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\NOK\DSIII_USB_HFS_disks.img")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\NOK\DSIII_USB_HFS_disks_img_EnCase_Uncompressed.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\NOK\DSIII_USB_NTFSExt4FATExt2_OSF_FourPartitions.aff")]
+        //[TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\NOK\DSIII-partly_folders_YAFFS2_YAFFEY_img_EnCase_Uncompressed.Ex01")]
 
         //DMG
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\DMG\DSIII_USB_HFSplus_DiskUtility_Compressed.dmg")]
-        [TestCase(@"\\diskmaskinen.netcleantech.local\DiskImages\DMG\DSIII_USB_HFSplus_DiskUtility_ReadOnly.dmg")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\DMG\DSIII_USB_HFSplus_DiskUtility_Compressed.dmg")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\DMG\DSIII_USB_HFSplus_DiskUtility_ReadOnly.dmg")]
 
         public void AssertFailingDS3Image(String imagePath)
         {
@@ -133,7 +133,7 @@ namespace SleuthkitSharp_UnitTests
         }
 
         // Swedish characters
-        [TestCase(@"\\diskmaskinen.netcleantech.local\Diskimages\Regression\AN-9401\TestSwedishFolderName.E01")]
+        [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\Regression\AN-9401\TestSwedishFolderName.E01")]
         public void TestSwedishCharacters(String imagePath)
         {
             var fileCount = CountFilesInImageAndGetLabels(imagePath, out var labels, out List<string> directories);
@@ -145,7 +145,7 @@ namespace SleuthkitSharp_UnitTests
         [Test]
         public void AndroidFileSystem()
         {
-            var imagePath = @"\\diskmaskinen.netcleantech.local\Diskimages\Regression\AN-12189\2picstest.E01";
+            var imagePath = @"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\Regression\AN-12189\2picstest.E01";
             var fileCount = CountFilesInImageAndGetLabels(imagePath, out _, out _, FileSystemType.FATAndroid);
 
             Assert.AreEqual(7, fileCount.FileCount);

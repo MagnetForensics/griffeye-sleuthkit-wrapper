@@ -14,10 +14,10 @@
     [TestFixture]
     public class PartitionTableTest
     {
-        [Test]
+        [Test, Explicit("464GB forensic image not copied to winfiles. Not able to reach smash from azure scale set builders.")]
         public void LibewfRegressionTest()
         {
-            FileInfo file = new FileInfo(@"\\diskmaskinen.netcleantech.local\diskimages\Regression\AN-3871\image-clone4.E01");
+            FileInfo file = new FileInfo(@"\\smash.griffeye.net\diskimages\Regression\AN-3871\image-clone4.E01");
             //DOS Partition Table
             //Offset Sector: 0
             //Units are in 512-byte sectors

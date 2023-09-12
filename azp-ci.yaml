@@ -1,0 +1,103 @@
+trigger:
+  - master
+  
+pool:
+  name: WindowsVMSS
+
+variables:
+- group: NuGetPushCredentials
+
+steps:
+# Checkout and run script for setting up build agent
+- checkout: git://Analyze/Pipelines
+- powershell: Pipelines/SetupAgent.ps1
+
+- checkout: self
+  clean: true
+  lfs: true
+  fetchDepth: 1
+  path: s # Checkout in source root folder, not a subfolder
+
+- task: NuGetCommand@2
+  displayName: 'tsk-win.sln: NuGet restore'
+  inputs:
+    command: 'restore'
+    restoreSolution: 'Source/sleuthkit/win32/tsk-win.sln'
+    feedsToUse: 'select'
+
+- task: MSBuild@1
+  displayName: 'tsk-win.sln: Build'
+  inputs:
+    solution: 'Source/sleuthkit/win32/tsk-win.sln'
+    msbuildArchitecture: 'x64'
+    platform: 'x64'
+    configuration: 'Release'
+    clean: true
+  env:
+    LIBEWF_HOME: $(Build.SourcesDirectory)\Source\libewf
+    LIBVMDK_HOME: $(Build.SourcesDirectory)\Source\libvmdk\libvmdk
+    LIBVHDI_HOME: $(Build.SourcesDirectory)\Source\libvhdi
+
+- task: DotNetCoreCLI@2
+  displayName: 'Sleuthkit Wrapper: NuGet restore'
+  inputs:
+    command: 'restore'
+    projects: 'Source/Sleuthkit Wrapper'
+    feedsToUse: 'select'
+
+- task: MSBuild@1
+  displayName: 'Sleuthkit Wrapper: Build'
+  inputs:
+    solution: 'Source/Sleuthkit Wrapper/Sleuthkit Wrapper.sln'
+    msbuildArchitecture: 'x64'
+    platform: 'x64'
+    configuration: 'Release'
+
+- task: CmdLine@2
+  displayName: 'Tests: Copy lib files to test'
+  inputs:
+    script: |
+      copy "Lib\x64\libewf.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
+      copy "Lib\x64\libvhdi.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
+      copy "Lib\x64\libvmdk.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
+      copy "Lib\x64\libtsk4.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
+      copy "Lib\x64\zlib.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
+      copy "Lib\x64\ewf.net.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
+      copy "Source\Sleuthkit Wrapper\src\bin\x64\Release\sleuthkit-sharp.dll" "Source\Sleuthkit Wrapper\unit-tests\bin\x64\Release\"
+
+- task: VSTest@3
+  displayName: 'Tests: Run'
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+     **\unit-tests.dll
+     !**\*TestAdapter.dll
+     !**\obj\**
+     !**\bin\**\ref\**
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+    resultsFolder: 'test-results'
+    diagnosticsEnabled: True
+
+- task: NuGetCommand@2
+  displayName: 'NuGet pack'
+  inputs:
+    command: 'pack'
+    packagesToPack: 'Source\Sleuthkit Wrapper\src\NuSpec\SleuthkitSharp.nuspec'
+    outputDir: 'artifacts'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish NuGet Package artifacts'
+  inputs:
+    targetPath: 'artifacts'
+    artifact: 'NuGet'
+
+- powershell: dotnet nuget push artifacts\*.nupkg --skip-duplicate --source $(AnalyzePushSource) --api-key $(AnalyzeApiKey)
+  displayName: 'Push NuGet package'
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))       
+
+- task: PublishTestResults@2
+  condition: always()
+  inputs:
+    searchFolder: 'test-results'
+    testResultsFiles: '*.trx'
+    testResultsFormat: VSTest
