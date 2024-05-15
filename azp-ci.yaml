@@ -6,6 +6,7 @@ pool:
 
 variables:
 - group: NuGetPushCredentials
+- group: MagnetForensics-Github
 
 steps:
 # Checkout and run script for setting up build agent
@@ -101,3 +102,17 @@ steps:
     searchFolder: 'test-results'
     testResultsFiles: '*.trx'
     testResultsFormat: VSTest
+
+- task: PowerShell@2
+  displayName: 'Push to GitHub'
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+  inputs:
+    targetType: 'inline'
+    script: |
+      git config user.email "Azure@Bot.com"
+      git config user.name "AzureDevOpsBot"
+      git remote remove github
+      git remote add github "https://$(PAT)@github.com/MagnetForensics/griffeye-sleuthkit-wrapper.git"
+      git push --force github HEAD:master
+  env:
+    PAT: $(PAT)
