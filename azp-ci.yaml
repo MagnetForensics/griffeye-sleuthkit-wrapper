@@ -16,7 +16,7 @@ steps:
 - checkout: self
   clean: true
   lfs: true
-  fetchDepth: 1
+  fetchDepth: 0
   path: s # Checkout in source root folder, not a subfolder
 
 - task: NuGetCommand@2
