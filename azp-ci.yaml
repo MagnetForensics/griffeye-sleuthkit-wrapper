@@ -1,5 +1,5 @@
 trigger:
-  - master
+  - main
   
 pool:
   name: WindowsVMSS
@@ -89,7 +89,7 @@ steps:
 
 - task: NuGetCommand@2
   displayName: "Nuget Push to Azure Feed"
-  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
   inputs:
     command: 'push'
     packagesToPush: 'artifacts\*.nupkg'
@@ -106,7 +106,7 @@ steps:
 
 - task: PowerShell@2
   displayName: 'Push to GitHub'
-  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
   inputs:
     targetType: 'inline'
     script: |
