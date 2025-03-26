@@ -25,12 +25,12 @@
  * \file VKRecord.cpp
  *
  */
+#include <memory>
 
 // Local includes
 #include "VKRecord.h"
 #include "RejistryException.h"
 #include "REGFHeader.h"
-#include <memory>
 
 namespace Rejistry {
 
@@ -43,7 +43,7 @@ namespace Rejistry {
         }
     }
 
-    VKRecord::VKRecord(const VKRecord& sourceRecord) : Record(sourceRecord._buf, sourceRecord._offset) {        
+    VKRecord::VKRecord(const VKRecord& sourceRecord) : Record(sourceRecord._buf, sourceRecord._offset) {
     }
 
     bool VKRecord::hasName() const {
@@ -77,7 +77,7 @@ namespace Rejistry {
     }
 
     ValueData::VALUE_TYPES VKRecord::getValueType() const {
-        return (ValueData::VALUE_TYPES)getDWord(VALUE_TYPE_OFFSET);
+        return (ValueData::VALUE_TYPES)(getDWord(VALUE_TYPE_OFFSET) & 0x0000FFFF);
     }
 
     uint32_t VKRecord::getDataLength() const {
@@ -127,12 +127,12 @@ namespace Rejistry {
                 data = new RegistryByteBuffer(new ByteBuffer(getData(DATA_OFFSET_OFFSET, bufSize), bufSize));
             }
             else if (DB_DATA_SIZE < length && length < LARGE_DATA_SIZE) {
-                std::auto_ptr< Cell > c(new Cell(_buf, offset));
+                std::unique_ptr< Cell > c(new Cell(_buf, offset));
                 if (c.get() == NULL) {
                     throw RegistryParseException("Failed to create Cell for Value data.");
                 }
                 try {
-                    std::auto_ptr< DBRecord > db(c->getDBRecord());
+                    std::unique_ptr< DBRecord > db(c->getDBRecord());
                     if (db.get() == NULL) {
                         throw RegistryParseException("Failed to create Cell for DBRecord.");
                     }
@@ -143,7 +143,7 @@ namespace Rejistry {
                 }
             }
             else {
-                std::auto_ptr< Cell > c(new Cell(_buf, offset));
+                std::unique_ptr< Cell > c(new Cell(_buf, offset));
                 if (c.get() == NULL) {
                     throw RegistryParseException("Failed to create Cell for Value data.");
                 }
@@ -156,8 +156,9 @@ namespace Rejistry {
             data = new RegistryByteBuffer(new ByteBuffer(getData(DATA_OFFSET_OFFSET, 0x4), 0x4));
             break;
         case ValueData::VALTYPE_QWORD:
+        case ValueData::VALTYPE_FILETIME:
             {
-                std::auto_ptr< Cell > c(new Cell(_buf, offset));
+                std::unique_ptr< Cell > c(new Cell(_buf, offset));
                 if (c.get() == NULL) {
                     throw RegistryParseException("Failed to create Cell for Value data.");
                 }
@@ -170,6 +171,6 @@ namespace Rejistry {
             data = new RegistryByteBuffer(new ByteBuffer(0));
         }
 
-        return new ValueData(data, getValueType());                                                            
+        return new ValueData(data, getValueType());
     }
 };
