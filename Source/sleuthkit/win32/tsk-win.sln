@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.916
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35913.81 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "img_stat", "img_stat\img_stat.vcxproj", "{48F52EA8-A5D1-4BF4-B774-6ECFCB0CE3C9}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -134,11 +134,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "posix-cpp-sample", "posix-c
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tsk_gettimes", "tsk_gettimes\tsk_gettimes.vcxproj", "{11A8927C-F971-4104-A286-5DC11C25E2EC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{76EFC06C-1F64-4478-ABE8-79832716B393} = {76EFC06C-1F64-4478-ABE8-79832716B393}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtsk_jni", "tsk_jni\tsk_jni.vcxproj", "{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{76EFC06C-1F64-4478-ABE8-79832716B393} = {76EFC06C-1F64-4478-ABE8-79832716B393}
 	EndProjectSection
@@ -715,26 +710,6 @@ Global
 		{11A8927C-F971-4104-A286-5DC11C25E2EC}.Release|Win32.Build.0 = Release|Win32
 		{11A8927C-F971-4104-A286-5DC11C25E2EC}.Release|x64.ActiveCfg = Release|x64
 		{11A8927C-F971-4104-A286-5DC11C25E2EC}.Release|x64.Build.0 = Release|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Debug_NoLibs|Win32.ActiveCfg = Debug_NoLibs|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Debug_NoLibs|Win32.Build.0 = Debug_NoLibs|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Debug_NoLibs|x64.ActiveCfg = Debug_NoLibs|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Debug_NoLibs|x64.Build.0 = Debug_NoLibs|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Debug|Win32.Build.0 = Debug|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Debug|x64.ActiveCfg = Debug|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Debug|x64.Build.0 = Debug|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release_NoLibs|Win32.ActiveCfg = Release_NoLibs|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release_NoLibs|Win32.Build.0 = Release_NoLibs|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release_NoLibs|x64.ActiveCfg = Release_NoLibs|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release_NoLibs|x64.Build.0 = Release_NoLibs|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release_XPNoLibs|Win32.ActiveCfg = Release_XPNoLibs|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release_XPNoLibs|Win32.Build.0 = Release_XPNoLibs|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release_XPNoLibs|x64.ActiveCfg = Release_XPNoLibs|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release_XPNoLibs|x64.Build.0 = Release_XPNoLibs|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release|Win32.ActiveCfg = Release|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release|Win32.Build.0 = Release|Win32
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release|x64.ActiveCfg = Release|x64
-		{62D88133-09F6-4E13-B39F-36FCEFBE4FAF}.Release|x64.Build.0 = Release|x64
 		{76EFC06C-1F64-4478-ABE8-79832716B393}.Debug_NoLibs|Win32.ActiveCfg = Debug_NoLibs|Win32
 		{76EFC06C-1F64-4478-ABE8-79832716B393}.Debug_NoLibs|Win32.Build.0 = Debug_NoLibs|Win32
 		{76EFC06C-1F64-4478-ABE8-79832716B393}.Debug_NoLibs|x64.ActiveCfg = Debug_NoLibs|x64
