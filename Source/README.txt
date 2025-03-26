@@ -2,12 +2,12 @@ Since 4.10.2 the depencencies libvmdk, libvhdi, libewf no longer needs to be bui
 
 SLEUTHKIT:
 
-1. When upgrading sleuthkit, just replace the contents of their folder with the new release contents.
-2. Open the solution in the latest Visual Studio version that is supported by the builders and update the toolset if required.
+1. When upgrading sleuthkit, just replace the contents of their folder with the new downloaded zip of the source code .
+2. Open the solution ("Source\sleuthkit\win32\tsk-win.sln") in the latest Visual Studio version that is supported by the builders and update the toolset if required.
    Make sure you adjust 4 xcopy rows in libtsk.vcxproj if toolset is changed.
-   xcopy /E /Y "$(VCInstallDir)\redist\$(PlatformTarget)\Microsoft.VC140.CRT" "$(OutDir)"
+   xcopy /E /Y "$(VCInstallDir)\redist\MSVC\$(VCToolsRedistVersion)\$(PlatformTarget)\Microsoft.VC142.CRT" "$(OutDir)
    to
-   xcopy /E /Y "$(VCToolsRedistInstallDir)$(PlatformTarget)\Microsoft.VC143.CRT" "$(OutDir)"
+   xcopy /E /Y "$(VCInstallDir)\redist\MSVC\$(VCToolsRedistVersion)\$(PlatformTarget)\Microsoft.VC143.CRT" "$(OutDir)
 
    Apply patches with our changes
       git am Source/0001-make-a-few-changes-from-original-sleuthkit-source.patch
