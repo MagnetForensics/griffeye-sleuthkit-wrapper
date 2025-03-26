@@ -5,7 +5,7 @@ Subject: [PATCH] make a few changes from original sleuthkit source
 
 ---
  Source/sleuthkit/samples/callback-style.cpp |  6 ++-
- Source/sleuthkit/tsk/fs/fatfs.c             | 14 ++++--
+ Source/sleuthkit/tsk/fs/fatfs.cpp             | 14 ++++--
  Source/sleuthkit/tsk/fs/fatfs_utils.c       |  2 +-
  Source/sleuthkit/tsk/fs/fatxxfs.c           | 48 +++++++++++----------
  Source/sleuthkit/tsk/fs/tsk_fs.h            |  1 +
@@ -28,11 +28,11 @@ index 8dad337..209a1bc 100644
  
      /* Ignore NTFS System files */
      if ((TSK_FS_TYPE_ISNTFS(fs_file->fs_info->ftype))
-diff --git a/Source/sleuthkit/tsk/fs/fatfs.c b/Source/sleuthkit/tsk/fs/fatfs.c
+diff --git a/Source/sleuthkit/tsk/fs/fatfs.c b/Source/sleuthkit/tsk/fs/fatfs.cpp
 index fe3ab17..19a5ed6 100644
---- a/Source/sleuthkit/tsk/fs/fatfs.c
-+++ b/Source/sleuthkit/tsk/fs/fatfs.c
-@@ -58,7 +58,15 @@ fatfs_open(TSK_IMG_INFO *a_img_info, TSK_OFF_T a_offset, TSK_FS_TYPE_ENUM a_ftyp
+--- a/Source/sleuthkit/tsk/fs/fatfs.cpp
++++ b/Source/sleuthkit/tsk/fs/fatfs.cpp
+@@ -58,7 +58,15 @@ fatfs_open(
          return NULL;
  	}
      fs = &(fatfs->fs_info);
@@ -49,7 +49,7 @@ index fe3ab17..19a5ed6 100644
      fs->img_info = a_img_info;
      fs->offset = a_offset;
      fs->dev_bsize = a_img_info->sector_size;
-@@ -126,8 +134,8 @@ fatfs_open(TSK_IMG_INFO *a_img_info, TSK_OFF_T a_offset, TSK_FS_TYPE_ENUM a_ftyp
+@@ -126,8 +134,8 @@ fatfs_open(
      }
  
  	// Attempt to open the file system as one of the FAT types.

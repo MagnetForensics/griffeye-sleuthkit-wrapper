@@ -10,8 +10,7 @@ SLEUTHKIT:
    xcopy /E /Y "$(VCInstallDir)\redist\MSVC\$(VCToolsRedistVersion)\$(PlatformTarget)\Microsoft.VC143.CRT" "$(OutDir)
 
    Apply patches with our changes
-      git am Source/0001-make-a-few-changes-from-original-sleuthkit-source.patch
-      git am Source/0002-add-includes-needed-by-new-platformtoolset.patch
+      git --whitespace=fix am Source/0001-make-a-few-changes-from-original-sleuthkit-source.patch      
 3. Disable build of the libtsk_jni project. Remove it from solution file.
 4. Run SetEnvironmentVaraiblesForSleuthkit.ps1 to set environment variables for build, step might not be needed anymore!?
 
