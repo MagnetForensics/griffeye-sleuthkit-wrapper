@@ -130,11 +130,11 @@
     </Link>
     <PreBuildEvent>
       <Command>
-        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvhdi.20200810.0.0\lib\native\lib\x64\libvhdi.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvhdi.20200810.0.0\lib\native\lib\x64\libvhdi.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvhdi.20240303.0.0\lib\native\lib\x64\libvhdi.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvhdi.20240303.0.0\lib\native\lib\x64\libvhdi.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
-        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvmdk.20200810.0.0\lib\native\lib\x64\libvmdk.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
-        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\libvmdk.20200810.0.0\lib\native\lib\x64\libvmdk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\skl-libvmdk.20240828.0.0\lib\native\lib\x64\libvmdk.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
+        copy /y "$(SolutionDir)..\sleuthkit\win32\packages\skl-libvmdk.20240828.0.0\lib\native\lib\x64\libvmdk.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
 
         copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\libewf.dll" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
         copy /y "$(SolutionDir)..\sleuthkit\win32\packages\sleuthkit-libewf.20130416.0.0\build\native\msvscpp\x64\Release\libewf.lib" "$(SolutionDir)..\..\Lib\$(PlatformName)\"
