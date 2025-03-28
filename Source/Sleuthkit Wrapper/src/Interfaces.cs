@@ -15,7 +15,7 @@ namespace SleuthKit
         /// <summary>
         /// Opens the content for reading.  Since this library is designed for reading disk images, there isn't going to be an <c>OpenWrite</c>.
         /// </summary>
-        /// <returns></returns>
+        
         Stream OpenRead();
     }
 }

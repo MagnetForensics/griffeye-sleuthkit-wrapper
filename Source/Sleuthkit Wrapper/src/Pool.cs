@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,6 @@ using System.Runtime.InteropServices;
 using SleuthKit.Structs;
 
 namespace SleuthKit;
-
 
 /// <summary>
 /// Pools can organize non-consecutive blocks into volumes. They were added to TSK as part of the APFS support.
@@ -17,7 +15,6 @@ public class Pool : IDisposable
 {
     public PoolHandle _handle;
     internal TSK_POOL_INFO _struct;
-    private ConcurrentDictionary<ulong, DiskImageHandle> _imageInfoHandles;
 
     /// <summary>
     /// ctor for filesystem that comes from within a volume
@@ -30,22 +27,18 @@ public class Pool : IDisposable
         this._struct = _handle.GetStruct();
     }
 
-    delegate IntPtr TestCallbackDelegate(PoolHandle pool, ulong block);
+    private delegate IntPtr TestCallbackDelegate(PoolHandle pool, ulong block);
 
     /// <summary>
     /// Create new image info to use with a specific pool volume
     /// </summary>
-    /// <returns></returns>
-    internal DiskImageHandle GetImageInfo(ulong pool_block)
-    {
-        _imageInfoHandles ??= new ConcurrentDictionary<ulong, DiskImageHandle>();
 
+    internal IntPtr GetImageInfo(ulong pool_block)
+    {
         var delegateForFunctionPointer = Marshal.GetDelegateForFunctionPointer<TestCallbackDelegate>(_struct.ptr_get_img_info);
         var ptrImgInfo = delegateForFunctionPointer.Invoke(_handle, pool_block);
-        var diskImageHandle = new DiskImageHandle(ptrImgInfo);
-        _imageInfoHandles.TryAdd(pool_block, diskImageHandle);
 
-        return diskImageHandle;
+        return ptrImgInfo;
     }
 
     /// <summary>
@@ -62,7 +55,7 @@ public class Pool : IDisposable
     /// Number of volumes in pool
     /// </summary>
     public int VolumeCount => _struct.num_vols;
-    
+
     /// <summary>
     /// Image offset
     /// </summary>
@@ -71,10 +64,10 @@ public class Pool : IDisposable
     /// <summary>
     /// Get volume info
     /// </summary>
-    /// <returns></returns>
+
     public IEnumerable<PoolVolumeInfo> GetVolumeInfos()
     {
-        return  _struct.PoolVolumeInfos.Select(pvi => new PoolVolumeInfo()
+        return _struct.PoolVolumeInfos.Select(pvi => new PoolVolumeInfo()
         {
             Block = pvi.Block,
             Description = pvi.Description
@@ -86,7 +79,7 @@ public class Pool : IDisposable
     /// </summary>
     /// <param name="poolVolumeInfo"></param>
     /// <param name="fileSystemType"></param>
-    /// <returns></returns>
+
     public FileSystem OpenFileSystem(PoolVolumeInfo poolVolumeInfo, FileSystemType fileSystemType = FileSystemType.Autodetect)
     {
         FileSystem fs = new FileSystem(this, poolVolumeInfo, fileSystemType);
@@ -106,20 +99,12 @@ public class Pool : IDisposable
             return fs;
         }
     }
-    
+
     /// <summary>
     /// Releases resources
     /// </summary>
     public void Dispose()
     {
         _handle.Dispose();
-        if (_imageInfoHandles != null)
-        {
-            foreach (var imageInfoHandle in _imageInfoHandles)
-            {
-                imageInfoHandle.Value.Dispose();
-            }
-            _imageInfoHandles = null;
-        }
     }
 }

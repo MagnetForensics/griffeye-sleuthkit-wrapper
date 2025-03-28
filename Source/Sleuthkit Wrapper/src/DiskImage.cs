@@ -10,7 +10,7 @@ namespace SleuthKit
     using System.Runtime.InteropServices;
 
     /// <summary>
-    /// An object encapsulating the SleuthKit disk image functions. 
+    /// An object encapsulating the SleuthKit disk image functions.
     /// See http://www.sleuthkit.org/sleuthkit/docs/api-docs/imgpage.html for more info.
     /// </summary>
     public class DiskImage : IDisposable, IContent
@@ -21,10 +21,10 @@ namespace SleuthKit
         internal TSK_IMG_INFO _struct;
         internal FileInfo[] files;
 
-
-        #endregion
+        #endregion Fields
 
         #region Constructors
+
         /// <summary>
         /// ctor
         /// </summary>
@@ -88,15 +88,15 @@ namespace SleuthKit
             {
                 var image_files_array = new IntPtr[this.files.Count()];
 
-                // Each IntPtr array element will point to a copy of a 
+                // Each IntPtr array element will point to a copy of a
                 // string element in the openFileDialog.FileNames array.
                 // based on answered provided in this link - http://stackoverflow.com/questions/8838455/how-to-convert-c-sharp-string-to-system-intptr
-                for (int i = 0; i < this.files.Count(); i++)
+                for (int i = 0; i < this.files.Length; i++)
                 {
                     image_files_array[i] = Marshal.StringToCoTaskMemUni(this.files[i].FullName);
                 }
 
-                this._handle = NativeMethods.tsk_img_open(this.files.Count(), image_files_array, 0, 0);
+                this._handle = NativeMethods.tsk_img_open(this.files.Length, image_files_array, 0, 0);
             }
 
             if (!this._handle.IsInvalid)
@@ -108,11 +108,10 @@ namespace SleuthKit
                 throw new InvalidOperationException("tsk_img_open didnt work right.");
             }
         }
-        
+
         /// <summary>
         /// A little diagnostic info about the disk image
         /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             var buf = new StringBuilder();
@@ -120,33 +119,27 @@ namespace SleuthKit
             buf.Append(string.Join(",", files.Select(_ => _.FullName).ToArray()));
             return buf.ToString();
         }
-        #endregion
+
+        #endregion Constructors
 
         #region Properties
 
         /// <summary>
         /// the size of this disk image, in bytes
         /// </summary>
-        public long Size
-        {
-            get
-            {
-                return _struct.size;
-            }
-        }
+        public long Size => _struct.size;
 
         /// <summary>
         /// the size of a sector on this disk image, in bytes
         /// </summary>
-        public long SectorSize
-        {
-            get
-            {
-                return _struct.sector_size;
-            }
-        }
+        public long SectorSize => _struct.sector_size;
 
-        #endregion
+        /// <summary>
+        /// The number of images in this disk image
+        /// </summary>
+        public int NumberOfImages => _struct.num_img;
+
+        #endregion Properties
 
         #region Methods
 
@@ -156,20 +149,15 @@ namespace SleuthKit
         /// <param name="offset"></param>
         /// <param name="buf"></param>
         /// <param name="buflen"></param>
-        /// <returns></returns>
+
         public int ReadBytes(long offset, byte[] buf, int buflen)
         {
-            /*
-            IntPtr br = NativeMethods.tsk_img_read(_handle, offset, buf, buflen);
-            return br.ToInt32();
-            //*/
             return NativeMethods.tsk_img_read(_handle, offset, buf, buflen);
         }
 
         /// <summary>
-        /// Returns a stream to the disk image contents.  Particularly useful if you are reading something other than a dd image.  
+        /// Returns a stream to the disk image contents.  Particularly useful if you are reading something other than a dd image.
         /// </summary>
-        /// <returns></returns>
         public Stream OpenRead()
         {
             return new DiskImageStream(this);
@@ -178,7 +166,7 @@ namespace SleuthKit
         /// <summary>
         /// Opens a volume system.
         /// </summary>
-        /// <returns></returns>
+
         public VolumeSystem OpenVolumeSystem()
         {
             var vs = new VolumeSystem(this);
@@ -196,7 +184,7 @@ namespace SleuthKit
             {
                 using (VolumeSystem volumeSystem = OpenVolumeSystem())
                 {
-                    return (volumeSystem != null && volumeSystem.PartitionCount > 0 && volumeSystem.Volumes.Count() > 0);
+                    return (volumeSystem != null && volumeSystem.PartitionCount > 0 && volumeSystem.Volumes.Any());
                 }
             }
         }
@@ -207,14 +195,15 @@ namespace SleuthKit
             {
                 using (VolumeSystem volumeSystem = OpenVolumeSystem())
                 {
-                    if (null == volumeSystem) 
+                    if (null == volumeSystem)
                     {
                         yield break;
                     }
 
                     foreach (Volume volume in volumeSystem.Volumes)
                     {
-                        yield return new VolumeInformation() {
+                        yield return new VolumeInformation()
+                        {
                             Address = volume.Address,
                             Description = volume.Description,
                             Flags = volume.Flags,
@@ -234,8 +223,7 @@ namespace SleuthKit
         /// </summary>
         /// <param name="fileSystemType"></param>
         /// <param name="offset"></param>
-        /// <returns></returns>
-        public FileSystem OpenFileSystem(FileSystemType fileSystemType = FileSystemType.Autodetect, ulong offset = 0)
+        public FileSystem OpenFileSystem(FileSystemType fileSystemType = FileSystemType.Autodetect, long offset = 0)
         {
             FileSystem fs = new FileSystem(this, fileSystemType, offset);
 
@@ -258,7 +246,6 @@ namespace SleuthKit
         /// <summary>
         /// Returns an enumeration of all filesystems on the disk image.  Here for convenience when writing LINQ queries.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<FileSystem> GetFileSystems()
         {
             var vs = this.OpenVolumeSystem();
@@ -285,7 +272,6 @@ namespace SleuthKit
             this._handle.Dispose();
         }
 
-
-        #endregion
+        #endregion Methods
     }
 }

@@ -1,15 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace SleuthKit.Structs
 {
     /// <summary>
     /// represents TSK_FS_FILE.  Generic structure used to refer to files in the file system.  A file will typically have a name and metadata.  This structure holds that type of information.
-    /// When deleted files are being processed, this structure may have the name defined but not metadata because it no longer exists. 
+    /// When deleted files are being processed, this structure may have the name defined but not metadata because it no longer exists.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct TSK_FS_FILE
@@ -25,22 +22,22 @@ namespace SleuthKit.Structs
         /// <summary>
         /// tag, can be used to validate that we have the right kind of struct.  a magic header for the struct, essentially.
         /// </summary>
-        StructureMagic tag;
+        private StructureMagic tag;
 
         /// <summary>
         /// pointer to filename struct - or null if file was opened using metadata address
         /// </summary>
-        IntPtr ptr_filename;
+        private IntPtr ptr_filename;
 
         /// <summary>
         /// Pointer to metadata of file (or NULL if name has invalid metadata address)
         /// </summary>
-        IntPtr ptr_meta;
+        private IntPtr ptr_meta;
 
         /// <summary>
         /// Pointer to file system that the file is located in.
         /// </summary>
-        IntPtr ptr_fsinfo;
+        private IntPtr ptr_fsinfo;
 
         /// <summary>
         /// filename
@@ -77,13 +74,7 @@ namespace SleuthKit.Structs
         /// <summary>
         /// validates the tag contains the proper constant
         /// </summary>
-        public bool AppearsValid
-        {
-            get
-            {
-                return tag == StructureMagic.FilesystemFileTag;
-            }
-        }
+        public bool AppearsValid => tag == StructureMagic.FilesystemFileTag;
 
         /// <summary>
         /// Looks at the name and metadata struct, and attempts to determine if the metadata actually belongs to the name.
@@ -91,7 +82,7 @@ namespace SleuthKit.Structs
         /// </summary>
         /*
         public bool MetadataAppearsValid(bool isNtfs)
-        { 
+        {
             if (!Name.HasValue || !Metadata.HasValue)
             {
                 return false;
@@ -100,7 +91,7 @@ namespace SleuthKit.Structs
             //We have to check if the metadata has a name that actually matches the found name
             String maybeLongName = (Name.Value.LongName ?? String.Empty).TrimEnd(new char[] { '\0' });
             String maybeShortName = (Name.Value.ShortName ?? String.Empty).TrimEnd(new char[] { '\0' });
-            
+
             ulong maybeParentAddress = Name.Value.ParentAddress;
 
             if (Metadata.Value.NameListHead.HasValue)
@@ -115,7 +106,7 @@ namespace SleuthKit.Structs
                         return true;
                     }
 
-                    if (realName.HasNext) 
+                    if (realName.HasNext)
                     {
                         realName = realName.Next;
                     }

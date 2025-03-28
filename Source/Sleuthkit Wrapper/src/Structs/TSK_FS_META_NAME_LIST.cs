@@ -1,9 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 
 namespace SleuthKit.Structs
 {
@@ -13,31 +10,25 @@ namespace SleuthKit.Structs
         /// <summary>
         /// Pointer to next name (or NULL)
         /// </summary>
-        IntPtr next;
+        private IntPtr next;
 
         /// <summary>
         /// Name in UTF-8 (does not include parent directory name)
         /// </summary>
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 512)]
-        byte[] name;
+        private byte[] name;
 
         /// <summary>
         /// Inode address of parent directory (NTFS only)
         /// </summary>
-        ulong par_inode;
+        private ulong par_inode;
 
         /// <summary>
         /// Sequence number of parent directory (NTFS only)
         /// </summary>
-        uint par_seq;
+        private uint par_seq;
 
-        public bool HasNext
-        {
-            get
-            {
-                return next != IntPtr.Zero;
-            }
-        }
+        public bool HasNext => next != IntPtr.Zero;
 
         public TSK_FS_META_NAME_LIST Next
         {
@@ -54,28 +45,10 @@ namespace SleuthKit.Structs
             }
         }
 
-        public ulong ParentAddress
-        {
-            get
-            {
-                return par_inode;
-            }
-        }
+        public ulong ParentAddress => par_inode;
 
-        public uint ParentSequence
-        {
-            get
-            {
-                return par_seq;
-            }
-        }
+        public uint ParentSequence => par_seq;
 
-        public String Name
-        {
-            get
-            {
-                return Encoding.UTF8.GetString(name).Trim(new char[] { '\0' });
-            }
-        }
+        public String Name => Encoding.UTF8.GetString(name).Trim('\0');
     };
 }

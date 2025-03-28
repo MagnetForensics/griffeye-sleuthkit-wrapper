@@ -8,6 +8,8 @@ namespace SleuthKit
     /// </summary>
     internal enum StructureMagic : uint
     {
+        None = 0,
+
         /// <summary>
         /// TSK_IMG_INFO_TAG
         /// </summary>
@@ -41,7 +43,7 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_DIR_TAG
         /// </summary>
-        FilesystemDirectoryTag = 0x97531246,
+        FilesystemDirectoryTag = 0x57531246,
 
         /// <summary>
         /// TSK_POOL_INFO_TAG
@@ -49,9 +51,19 @@ namespace SleuthKit
         PoolInfoTag = 0x504F4C4C,
 
         /// <summary>
-        /// TSK_POOL_VOL_INFO_TAG 
+        /// TSK_POOL_VOL_INFO_TAG
         /// </summary>
         PoolVolumeInfoTag = 0x50564F4C,
+
+        /// <summary>
+        /// TSK_VS_INFO_TAG
+        /// </summary>
+        VolumeSystemInfoTag = 0x52301642,
+
+        /// <summary>
+        /// TSK_VS_PART_INFO_TAG
+        /// </summary>
+        VolumeSystemPartInfoTag = 0x40121253
     }
 
     /// <summary>
@@ -77,6 +89,7 @@ namespace SleuthKit
 
     /// <summary>
     /// Volume system type enumeration
+    /// TSK_VS_TYPE_ENUM
     /// </summary>
     public enum VolumeSystemType
     {
@@ -114,6 +127,11 @@ namespace SleuthKit
         /// TSK_VS_TYPE_APFS, APFS pool NON-NLS
         /// </summary>
         APFS = 0x0020,
+
+        /// <summary>
+        /// TSK_VS_TYPE_LVM, LVM
+        /// </summary>
+        LVM = 0x0030,
 
         /// <summary>
         /// TSK_VS_TYPE_DBFILLER, fake partition table type for loaddb (for images that do not have a volume system)
@@ -220,8 +238,14 @@ namespace SleuthKit
         /// <summary>
         /// Special (TSK added "Virtual" files)
         /// </summary>
-        /// <remarks>TSK_FS_NAME_TYPE_VIRT </remarks>
+        /// <remarks>TSK_FS_NAME_TYPE_VIRT</remarks>
         Virtual = 10,
+
+        /// <summary>
+        /// Special (TSK added "Virtual" directories)
+        /// </summary>
+        /// <remarks>TSK_FS_NAME_TYPE_VIRT_DIR</remarks>
+        VirtualDirectory = 11
     }
 
     /// <summary>
@@ -237,7 +261,27 @@ namespace SleuthKit
         /// <summary>
         /// TSK_FS_META_CONTENT_TYPE_EXT4_EXTENTS, Ext4 with extents instead of individual pointers
         /// </summary>
-        Ext4Extents = 0x1
+        Ext4Extents = 0x1,
+
+        /// <summary>
+        /// TSK_FS_META_CONTENT_TYPE_EXT4_INLINE, Ext4 with inline data
+        /// </summary>
+        Ext4Inline = 0x02,
+
+        /// <summary>
+        /// TSK_FS_META_CONTENT_TYPE_XFS_DATA_FORK_SHORTFORM
+        /// </summary>
+        XFSDataForkShortForm = 0x03,
+
+        /// <summary>
+        /// TSK_FS_META_CONTENT_TYPE_XFS_DATA_FORK_EXTENTS
+        /// </summary>
+        XFSDataForkExtents = 0x04,
+
+        /// <summary>
+        /// TSK_FS_META_CONTENT_TYPE_XFS_DATA_FORK_BTREE
+        /// </summary>
+        XFSDataForkBtree = 0x05,
     }
 
     /// <summary>
@@ -418,6 +462,11 @@ namespace SleuthKit
     [Flags]
     public enum MetadataMode : int
     {
+        /// <summary>
+        /// unspecified
+        /// </summary>
+        TSK_FS_META_MODE_UNSPECIFIED = 0000000,
+
         /// <summary>
         /// set user id on execution
         /// </summary>
@@ -809,6 +858,33 @@ namespace SleuthKit
         ApfsAutodetect = 0x00010000,
 
         /// <summary>
+        /// Logical directory (aut detection not supported)
+        /// </summary>
+        Logical = 0x00020000,
+
+        /// <summary>
+        /// Btrfs file system
+        /// </summary>
+        Btrs = 0x00040000,
+
+        /// <summary>
+        /// Btrfs auto detection
+        /// </summary>
+        [Description("Autodetect Btrfs")]
+        BtrsAutoDetect = 0x00040000,
+
+        /// <summary>
+        /// XFS file system
+        /// </summary>
+        XFS = 0x00080000,
+
+        /// <summary>
+        /// XFS auto detection
+        /// </summary>
+        [Description("Autodetect XFS")]
+        XFSAutoDetect = 0x00080000,
+
+        /// <summary>
         /// TSK_FS_TYPE_UNSUPP, Unsupported file system
         /// </summary>
         Unsupported = 0xffffffff,
@@ -895,12 +971,22 @@ namespace SleuthKit
         VHD = 0x0100,
 
         /// <summary>
+        /// TSK_IMG_TYPE_AFF4_AFF4, AFF4 version
+        /// </summary>
+        AFF4 = 0x0200,
+
+        /// <summary>
+        /// TSK_IMG_TYPE_QCOW_QCOW, QCOW version
+        /// </summary>
+        QCOW = 0x0400,
+
+        /// <summary>
         /// TSK_IMG_TYPE_EXTERNAL, external defined format which at least implements TSK_IMG_INFO, used by pytsk
         /// </summary>
         External = 0x1000,
 
         /// <summary>
-        ///  Pool (internal use) NON-NLS
+        ///  TSK_IMG_TYPE_POOL, Pool (internal use) NON-NLS
         /// </summary>
         POOL = 0x4000,
 
@@ -1021,9 +1107,11 @@ namespace SleuthKit
 
         UnixIndir = 0x1001,   //  Indirect blocks for UFS and ExtX file systems
         UnixExtent = 0x1002,  //  Extents for Ext4 file system
+        UnixXAttr = 0x1003,   //  Extended Attributes for Btrfs file system
 
         // Types for HFS+ File Attributes
         HfsDefault = 0x01,    // 1    Data fork of fs special files and misc
+
         HfsData = 0x1100,     // 4352 Data fork of regular files
         HfsRSRC = 0x1101,     // 4353 Resource fork of regular files
         HfsExtAttr = 0x1102, // 4354 Extended Attributes, except compression records
@@ -1036,5 +1124,14 @@ namespace SleuthKit
         None = 0,
         Deleted = 1,
         Overwritten = 2,
+    }
+
+    /// <summary>
+    /// TSK_FS_ENCRYPTION_TYPE_ENUM
+    /// </summary>
+    public enum EncryptionType
+    {
+        None = 0x00,
+        BitLocker = 0x01,
     }
 }

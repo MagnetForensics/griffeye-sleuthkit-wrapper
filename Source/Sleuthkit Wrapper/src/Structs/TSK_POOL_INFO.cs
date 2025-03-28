@@ -27,23 +27,17 @@ internal struct TSK_POOL_INFO
 
     //uint8_t(*poolstat)(const struct _TSK_POOL_INFO *pool, FILE *hFile)
     internal IntPtr poolstat;
-    
+
     //TSK_IMG_INFO* (* get_img_info) (const struct _TSK_POOL_INFO *pool, TSK_DADDR_T pvol_block)
     internal IntPtr ptr_get_img_info;
-    
+
     //void* impl;  ///< \internal Implementation specific pointer
     internal IntPtr impl;
 
     /// <summary>
     /// First volume info
     /// </summary>
-    internal TSK_POOL_VOLUME_INFO? FirstPoolVolumeInfo
-    {
-        get
-        {
-            return TSK_POOL_VOLUME_INFO.FromIntPtr(this.ptr_vol_list);
-        }
-    }
+    internal TSK_POOL_VOLUME_INFO? FirstPoolVolumeInfo => TSK_POOL_VOLUME_INFO.FromIntPtr(this.ptr_vol_list);
 
     /// <summary>
     /// All volume infos
@@ -62,5 +56,4 @@ internal struct TSK_POOL_INFO
             }
         }
     }
-    
 }

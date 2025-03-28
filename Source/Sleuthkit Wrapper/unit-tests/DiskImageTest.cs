@@ -92,7 +92,7 @@
         [Test]
         public void OpenSingleFileFromVolume()
         {
-            int volumeAddress = 2;
+            uint volumeAddress = 2;
             String filepath = @"A folder/370076.jpg";
 
             using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
@@ -116,8 +116,8 @@
         [Test]
         public void OpenSingleFileAddressFromVolume()
         {
-            int volumeAddress = 2;
-            long fileAddress = 518;
+            uint volumeAddress = 2;
+            ulong fileAddress = 518;
 
             using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
             {
@@ -174,7 +174,7 @@
         [Test]
         public void OpenVolumeSystemAndFindFiles()
         {
-            int volumeAdress = 2;
+            uint volumeAdress = 2;
 
             using (VolumeSystem volumeSystem = this.diskImage.OpenVolumeSystem())
             {

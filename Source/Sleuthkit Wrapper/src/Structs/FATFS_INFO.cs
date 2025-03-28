@@ -3,7 +3,7 @@
 namespace SleuthKit.Structs
 {
     [StructLayout(LayoutKind.Explicit,
-        Size = 17616
+        Size = 17616 + 16
     )]
     public struct FATFS_INFO
     {
@@ -13,17 +13,11 @@ namespace SleuthKit.Structs
         /// <summary>
         /// super block
         /// </summary>
-        [FieldOffset(17024)]
+        [FieldOffset(17024 + 16)]
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]
         private byte[] boot_sector_buffer;
 
-        internal TSK_FS_INFO tsk_fs_info
-        {
-            get
-            {
-                return fs_info;
-            }
-        }
+        internal TSK_FS_INFO tsk_fs_info => fs_info;
 
         internal FATXXFS_SB sb
         {

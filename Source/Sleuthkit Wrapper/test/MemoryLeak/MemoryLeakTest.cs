@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Test.MemoryLeak
 {
@@ -27,10 +25,11 @@ namespace Test.MemoryLeak
                 Thread tprocessingThread = new Thread(() =>
                 {
                     ProcessMethod(iSource);
-                }) { Name = "Processing thread " + i };
+                })
+                { Name = "Processing thread " + i };
 
                 processingThreads.Add(tprocessingThread);
-                tprocessingThread.Start();            
+                tprocessingThread.Start();
             }
 
             foreach (Thread t in processingThreads)
@@ -77,9 +76,9 @@ namespace Test.MemoryLeak
                     {
                         originalStream.Dispose();
                         originalStream = null;
-                    }                    
+                    }
                 }
-            }        
+            }
         }
     }
 }

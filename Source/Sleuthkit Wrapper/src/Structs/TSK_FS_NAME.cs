@@ -1,9 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 
 namespace SleuthKit.Structs
 {
@@ -16,73 +13,67 @@ namespace SleuthKit.Structs
         /// <summary>
         /// tag, can be used to validate that we have the right kind of struct. a magic header for the struct, essentially.
         /// </summary>
-        StructureMagic tag;
+        private StructureMagic tag;
 
         /// <summary>
         /// The name of the file (in UTF-8)
         /// </summary>
-        IntPtr ptr_name;
+        private IntPtr ptr_name;
 
         /// <summary>
         /// The number of bytes allocated to name
         /// </summary>
-        UIntPtr name_size;
+        private UIntPtr name_size;
 
         /// <summary>
         /// The short name of the file or null (in UTF-8)
         /// </summary>
-        IntPtr ptr_short_name;
+        private IntPtr ptr_short_name;
 
         /// <summary>
         /// The number of bytes allocated to shrt_name
         /// </summary>
-        UIntPtr short_name_size;
+        private UIntPtr short_name_size;
 
         /// <summary>
-        /// Address of the metadata structure that the name points to. 
+        /// Address of the metadata structure that the name points to.
         /// </summary>
-        ulong meta_addr;
+        private ulong meta_addr;
 
         /// <summary>
-        /// Sequence number for metadata structure (NTFS only) 
+        /// Sequence number for metadata structure (NTFS only)
         /// </summary>
-        uint meta_seq;
+        private uint meta_seq;
 
         /// <summary>
-        /// Metadata address of parent directory (equal to meta_addr if this entry is for root directory). 
+        /// Metadata address of parent directory (equal to meta_addr if this entry is for root directory).
         /// </summary>
-        ulong par_addr;
+        private ulong par_addr;
 
         /// <summary>
         /// Sequence number for parent directory (NTFS only)
         /// </summary>
-        uint par_seq;
+        private uint par_seq;
 
         /// <summary>
         /// Time entry was added to a directory(APFS only)
         /// </summary>
-        ulong date_added;
+        private ulong date_added;
 
         /// <summary>
         /// File type information (directory, file, etc.)
         /// </summary>
-        FilesystemNameType type;
+        private FilesystemNameType type;
 
         /// <summary>
-        /// Flags that describe allocation status etc. 
+        /// Flags that describe allocation status etc.
         /// </summary>
-        NameFlags flags;
+        private NameFlags flags;
 
         /// <summary>
         /// validates the tag contains the proper constant
         /// </summary>
-        public bool AppearsValid
-        {
-            get
-            {
-                return this.tag == StructureMagic.FilesystemNameTag;
-            }
-        }
+        public bool AppearsValid => this.tag == StructureMagic.FilesystemNameTag;
 
         /// <summary>
         /// The filename
@@ -158,7 +149,7 @@ namespace SleuthKit.Structs
                 name = this.ShortName;
             }
 
-            //go back to the base impl, which sucks but its better than nothing 
+            //go back to the base impl, which sucks but its better than nothing
             if (name == null)
             {
                 name = base.ToString();
@@ -183,52 +174,16 @@ namespace SleuthKit.Structs
                 : ShortName.Trim(new char[] { '\0' });
         }
 
-        public ulong MetadataAddress
-        {
-            get
-            {
-                return this.meta_addr;
-            }
-        }
+        public ulong MetadataAddress => this.meta_addr;
 
-        public uint MetadataSequence
-        {
-            get
-            {
-                return this.meta_seq;
-            }
-        }
+        public uint MetadataSequence => this.meta_seq;
 
-        public ulong ParentAddress
-        {
-            get
-            {
-                return this.par_addr;
-            }
-        }
+        public ulong ParentAddress => this.par_addr;
 
-        public uint ParentSequence
-        {
-            get
-            {
-                return this.par_seq;
-            }
-        }
+        public uint ParentSequence => this.par_seq;
 
-        public FilesystemNameType Type
-        {
-            get
-            {
-                return type;
-            }
-        }
+        public FilesystemNameType Type => type;
 
-        public NameFlags Flags
-        {
-            get
-            {
-                return flags;
-            }
-        }
+        public NameFlags Flags => flags;
     }
 }

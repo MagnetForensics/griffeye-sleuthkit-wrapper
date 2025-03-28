@@ -78,7 +78,7 @@ namespace Test.MemoryLeak
             }
         }
 
-        private SleuthKit.File OpenFile(FileSystem fileSystem, long address, String displayPath)
+        private SleuthKit.File OpenFile(FileSystem fileSystem, ulong address, String displayPath)
         {
             SleuthKit.File file = fileSystem.OpenFile(address, null, displayPath);
             if (null == file)
@@ -288,7 +288,7 @@ namespace Test.MemoryLeak
         private class FileCallbackContainer
         {
             private readonly bool hasVolumes;
-            private readonly long volumeAddress;
+            private readonly uint volumeAddress;
 
             private readonly FileSystem fileSystem;
             private Tuple<SleuthKit.File, MediaPath> _nextFile;
@@ -341,7 +341,7 @@ namespace Test.MemoryLeak
                 this.externalCancellationToken = externalCancellationToken;
             }
 
-            public FileCallbackContainer(FileSystem fileSystem, long volumeAddress, CancellationToken internalCancellationToken, CancellationToken externalCancellationToken)
+            public FileCallbackContainer(FileSystem fileSystem, uint volumeAddress, CancellationToken internalCancellationToken, CancellationToken externalCancellationToken)
             {
                 hasVolumes = true;
                 this.volumeAddress = volumeAddress;
@@ -404,7 +404,7 @@ namespace Test.MemoryLeak
             private Tuple<SleuthKit.File, MediaPath> currentFile;
 
             private readonly bool hasVolumes;
-            private readonly long volumeAddress;
+            private readonly uint volumeAddress;
             private readonly FileSystem fileSystem;
             private FileCallbackContainer callbackContainer;
 
@@ -422,7 +422,7 @@ namespace Test.MemoryLeak
                 Start();
             }
 
-            public FileEnumerator(FileSystem fileSystem, long volumeAddress, CancellationToken cancellationToken)
+            public FileEnumerator(FileSystem fileSystem, uint volumeAddress, CancellationToken cancellationToken)
             {
                 this.hasVolumes = true;
                 this.volumeAddress = volumeAddress;

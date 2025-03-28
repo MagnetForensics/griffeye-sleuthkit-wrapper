@@ -1,9 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 
 namespace SleuthKit.Structs
 {
@@ -15,32 +11,32 @@ namespace SleuthKit.Structs
         /// <summary>
         /// Tag of TSK_VS_PART_INFO
         /// </summary>
-        int tag;
+        private int tag;
 
         /// <summary>
         /// Pointer to previous partition (or NULL)
         /// </summary>
-        internal IntPtr ptr_prev_part;// TSK_VS_PART_INFO* prev; 
+        internal IntPtr ptr_prev_part;// TSK_VS_PART_INFO* prev;
 
         /// <summary>
         /// Pointer to next partition (or NULL)
         /// </summary>
-        internal IntPtr ptr_next_part;// TSK_VS_PART_INFO* next; 
+        internal IntPtr ptr_next_part;// TSK_VS_PART_INFO* next;
 
         /// <summary>
         /// Pointer to parent volume system handle
         /// </summary>
-        private IntPtr ptr_vs_info; //TSK_VS_INFO* vs;        
+        private IntPtr ptr_vs_info; //TSK_VS_INFO* vs;
 
         /// <summary>
         /// Sector offset of start of partition
         /// </summary>
-        private long start;
+        private ulong start;
 
         /// <summary>
         /// Number of sectors in partition
         /// </summary>
-        private long len;
+        private ulong len;
 
         /// <summary>
         ///  UTF-8 description of partition (volume system type-specific)
@@ -50,12 +46,12 @@ namespace SleuthKit.Structs
         /// <summary>
         /// Table address that describes this partition
         /// </summary>
-        private byte table_num;
+        private sbyte table_num;
 
         /// <summary>
         /// Entry in the table that describes this partition
         /// </summary>
-        private byte slot_num;
+        private short slot_num;
 
         /// <summary>
         /// Address of this partition
@@ -67,72 +63,35 @@ namespace SleuthKit.Structs
         /// </summary>
         private VolumeFlags flags;
 
-
         /// <summary>
-        /// Sector offset of start of partition. 
+        /// Sector offset of start of partition.
         /// </summary>
-        public long SectorOffset
-        {
-            get
-            {
-                return this.start;
-            }
-        }
+        public ulong SectorOffset => this.start;
 
         /// <summary>
         /// Size in bytes of this volume
         /// </summary>
-        public long SectorLength
-        {
-            get
-            {
-                return this.len;
-            }
-        }
+        public ulong SectorLength => this.len;
 
         /// <summary>
-        /// Table address that describes this partition. 
+        /// Table address that describes this partition.
         /// </summary>
-        public int TableNumber
-        {
-            get
-            {
-                return table_num;
-            }
-        }
+        public int TableNumber => table_num;
 
         /// <summary>
-        /// Table address that describes this partition. 
+        /// Table address that describes this partition.
         /// </summary>
-        public int SlotNumber
-        {
-            get
-            {
-                return slot_num;
-            }
-        }
+        public int SlotNumber => slot_num;
 
         /// <summary>
         /// Address of this partition
         /// </summary>
-        public uint Address
-        {
-            get
-            {
-                return addr;
-            }
-        }
+        public uint Address => addr;
 
         /// <summary>
         /// Flags.. what more can you say?
         /// </summary>
-        public VolumeFlags Flags
-        {
-            get
-            {
-                return this.flags;
-            }
-        }
+        public VolumeFlags Flags => this.flags;
 
         internal static TSK_VS_PART_INFO? FromIntPtr(IntPtr ptr)
         {
@@ -145,24 +104,12 @@ namespace SleuthKit.Structs
         /// <summary>
         /// Next volume, if any
         /// </summary>
-        public TSK_VS_PART_INFO? Next
-        {
-            get
-            {
-                return FromIntPtr(this.ptr_next_part);
-            }
-        }
+        public TSK_VS_PART_INFO? Next => FromIntPtr(this.ptr_next_part);
 
         /// <summary>
         /// Previous volume, if any
         /// </summary>
-        public TSK_VS_PART_INFO? Previous
-        {
-            get
-            {
-                return FromIntPtr(this.ptr_prev_part);
-            }
-        }
+        public TSK_VS_PART_INFO? Previous => FromIntPtr(this.ptr_prev_part);
 
         /// <summary>
         /// Volume description

@@ -14,13 +14,13 @@ internal struct TSK_POOL_VOLUME_INFO
     /// <summary>
     /// Index of Volume
     /// </summary>
-    internal uint index;
+    internal int index;
 
     /// <summary>
     /// UTF-8 description of partition (volume system type-specific)
     /// </summary>
     private IntPtr ptr_utf8desc;// char* desc;
-    
+
     /// <summary>
     /// UTF-8 password hint for encrypted volumes
     /// </summary>
@@ -39,18 +39,18 @@ internal struct TSK_POOL_VOLUME_INFO
     /// <summary>
     /// Pointer to next partition (or NULL)
     /// </summary>
-    internal IntPtr ptr_next_vol;// TSK_POOL_VOLUME_INFO* next; 
+    internal IntPtr ptr_next_vol;// TSK_POOL_VOLUME_INFO* next;
 
     /// <summary>
     /// Pointer to previous partition (or NULL)
     /// </summary>
-    internal IntPtr ptr_prev_vol;// TSK_POOL_VOLUME_INFO* prev; 
-    
+    internal IntPtr ptr_prev_vol;// TSK_POOL_VOLUME_INFO* prev;
+
     /// <summary>
     /// Pool volume flags
     /// </summary>
     internal PoolVolumeFlags flags;
-    
+
     internal static TSK_POOL_VOLUME_INFO? FromIntPtr(IntPtr ptr)
     {
         if (ptr == IntPtr.Zero)
@@ -62,13 +62,7 @@ internal struct TSK_POOL_VOLUME_INFO
     /// <summary>
     /// Starting block (for pool volumes only)
     /// </summary>
-    public ulong Block
-    {
-        get
-        {
-            return block;
-        }
-    }
+    public ulong Block => block;
 
     /// <summary>
     /// Volume description
@@ -91,36 +85,18 @@ internal struct TSK_POOL_VOLUME_INFO
     /// <summary>
     /// Pool volume flags
     /// </summary>
-    public PoolVolumeFlags Flags
-    {
-        get
-        {
-            return flags;
-        }
-    }
+    public PoolVolumeFlags Flags => flags;
 
     /// <summary>
     /// Next volume, if any
     /// </summary>
-    internal TSK_POOL_VOLUME_INFO? Next
-    {
-        get
-        {
-            return FromIntPtr(this.ptr_next_vol);
-        }
-    }
+    internal TSK_POOL_VOLUME_INFO? Next => FromIntPtr(this.ptr_next_vol);
 
     /// <summary>
     /// Previous volume, if any
     /// </summary>
-    internal TSK_POOL_VOLUME_INFO? Previous
-    {
-        get
-        {
-            return FromIntPtr(this.ptr_prev_vol);
-        }
-    }
-    
+    internal TSK_POOL_VOLUME_INFO? Previous => FromIntPtr(this.ptr_prev_vol);
+
     /// <summary>
     /// Password hint
     /// </summary>

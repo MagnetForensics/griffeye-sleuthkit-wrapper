@@ -279,7 +279,7 @@ namespace SleuthKit
         /// </summary>
         /// <param name="ptr"></param>
         /// <param name="cbSize"></param>
-        /// <returns></returns>
+        
         public static IntPtr Increment(this IntPtr ptr, int cbSize)
         {
             return new IntPtr(ptr.ToInt64() + cbSize);
@@ -290,7 +290,7 @@ namespace SleuthKit
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="ptr"></param>
-        /// <returns></returns>
+        
         public static IntPtr Increment<T>(this IntPtr ptr)
         {
             return ptr.Increment(Marshal.SizeOf(typeof(T)));
@@ -302,7 +302,7 @@ namespace SleuthKit
         /// <typeparam name="T"></typeparam>
         /// <param name="ptr"></param>
         /// <param name="index"></param>
-        /// <returns></returns>
+        
         public static T ElementAt<T>(this IntPtr ptr, int index)
         {
             var offset = Marshal.SizeOf(typeof(T)) * index;
@@ -317,7 +317,7 @@ namespace SleuthKit
         /// Converts a UTF8 string to UTF16.
         /// </summary>
         /// <param name="utf8"></param>
-        /// <returns></returns>
+        
         public static string Utf8ToUtf16(this IntPtr utf8)
         {
             int len = MultiByteToWideChar(65001, 0, utf8, -1, null, 0);

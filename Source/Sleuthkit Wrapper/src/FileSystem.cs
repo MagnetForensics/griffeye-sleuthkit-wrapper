@@ -14,26 +14,17 @@ namespace SleuthKit
     public class FileSystem : IDisposable
     {
         #region Fields
-        private DiskImage _image;
+
+        private readonly DiskImage _image;
         internal FileSystemHandle _handle;
         private TSK_FS_INFO _struct;
-        private Volume _volume;
         private readonly PoolVolumeInfo _poolVolumeInfo;
         private static readonly SemaphoreSlim poolLock = new SemaphoreSlim(1);
 
         private byte[] _bitmap;
-        private byte[] Bitmap
-        {
-            get
-            {
-                if (_bitmap == null)
-                {
-                    _bitmap = GetBitmap();
-                }
 
-                return _bitmap;
-            }
-        }
+        private byte[] Bitmap => _bitmap ??= GetBitmap();
+
         #endregion Fields
 
         #region Constructors
@@ -44,10 +35,9 @@ namespace SleuthKit
         /// <param name="diskImage"></param>
         /// <param name="type"></param>
         /// <param name="offset"></param>
-        internal FileSystem(DiskImage diskImage, FileSystemType type, ulong offset)
+        internal FileSystem(DiskImage diskImage, FileSystemType type, long offset)
         {
             this._image = diskImage;
-            this._volume = null; //no luck on this, no volume system!
             this._handle = diskImage._handle.OpenFileSystemHandle(type, offset);
             this._struct = _handle.GetStruct();
         }
@@ -60,18 +50,16 @@ namespace SleuthKit
         internal FileSystem(Volume volume, FileSystemType fstype)
         {
             this._image = volume.VolumeSystem.DiskImage;
-            this._volume = volume;
             this._handle = NativeMethods.tsk_fs_open_vol(volume._ptr_volinfo, fstype);
             this._struct = _handle.GetStruct();
         }
-        
+
         internal FileSystem(Pool pool, PoolVolumeInfo poolVolumeInfo, FileSystemType fstype)
         {
             try
             {
                 this._poolVolumeInfo = poolVolumeInfo;
                 this._image = null;
-                this._volume = null;
 
                 WaitForLockWhenWithinPool();
                 var tskImgInfo = pool.GetImageInfo(poolVolumeInfo.Block);
@@ -83,7 +71,7 @@ namespace SleuthKit
                 ReleaseLockWhenWithinPool();
             }
         }
-        
+
         #endregion Constructors
 
         #region Properties
@@ -96,6 +84,7 @@ namespace SleuthKit
                 {
                     case FileSystemType.Apfs:
                         return _poolVolumeInfo.Description;
+
                     case FileSystemType.ext2:
                     case FileSystemType.ext3:
                     case FileSystemType.ext4:
@@ -168,90 +157,42 @@ namespace SleuthKit
         /// <summary>
         /// 	Size of each block (in bytes)
         /// </summary>
-        public int BlockSize
-        {
-            get
-            {
-                return this._struct.block_size;
-            }
-        }
+        public uint BlockSize => this._struct.block_size;
 
         /// <summary>
         /// Number of blocks in fs.
         /// </summary>
-        public long BlockCount
-        {
-            get
-            {
-                return this._struct.block_count;
-            }
-        }
+        public ulong BlockCount => this._struct.block_count;
 
         /// <summary>
         /// Address of first block.
         /// </summary>
-        public long FirstBlock
-        {
-            get
-            {
-                return this._struct.first_block;
-            }
-        }
+        public ulong FirstBlock => this._struct.first_block;
 
         /// <summary>
         /// Address of last block as reported by file system (could be larger than last_block in image if end of image does not exist)
         /// </summary>
-        public long LastBlock
-        {
-            get
-            {
-                return this._struct.last_block;
-            }
-        }
+        public ulong LastBlock => this._struct.last_block;
 
         /// <summary>
         /// Address of last block -- adjusted so that it is equal to the last block in the image or volume (if image is not complete)
         /// </summary>
-        public long ActualLastBlock
-        {
-            get
-            {
-                return this._struct.last_block_act;
-            }
-        }
+        public ulong ActualLastBlock => this._struct.last_block_act;
 
         /// <summary>
         /// the filesystem type
         /// </summary>
-        public FileSystemType Type
-        {
-            get
-            {
-                return this._struct.FilesystemType;
-            }
-        }
+        public FileSystemType Type => this._struct.FilesystemType;
 
         /// <summary>
         /// The image this filesystem comes from
         /// </summary>
-        public DiskImage DiskImage
-        {
-            get
-            {
-                return this._image;
-            }
-        }
+        public DiskImage DiskImage => this._image;
 
         /// <summary>
         /// If this file system is within a pool
         /// </summary>
-        public bool WithinPool
-        {
-            get
-            {
-                return this._poolVolumeInfo != null;
-            }
-        }
+        public bool WithinPool => this._poolVolumeInfo != null;
 
         #endregion Properties
 
@@ -261,7 +202,7 @@ namespace SleuthKit
         /// Opens a file by path
         /// </summary>
         /// <param name="path"></param>
-        /// <returns></returns>
+
         public File OpenFile(string path, Directory parent = null)
         {
             WaitForLockWhenWithinPool();
@@ -289,9 +230,7 @@ namespace SleuthKit
         /// <summary>
         /// Opens a file by metadata address
         /// </summary>
-        /// <param name="address"></param>
-        /// <returns></returns>
-        public File OpenFile(long address, Directory parent = null, String name = null)
+        public File OpenFile(ulong address, Directory parent = null, String name = null)
         {
             WaitForLockWhenWithinPool();
             File file = null;
@@ -316,6 +255,7 @@ namespace SleuthKit
                 poolLock.Wait();
             }
         }
+
         public void ReleaseLockWhenWithinPool()
         {
             if (WithinPool)
@@ -329,7 +269,7 @@ namespace SleuthKit
         /// </summary>
         /// <param name="path"></param>
         /// <param name="parent"></param>
-        /// <returns></returns>
+
         public Directory OpenDirectory(string path, Directory parent = null)
         {
             Directory dir = null;
@@ -350,8 +290,7 @@ namespace SleuthKit
         /// </summary>
         /// <param name="address"></param>
         /// <param name="parent"></param>
-        /// <returns></returns>
-        public Directory OpenDirectory(long address, Directory parent = null)
+        public Directory OpenDirectory(ulong address, Directory parent = null)
         {
             Directory dir = null;
             var dh = NativeMethods.tsk_fs_dir_open_meta(this._handle, address);
@@ -365,7 +304,6 @@ namespace SleuthKit
         /// <summary>
         /// Opens the root directory
         /// </summary>
-        /// <returns></returns>
         public Directory OpenRootDirectory()
         {
             Directory dir = null;
@@ -381,7 +319,6 @@ namespace SleuthKit
         /// Opens a block
         /// </summary>
         /// <param name="block"></param>
-        /// <returns></returns>
         public FileSystemBlock OpenBlock(long block)
         {
             var fsbh = NativeMethods.tsk_fs_block_get(this._handle, IntPtr.Zero, block);
@@ -436,7 +373,7 @@ namespace SleuthKit
         /// <summary>
         /// diagnostic string
         /// </summary>
-        /// <returns></returns>
+
         public override string ToString()
         {
             var buf = new StringBuilder();
@@ -489,7 +426,7 @@ namespace SleuthKit
                     }
 
                 default:
-                    return new byte[] { };
+                    return [];
             }
         }
 
@@ -550,10 +487,12 @@ namespace SleuthKit
     public class FileSystemBlock : IDisposable
     {
         #region Fields
+
         private FileSystem _fs;
         private FileSystemBlockHandle _handle;
         private long _blockAddress;
         private TSK_FS_BLOCK _struct;
+
         #endregion Fields
 
         internal FileSystemBlock(FileSystem fileSystem, FileSystemBlockHandle fsbh, long block)
@@ -567,32 +506,17 @@ namespace SleuthKit
         /// <summary>
         /// The filesystem
         /// </summary>
-        public FileSystem FileSystem
-        {
-            get { return _fs; }
-        }
+        public FileSystem FileSystem => _fs;
 
         /// <summary>
         /// The address of this block
         /// </summary>
-        public long BlockAddress
-        {
-            get
-            {
-                return this._blockAddress;
-            }
-        }
+        public long BlockAddress => this._blockAddress;
 
         /// <summary>
         /// The flags
         /// </summary>
-        public FileSystemBlockFlags Flags
-        {
-            get
-            {
-                return this._struct.flags;
-            }
-        }
+        public FileSystemBlockFlags Flags => this._struct.flags;
 
         /// <summary>
         /// Disposes resources

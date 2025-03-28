@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Test.MemoryLeak
 {
@@ -12,45 +8,21 @@ namespace Test.MemoryLeak
 
         private readonly bool hasVolumes;
 
-        private readonly long volumeAddress;
+        private readonly uint volumeAddress;
 
-        private readonly long fileAddress;
+        private readonly ulong fileAddress;
 
-        public String InternalPath
-        {
-            get 
-            {
-                return hasVolumes
+        public String InternalPath => hasVolumes
                     ? String.Format("{0}\\{1}", volumeAddress, fileAddress)
                     : fileAddress.ToString();
-            }
-        }
 
-        public String DisplayPath
-        {
-            get 
-            {
-                return displayPath;
-            }
-        }
+        public String DisplayPath => displayPath;
 
-        public long VolumeAddress
-        {
-            get 
-            {
-                return volumeAddress;
-            }
-        }
+        public uint VolumeAddress => volumeAddress;
 
-        public long FileAddress
-        {
-            get
-            {
-                return fileAddress;
-            }
-        }
-        
-        public MediaPath(String displayPath, long fileAddress)
+        public ulong FileAddress => fileAddress;
+
+        public MediaPath(String displayPath, ulong fileAddress)
         {
             this.displayPath = displayPath;
 
@@ -59,7 +31,7 @@ namespace Test.MemoryLeak
             hasVolumes = false;
         }
 
-        public MediaPath(String displayPath, long volumeAddress, long fileAddress)
+        public MediaPath(String displayPath, uint volumeAddress, ulong fileAddress)
         {
             this.displayPath = displayPath;
 
