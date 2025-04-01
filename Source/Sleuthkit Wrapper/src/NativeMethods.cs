@@ -70,9 +70,6 @@ namespace SleuthKit
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern FileSystemHandle tsk_fs_open_img(DiskImageHandle image, long offset, FileSystemType fstype);
 
-        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern FileSystemHandle tsk_fs_open_img(IntPtr imageInfoPtr, long offset, FileSystemType fstype);
-
         //TSK_FS_INFO *tsk_fs_open_vol(const TSK_VS_PART_INFO * a_part_info, TSK_FS_TYPE_ENUM a_ftype)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
         internal static extern FileSystemHandle tsk_fs_open_vol(IntPtr volinfo, FileSystemType fstype);

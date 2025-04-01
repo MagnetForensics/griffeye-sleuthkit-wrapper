@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ public class Pool : IDisposable
 {
     public PoolHandle _handle;
     internal TSK_POOL_INFO _struct;
+    private ConcurrentDictionary<ulong, DiskImageHandle> _imageInfoHandles;
 
     /// <summary>
     /// ctor for filesystem that comes from within a volume
@@ -32,13 +34,16 @@ public class Pool : IDisposable
     /// <summary>
     /// Create new image info to use with a specific pool volume
     /// </summary>
-
-    internal IntPtr GetImageInfo(ulong pool_block)
+    internal DiskImageHandle GetImageInfo(ulong pool_block)
     {
+        _imageInfoHandles ??= new ConcurrentDictionary<ulong, DiskImageHandle>();
+
         var delegateForFunctionPointer = Marshal.GetDelegateForFunctionPointer<TestCallbackDelegate>(_struct.ptr_get_img_info);
         var ptrImgInfo = delegateForFunctionPointer.Invoke(_handle, pool_block);
+        var diskImageHandle = new DiskImageHandle(ptrImgInfo);
+        _imageInfoHandles.TryAdd(pool_block, diskImageHandle);
 
-        return ptrImgInfo;
+        return diskImageHandle;
     }
 
     /// <summary>
@@ -106,5 +111,13 @@ public class Pool : IDisposable
     public void Dispose()
     {
         _handle.Dispose();
+        if (_imageInfoHandles != null)
+        {
+            foreach (var imageInfoHandle in _imageInfoHandles)
+            {
+                imageInfoHandle.Value.Dispose();
+            }
+            _imageInfoHandles = null;
+        }
     }
 }
