@@ -1,9 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 
 namespace SleuthKit.Structs
 {
@@ -16,111 +13,80 @@ namespace SleuthKit.Structs
         /// <summary>
         /// Will be set to TSK_VS_INFO_TAG if structure is still allocated.
         /// </summary>
-        int tag;
+        private int tag;
 
         /// <summary>
         /// Pointer to disk image that VS is in
         /// </summary>
-        IntPtr ptr_imageInfo; //TSK_IMG_INFO *img_info; 
+        private IntPtr ptr_imageInfo; //TSK_IMG_INFO *img_info;
 
         /// <summary>
         /// Type of volume system / media management
         /// </summary>
-        VolumeSystemType vstype;
+        private VolumeSystemType vstype;
+
+        /// <summary>
+        /// 1 if the partition table found was a backup
+        /// </summary>
+        private int is_backup;
 
         /// <summary>
         /// Byte offset where VS starts in disk image
         /// </summary>
-        long offset;
+        private long offset;
 
         /// <summary>
         /// Size of blocks in bytes
         /// </summary>
-        int block_size;
+        private uint block_size;
 
         /// <summary>
         /// Endian ordering of data
         /// </summary>
-        Endianness endian;
+        private Endianness endian;
 
         /// <summary>
         /// Linked list of partitions
         /// </summary>
-        internal IntPtr ptr_first_volumeinfo;// TSK_VS_PART_INFO *part_list;    // 
+        internal IntPtr ptr_first_volumeinfo;// TSK_VS_PART_INFO *part_list;    //
 
         /// <summary>
-        /// number of partitions 
+        /// number of partitions
         /// </summary>
-        int part_count;
+        private long part_count;
 
         //void (*close) (TSK_VS_INFO *);  // \internal Progs should call tsk_vs_close().
-        IntPtr funcptr_close;
+        private IntPtr funcptr_close;
 
         /// <summary>
         /// The offset to the start of this volume system
         /// </summary>
-        public long Offset
-        {
-            get
-            {
-                return offset;
-            }
-        }
+        public long Offset => offset;
 
         /// <summary>
         /// The type of volume system (MBR, APM, GPT, etc)
         /// </summary>
-        public VolumeSystemType Type
-        {
-            get
-            {
-                return vstype;
-            }
-        }
+        public VolumeSystemType Type => vstype;
 
         /// <summary>
         /// The endianness of this volume system (little, big, etc)
         /// </summary>
-        public Endianness Endianness
-        {
-            get
-            {
-                return this.endian;
-            }
-        }
+        public Endianness Endianness => this.endian;
 
         /// <summary>
         /// The number of partitions on this volume system
         /// </summary>
-        public int PartitionCount
-        {
-            get
-            {
-                return part_count;
-            }
-        }
+        public long PartitionCount => part_count;
 
         /// <summary>
         /// The number of blocks
         /// </summary>
-        public int BlockSize
-        {
-            get
-            {
-                return block_size;
-            }
-        }
+        public uint BlockSize => block_size;
 
         /// <summary>
         /// First volume info
         /// </summary>
-        internal TSK_VS_PART_INFO? FirstVolumeInfo
-        {
-            get
-            {
-                return TSK_VS_PART_INFO.FromIntPtr(this.ptr_first_volumeinfo);
-            }
-        }
+        internal TSK_VS_PART_INFO? FirstVolumeInfo => TSK_VS_PART_INFO.FromIntPtr(this.ptr_first_volumeinfo);
 
         /// <summary>
         /// All volume infos

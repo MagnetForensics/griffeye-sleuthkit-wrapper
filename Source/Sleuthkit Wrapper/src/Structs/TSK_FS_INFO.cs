@@ -7,7 +7,7 @@ namespace SleuthKit.Structs
     /// struct TSK_FS_INFO
     /// </summary>
     [StructLayout(LayoutKind.Explicit,
-    Size = 424
+    Size = 424 + 16
 )]
     public struct TSK_FS_INFO
     {
@@ -27,7 +27,7 @@ namespace SleuthKit.Structs
         /// TSK_OFF_T offset, Byte offset into img_info that fs starts
         /// </summary>
         [FieldOffset(16)]
-        private long offset;
+        private ulong offset;
 
         /* meta data */
 
@@ -35,25 +35,25 @@ namespace SleuthKit.Structs
         /// number of metadata addresses
         /// </summary>
         [FieldOffset(24)]
-        internal long inum_count;
+        internal ulong inum_count;
 
         /// <summary>
         /// address of root directory
         /// </summary>
         [FieldOffset(32)]
-        internal long root_inum;
+        internal ulong root_inum;
 
         /// <summary>
         /// address of first metadata
         /// </summary>
         [FieldOffset(40)]
-        internal long first_inum;
+        internal ulong first_inum;
 
         /// <summary>
         /// address of last metadata
         /// </summary>
         [FieldOffset(48)]
-        internal long last_inum;
+        internal ulong last_inum;
 
         /* content */
 
@@ -61,37 +61,37 @@ namespace SleuthKit.Structs
         /// Number of blocks in fs
         /// </summary>
         [FieldOffset(56)]
-        internal long block_count;
+        internal ulong block_count;
 
         /// <summary>
         /// Address of first block
         /// </summary>
         [FieldOffset(64)]
-        internal long first_block;
+        internal ulong first_block;
 
         /// <summary>
         /// Address of last block as reported by file system (could be larger than last_block in image if end of image does not exist)
         /// </summary>
         [FieldOffset(72)]
-        internal long last_block;
+        internal ulong last_block;
 
         /// <summary>
         /// Address of last block -- adjusted so that it is equal to the last block in the image or volume (if image is not complete)
         /// </summary>
         [FieldOffset(80)]
-        internal long last_block_act;
+        internal ulong last_block_act;
 
         /// <summary>
         /// Size of each block (in bytes)
         /// </summary>
         [FieldOffset(88)]
-        internal int block_size;
+        internal uint block_size;
 
         /// <summary>
         /// Size of device block (typically always 512)
         /// </summary>
         [FieldOffset(92)]
-        internal int dev_bsize;
+        internal uint dev_bsize;
 
         /// <summary>
         /// Number of bytes that preceed each block (currently only used for RAW CDs)
@@ -140,8 +140,8 @@ namespace SleuthKit.Structs
         /// fs id used
         /// </summary>
         [FieldOffset(168)]
-        private UIntPtr fs_id_used;
-        
+        private ulong fs_id_used;
+
         [FieldOffset(176)]
         private Endianness endian;
 
@@ -157,54 +157,60 @@ namespace SleuthKit.Structs
         [FieldOffset(224)]
         private IntPtr list_inum_named_ptr; //TSK_LIST *list_inum_named;
 
+        [FieldOffset(232)]
+        private EncryptionType encryption_type;
+
+        [FieldOffset(236)]
+        private IntPtr encryption_data_ptr;
+
         /// <summary>
         /// taken for the duration of orphan hunting (not just when updating orphan_dir)
         /// </summary>
-        [FieldOffset(232)]
+        [FieldOffset(232 + 16)]
         private tsk_lock_t orphan_dir_lock;
 
         /// <summary>
         /// Files and dirs in the top level of the $OrphanFiles directory.  NULL if orphans have not been hunted for yet.
         /// </summary>
-        [FieldOffset(272)]
+        [FieldOffset(272 + 16)]
         private IntPtr orphan_dir_ptr; //TSK_FS_DIR *orphan_dir;
 
         #region methods
-        
-        [FieldOffset(280)]
+
+        [FieldOffset(280 + 16)]
         private IntPtr block_walk_ptr;
-        
-        [FieldOffset(288)]
+
+        [FieldOffset(288 + 16)]
         private IntPtr block_getflags_ptr;
-        
-        [FieldOffset(296)]
+
+        [FieldOffset(296 + 16)]
         private IntPtr inode_Walk_ptr;
-        
-        [FieldOffset(304)]
+
+        [FieldOffset(304 + 16)]
         private IntPtr file_add_meta_ptr;
-        
-        [FieldOffset(312)]
+
+        [FieldOffset(312 + 16)]
         private IntPtr get_default_attr_type_ptr;
-        
-        [FieldOffset(320)]
+
+        [FieldOffset(320 + 16)]
         private IntPtr load_attrs_ptr;
-        
-        [FieldOffset(328)]
+
+        [FieldOffset(328 + 16)]
         private IntPtr decrypt_block_ptr;
-        
-        [FieldOffset(336)]
+
+        [FieldOffset(336 + 16)]
         private IntPtr istat_ptr;
-        
-        [FieldOffset(344)]
+
+        [FieldOffset(344 + 16)]
         private IntPtr dir_open_meta_ptr;
-        
-        [FieldOffset(352)]
+
+        [FieldOffset(352 + 16)]
         private IntPtr jopen_ptr;
-        
-        [FieldOffset(360)]
+
+        [FieldOffset(360 + 16)]
         private IntPtr jblk_walk_ptr;
-        
-        [FieldOffset(368)]
+
+        [FieldOffset(368 + 16)]
         private IntPtr jentry_walk_ptr;
 
         /*
@@ -213,23 +219,23 @@ namespace SleuthKit.Structs
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public unsafe delegate byte fsstatDelegate(IntPtr fs, FILE* hFile);
         //*/
-        
-        [FieldOffset(376)]
+
+        [FieldOffset(376 + 16)]
         private IntPtr fsstat_ptr;
-        
-        [FieldOffset(384)]
+
+        [FieldOffset(384 + 16)]
         private IntPtr name_cmp_ptr;
-        
-        [FieldOffset(392)]
+
+        [FieldOffset(392 + 16)]
         private IntPtr fscheck_ptr;
-        
-        [FieldOffset(400)]
+
+        [FieldOffset(400 + 16)]
         private IntPtr close_ptr;
-        
-        [FieldOffset(408)]
+
+        [FieldOffset(408 + 16)]
         private IntPtr fread_owner_sid_ptr;
-        
-        [FieldOffset(416)]
+
+        [FieldOffset(416 + 16)]
         private IntPtr impl_ptr;
 
         #endregion methods
@@ -258,13 +264,7 @@ namespace SleuthKit.Structs
         /// <summary>
         /// validates the tag contains the proper constant
         /// </summary>
-        public bool AppearsValid
-        {
-            get
-            {
-                return this.tag == StructureMagic.FilesystemInfoTag;
-            }
-        }
+        public bool AppearsValid => this.tag == StructureMagic.FilesystemInfoTag;
 
         /// <summary>
         /// Image information
@@ -285,31 +285,13 @@ namespace SleuthKit.Structs
         /// <summary>
         /// the offset where the filesystem starts
         /// </summary>
-        public long Offset
-        {
-            get
-            {
-                return this.offset;
-            }
-        }
+        public ulong Offset => this.offset;
 
         /// <summary>
         /// the type of filesystem
         /// </summary>
-        public FileSystemType FilesystemType
-        {
-            get
-            {
-                return this.ftype;
-            }
-        }
+        public FileSystemType FilesystemType => this.ftype;
 
-        public Endianness Endian
-        {
-            get
-            {
-                return endian;
-            }
-        }
+        public Endianness Endian => endian;
     }
 }

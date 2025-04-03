@@ -33,116 +33,55 @@ namespace SleuthKit
         /// <summary>
         /// The volume system that this partition came from
         /// </summary>
-        public VolumeSystem VolumeSystem
-        {
-            get
-            {
-                return this._system;
-            }
-        }
+        public VolumeSystem VolumeSystem => this._system;
 
-        internal TSK_VS_PART_INFO VolumeInfo
-        {
-            get
-            {
-                return _struct;
-            }
-        }
+        internal TSK_VS_PART_INFO VolumeInfo => _struct;
 
         /// <summary>
         /// Description
         /// </summary>
-        public string Description
-        {
-            get
-            {
-                return _struct.Description;
-            }
-        }
+        public string Description => _struct.Description;
 
         /// <summary>
         /// Flags
         /// </summary>
-        public VolumeFlags Flags
-        {
-            get
-            {
-                return _struct.Flags;
-            }
-        }
+        public VolumeFlags Flags => _struct.Flags;
 
         /// <summary>
         /// Is allocated? <c>(Flags &amp; VolumeFlags.Allocated) != 0</c>
         /// </summary>
-        public bool IsAllocated
-        {
-            get
-            {
-                return (Flags & VolumeFlags.Allocated) != 0;
-            }
-        }
+        public bool IsAllocated => (Flags & VolumeFlags.Allocated) != 0;
 
         /// <summary>
         /// The offset in bytes of the start of the partition
         /// </summary>
-        public long Offset
-        {
-            get
-            {
-                return _struct.SectorOffset * this._system.BlockSize;
-            }
-
-        }
+        public ulong Offset => _struct.SectorOffset * this._system.BlockSize;
 
         /// <summary>
         /// The length in bytes of this partition
         /// </summary>
-        public long Length
-        {
-            get
-            {
-                return _struct.SectorLength * this._system.BlockSize;
-            }
-        }
+        public ulong Length => _struct.SectorLength * this._system.BlockSize;
 
         /// <summary>
-        /// Sector offset of start of partition. 
+        /// Sector offset of start of partition.
         /// </summary>
-        public long SectorOffset
-        {
-            get
-            {
-                return _struct.SectorOffset;
-            }
-        }
+        public ulong SectorOffset => _struct.SectorOffset;
 
         /// <summary>
-        /// Sector length of start of partition. 
+        /// Sector length of start of partition.
         /// </summary>
-        public long SectorLength
-        {
-            get
-            {
-                return _struct.SectorLength;
-            }
-        }
+        public ulong SectorLength => _struct.SectorLength;
 
         /// <summary>
         /// Address of this partition
         /// </summary>
-        public long Address
-        {
-            get 
-            {
-                return _struct.Address;
-            }
-        }
+        public uint Address => _struct.Address;
 
         /// <summary>
         /// Opens the filesystem on this volume, if any
         /// </summary>
         /// <param name="fileSystemType"></param>
-        /// <returns></returns>
+
         public FileSystem OpenFileSystem(FileSystemType fileSystemType = FileSystemType.Autodetect)
         {
             FileSystem fs = new FileSystem(this, fileSystemType);
@@ -167,7 +106,7 @@ namespace SleuthKit
         /// Open pool on this volume, if any
         /// </summary>
         /// <param name="fileSystemType"></param>
-        /// <returns></returns>
+
         public Pool OpenPool(FileSystemType fileSystemType = FileSystemType.Autodetect)
         {
             var p = new Pool(this, fileSystemType);
@@ -183,7 +122,7 @@ namespace SleuthKit
         /// <summary>
         /// A human-friendly description of the volume
         /// </summary>
-        /// <returns></returns>
+
         public override string ToString()
         {
             var buf = new StringBuilder();

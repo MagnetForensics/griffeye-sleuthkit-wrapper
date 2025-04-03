@@ -1,109 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SleuthKit.Structs
 {
-    [StructLayout(LayoutKind.Explicit,
-    Size = 144
-    )]
+    [StructLayout(LayoutKind.Sequential)]
     public struct TSK_FS_ATTR
     {
-        [FieldOffset(0)]
-        IntPtr next_ptr;
-        
-        [FieldOffset(8)]
-        IntPtr fs_file_ptr;
-        
-        [FieldOffset(16)]
-        AttributeFlags flags;
-        
-        [FieldOffset(24)]
-        IntPtr name_ptr;
-        
-        [FieldOffset(32)]
-        int name_size;
-        
-        [FieldOffset(40)]
-        AttributeType type;
-        
-        [FieldOffset(44)]
-        ushort id;
-        
-        [FieldOffset(48)]
-        long size;
-        
-        [FieldOffset(56)]
-        IntPtr nrd_run_ptr;
-        
-        [FieldOffset(64)]
-        IntPtr nrd_run_end_ptr;
-        
-        [FieldOffset(72)]
-        uint nrd_skiplen;
-        
-        [FieldOffset(80)]
-        long nrd_allocsize;
-        
-        [FieldOffset(88)]
-        long nrg_initsize;
-        
-        [FieldOffset(96)]
-        uint nrd_compsize;
-        
-        [FieldOffset(104)]
-        IntPtr rd_buf_ptr;
-        
-        [FieldOffset(112)]
-        int rd_buf_size;
-        
-        [FieldOffset(120)]
-        long rd_offset;
+        private IntPtr next_ptr;
+
+        private IntPtr fs_file_ptr;
+
+        private AttributeFlags flags;
+
+        private IntPtr name_ptr;
+
+        private ulong name_size;
+
+        private AttributeType type;
+
+        private ushort id;
+
+        private long size;
+
+        private IntPtr nrd_run_ptr;
+
+        private IntPtr nrd_run_end_ptr;
+
+        private uint nrd_skiplen;
+
+        private long nrd_allocsize;
+
+        private long nrg_initsize;
+
+        private uint nrd_compsize;
+
+        private IntPtr rd_buf_ptr;
+
+        private int rd_buf_size;
+
+        private long rd_offset;
 
         //Some more attributes here, but not wrapped
 
-        public bool HasNext
-        {
-            get
-            {
-                return next_ptr != IntPtr.Zero;
-            }
-        }
+        public bool HasNext => next_ptr != IntPtr.Zero;
 
-        public TSK_FS_ATTR Next
-        {
-            get
-            {
-                return ((TSK_FS_ATTR)Marshal.PtrToStructure(next_ptr, typeof(TSK_FS_ATTR)));
-            }
-        }
+        public TSK_FS_ATTR Next => ((TSK_FS_ATTR)Marshal.PtrToStructure(next_ptr, typeof(TSK_FS_ATTR)));
 
-        public TSK_FS_FILE File
-        {
-            get
-            {
-                return ((TSK_FS_FILE)Marshal.PtrToStructure(fs_file_ptr, typeof(TSK_FS_FILE)));
-            }
-        }
+        public TSK_FS_FILE File => ((TSK_FS_FILE)Marshal.PtrToStructure(fs_file_ptr, typeof(TSK_FS_FILE)));
 
-        public IntPtr FilePointer
-        {
-            get
-            {
-                return fs_file_ptr;
-            }
-        }
+        public IntPtr FilePointer => fs_file_ptr;
 
-        public AttributeFlags AttributeFlags
-        {
-            get
-            {
-                return flags;
-            }
-        }
+        public AttributeFlags AttributeFlags => flags;
 
         public String Name
         {
@@ -112,8 +61,8 @@ namespace SleuthKit.Structs
                 if (name_size > 0)
                 {
                     byte[] buffer = new byte[name_size];
-                    Marshal.Copy(name_ptr, buffer, 0, name_size);
-                    return Encoding.UTF8.GetString(buffer, 0, name_size).TrimEnd(new char[] { '\0' });
+                    Marshal.Copy(name_ptr, buffer, 0, (int)name_size);
+                    return Encoding.UTF8.GetString(buffer, 0, (int)name_size).TrimEnd('\0');
                 }
                 else
                 {
@@ -122,32 +71,14 @@ namespace SleuthKit.Structs
             }
         }
 
-        public AttributeType AttributeType
-        {
-            get 
-            {
-                return type;
-            }
-        }
+        public AttributeType AttributeType => type;
 
-        public ushort Id
-        {
-            get
-            {
-                return id;
-            }
-        }
+        public ushort Id => id;
 
-        public long Size
-        {
-            get
-            {
-                return size;
-            }
-        }
+        public long Size => size;
 
         public IEnumerable<TSK_FS_ATTR_RUN> NonResidentBlocks
-        { 
+        {
             get
             {
                 if (nrd_run_ptr != IntPtr.Zero)
@@ -171,14 +102,8 @@ namespace SleuthKit.Structs
             }
         }
 
-        public String rdBufString
-        {
-            get
-            {
-                return rd_buf_ptr == null
+        public String rdBufString => rd_buf_ptr == null
                     ? null
                     : Marshal.PtrToStringUni(rd_buf_ptr, (int)(size / 2));
-            }
-        }
     }
 }

@@ -83,7 +83,6 @@ namespace SleuthkitSharp_UnitTests
             Assert.GreaterOrEqual(fileCount.FileCount, 100);
         }
 
-
         //RAW
         [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\IMG\DSIII_USB_Ext4_disks.img")]
         public void AssertDS3ImageExactCount(String imagePath)
@@ -93,7 +92,7 @@ namespace SleuthkitSharp_UnitTests
             Assert.AreEqual(5346, fileCount.FileCount);
             Assert.AreEqual(4630, fileCount.MetadataIsValidCount);
         }
-        
+
         //APFS
         [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\APFS\apfs.dmg", 23)]
         [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\APFS\unencrypted_apfs.dmg", 15)]
@@ -124,7 +123,6 @@ namespace SleuthkitSharp_UnitTests
         //DMG
         [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\DMG\DSIII_USB_HFSplus_DiskUtility_Compressed.dmg")]
         [TestCase(@"\\winfiles.griffeye.net\dfs\TestData\Test sets\Automation sets\Forensic images\DSIII\DMG\DSIII_USB_HFSplus_DiskUtility_ReadOnly.dmg")]
-
         public void AssertFailingDS3Image(String imagePath)
         {
             var fileCount = CountFilesInImageAndGetLabels(imagePath, out var labels, out List<string> directories);
@@ -141,7 +139,7 @@ namespace SleuthkitSharp_UnitTests
             Assert.AreEqual(54, fileCount.FileCount);
             Assert.IsTrue(directories.Contains("ÅÄÖ/"));
         }
-        
+
         [Test]
         public void AndroidFileSystem()
         {
@@ -169,6 +167,12 @@ namespace SleuthkitSharp_UnitTests
                         {
                             foreach (Volume v in vs.Volumes)
                             {
+                                if (!v.IsAllocated)
+                                {
+                                    continue;
+                                }
+
+                                bool poolOpened = false;
                                 using (var openPool = v.OpenPool(fileSystem))
                                 {
                                     if (openPool != null)
@@ -177,11 +181,12 @@ namespace SleuthkitSharp_UnitTests
                                         {
                                             try
                                             {
-                                                using (FileSystem fs = openPool.OpenFileSystem(tskPoolVolumeInfo))
+                                                using (FileSystem fs = openPool.OpenFileSystem(tskPoolVolumeInfo, fileSystem))
                                                 {
                                                     labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
 
                                                     fs.WalkDirectories(counter.DirWalkCallback);
+                                                    poolOpened = true;
                                                 }
                                             }
                                             catch (Exception e)
@@ -189,17 +194,19 @@ namespace SleuthkitSharp_UnitTests
                                                 failCount++;
                                             }
                                         }
-
                                     }
                                 }
-                                
+
                                 try
                                 {
-                                    using (FileSystem fs = v.OpenFileSystem(fileSystem))
+                                    if (!poolOpened)
                                     {
-                                        labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
+                                        using (FileSystem fs = v.OpenFileSystem(fileSystem))
+                                        {
+                                            labels += labels == String.Empty ? fs.Label : ", " + fs.Label;
 
-                                        fs.WalkDirectories(counter.DirWalkCallback);
+                                            fs.WalkDirectories(counter.DirWalkCallback);
+                                        }
                                     }
                                 }
                                 catch (Exception)
@@ -245,7 +252,7 @@ namespace SleuthkitSharp_UnitTests
             {
                 var directoryName = utf8_path.Utf8ToUtf16();
                 Directories.Add(directoryName);
-                
+
                 var metadataValid = MetadataIsValid(file, FileSystemType.Autodetect);
 
                 MetadataIsValidCount += metadataValid ? 1 : 0;

@@ -2,14 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SleuthkitSharp</id>
-    <version>3.6.1</version>
+    <version>3.7.0</version>
     <authors>Sandun Weerasinghe, Sathyendra Balaretnaraja, Josef Eklann, Andreas Eriksson, Adam Sällergård, Sven Claesson</authors>
-    <owners>Safer Society Group</owners>
-    <dependencies />
-    <projectUrl>http://www.safersociety.com</projectUrl>
+    <owners>Magnet Forensics</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A wrapper of sleuthkit for C#</description>
     <releaseNotes>
+      3.7.0 Updated Sleuthkit to version 4.13.0
       3.6.1 Implement APFS and pool support
       3.6.0 Updated Sleuthkit to version 4.12.0
       3.5.0 Updated Sleuthkit to version 4.10.2
@@ -32,10 +31,10 @@
     </releaseNotes>
   </metadata>
   <files>
-    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="lib\netstandard2.0\" />
-    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="build\netstandard2.0\x64\" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="lib\net8.0\" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="build\net8.0\x64\" />
 
-    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="ref\net6.0\" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.*" target="ref\net8.0\" />
 
     <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="FilesToCopy\x64" />
     <file src="..\..\..\..\Lib\x64\libewf.dll" target="FilesToCopy\x64" />
@@ -46,8 +45,8 @@
     <file src="..\..\..\..\Lib\x64\libcrypto-1_1-x64.dll" target="FilesToCopy\x64" />
     <file src="..\..\..\..\Lib\x64\libssl-1_1-x64.dll" target="FilesToCopy\x64" />
 
-    <file src="..\bin\x64\Release\sleuthkit-sharp.dll" target="runtimes\win-x64\lib\net6.0" />
-    <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="runtimes\win-x64\lib\net6.0" />
+    <file src="..\bin\x64\Release\sleuthkit-sharp.dll" target="runtimes\win-x64\lib\net8.0" />
+    <file src="..\..\..\..\Lib\x64\ewf.net.dll" target="runtimes\win-x64\lib\net8.0" />
     <file src="..\..\..\..\Lib\x64\libewf.dll" target="runtimes\win-x64\native\" />
     <file src="..\..\..\..\Lib\x64\libvhdi.dll" target="runtimes\win-x64\native\" />
     <file src="..\..\..\..\Lib\x64\libvmdk.dll" target="runtimes\win-x64\native\" />
@@ -55,7 +54,7 @@
     <file src="..\..\..\..\Lib\x64\zlib.dll" target="runtimes\win-x64\native\" />
     <file src="..\..\..\..\Lib\x64\libcrypto-1_1-x64.dll" target="runtimes\win-x64\native\" />
     <file src="..\..\..\..\Lib\x64\libssl-1_1-x64.dll" target="runtimes\win-x64\native\" />
-    
+
     <file src="SleuthkitSharp.targets" target="build" />
   </files>
 </package>

@@ -13,21 +13,9 @@ namespace SleuthKit.Structs
         [FieldOffset(64)] //really 71, see above
         private fatfs_vol_lab_32 vol_lab_f32;
 
-        internal String VolumeName16
-        {
-            get
-            {
-                return vol_lab_f16.Name;
-            }
-        }
+        internal String VolumeName16 => vol_lab_f16.Name;
 
-        internal String VolumeName32
-        {
-            get
-            {
-                return vol_lab_f32.Name;
-            }
-        }
+        internal String VolumeName32 => vol_lab_f32.Name;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -40,13 +28,7 @@ namespace SleuthKit.Structs
         [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 11)]
         private String vol_lab;
 
-        public String Name
-        {
-            get
-            {
-                return vol_lab;
-            }
-        }
+        public String Name => vol_lab;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -63,12 +45,6 @@ namespace SleuthKit.Structs
         [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 11)]
         private String vol_lab;
 
-        public String Name
-        {
-            get
-            {
-                return vol_lab;
-            }
-        }
+        public String Name => vol_lab;
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SleuthKit.Structs
 {
@@ -15,59 +11,23 @@ namespace SleuthKit.Structs
         private ulong offset;     ///< Offset (in blocks) of this run in the file
 
         private ulong addr;       ///< Starting block address (in file system) of run
-        
+
         private ulong len;        ///< Number of blocks in run (0 when entry is not in use)
-        
+
         private ulong crypto_id;  ///< Starting block number used for XTS encryption IV
 
         private AttributeRunFlags flags;        ///< Flags for run
 
-        public bool HasNext
-        {
-            get
-            {
-                return next_ptr != IntPtr.Zero;
-            }
-        }
+        public bool HasNext => next_ptr != IntPtr.Zero;
 
-        public TSK_FS_ATTR_RUN Next
-        {
-            get
-            {
-                return ((TSK_FS_ATTR_RUN)Marshal.PtrToStructure(next_ptr, typeof(TSK_FS_ATTR_RUN)));
-            }
-        }
+        public TSK_FS_ATTR_RUN Next => ((TSK_FS_ATTR_RUN)Marshal.PtrToStructure(next_ptr, typeof(TSK_FS_ATTR_RUN)));
 
-        public ulong Offset
-        {
-            get
-            {
-                return offset;
-            }
-        }
+        public ulong Offset => offset;
 
-        public ulong Address
-        {
-            get
-            {
-                return addr;
-            }
-        }
+        public ulong Address => addr;
 
-        public ulong Length
-        {
-            get
-            {
-                return len;
-            }
-        }
+        public ulong Length => len;
 
-        public AttributeRunFlags Flags
-        {
-            get
-            {
-                return flags;
-            }
-        }
+        public AttributeRunFlags Flags => flags;
     }
 }

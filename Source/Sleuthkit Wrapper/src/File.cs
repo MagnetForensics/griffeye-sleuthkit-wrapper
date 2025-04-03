@@ -90,13 +90,13 @@ namespace SleuthKit
         /// <summary>
         /// The filesystem identifier, or inode of this file
         /// </summary>
-        public long Address
+        public ulong Address
         {
             get;
             internal set;
         }
 
-        #endregion
+        #endregion Properties
     }
 
     /// <summary>
@@ -105,13 +105,15 @@ namespace SleuthKit
     public class File : FileSystemEntry, IDisposable, IContent
     {
         #region Fields
+
         private FileSystem _fs;
         private FileHandle _handle;
         private TSK_FS_FILE _struct;
         private Directory _parentDir;
         private Utf8String _utf8String;
         private string path;
-        #endregion
+
+        #endregion Fields
 
         /// <summary>
         /// ctor
@@ -156,7 +158,6 @@ namespace SleuthKit
             }
 
             this.FileSystem = this._fs;
-
         }
 
         #region Properties
@@ -176,7 +177,6 @@ namespace SleuthKit
             this._handle = null;
             _fs.ReleaseLockWhenWithinPool();
         }
-
 
         /// <summary>
         /// Long name of the file - use this
@@ -226,7 +226,7 @@ namespace SleuthKit
             }
         }
 
-        #endregion
+        #endregion Properties
 
         /// <summary>
         /// Reads file data
@@ -234,7 +234,7 @@ namespace SleuthKit
         /// <param name="offset">The offset.</param>
         /// <param name="buffer">The buffer.</param>
         /// <param name="amt">The amt.</param>
-        /// <returns></returns>
+
         /// <exception cref="SleuthKit.NtfsCompressionException">If a compressed file is corrupt</exception>
         /// <exception cref="System.IO.IOException">If the file reading fails for another reason</exception>
         public int ReadBytes(long offset, byte[] buffer, int amt)
@@ -275,7 +275,7 @@ namespace SleuthKit
         }
 
         /// <summary>
-        /// Process a file and call a callback function with the file contents. 
+        /// Process a file and call a callback function with the file contents.
         /// </summary>
         /// <param name="callback">Callback action to call with content.</param>
         /// <param name="a_ptr">Pointer that will be passed to callback.</param>
@@ -289,7 +289,7 @@ namespace SleuthKit
         /// <summary>
         /// Returns a stream to this file's contents.
         /// </summary>
-        /// <returns></returns>
+
         public System.IO.Stream OpenRead()
         {
             return new FileStream(this);

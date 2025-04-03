@@ -68,7 +68,7 @@ namespace SleuthKit
 
         //TSK_FS_INFO *tsk_fs_open_img(TSK_IMG_INFO * a_img_info, TSK_OFF_T a_offset, TSK_FS_TYPE_ENUM a_ftype)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern FileSystemHandle tsk_fs_open_img(DiskImageHandle image, ulong offset, FileSystemType fstype);
+        internal static extern FileSystemHandle tsk_fs_open_img(DiskImageHandle image, long offset, FileSystemType fstype);
 
         //TSK_FS_INFO *tsk_fs_open_vol(const TSK_VS_PART_INFO * a_part_info, TSK_FS_TYPE_ENUM a_ftype)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
@@ -117,7 +117,7 @@ namespace SleuthKit
 
         //TSK_FS_FILE *tsk_fs_file_open_meta(TSK_FS_INFO * a_fs, TSK_FS_FILE * a_fs_file, TSK_INUM_T a_addr)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern FileHandle tsk_fs_file_open_meta(FileSystemHandle fs, [In] IntPtr should_be_zero, [In] long metadata_address);
+        internal static extern FileHandle tsk_fs_file_open_meta(FileSystemHandle fs, [In] IntPtr should_be_zero, [In] ulong metadata_address);
 
         //ssize_t tsk_fs_file_read(TSK_FS_FILE * a_fs_file, TSK_OFF_T a_offset, char *a_buf, size_t a_len, TSK_FS_FILE_READ_FLAG_ENUM a_flags)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
@@ -149,7 +149,7 @@ namespace SleuthKit
 
         //TSK_FS_DIR *tsk_fs_dir_open_meta(TSK_FS_INFO * a_fs, TSK_INUM_T a_addr)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern DirectoryHandle tsk_fs_dir_open_meta(FileSystemHandle file, long metadata_address);
+        internal static extern DirectoryHandle tsk_fs_dir_open_meta(FileSystemHandle file, ulong metadata_address);
 
         //size_t tsk_fs_dir_getsize(const TSK_FS_DIR * a_fs_dir)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
@@ -165,10 +165,10 @@ namespace SleuthKit
 
         //uint8_t tsk_fs_dir_walk(TSK_FS_INFO * a_fs, TSK_INUM_T a_addr, TSK_FS_DIR_WALK_FLAG_ENUM a_flags, TSK_FS_DIR_WALK_CB a_action, void *a_ptr)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern byte tsk_fs_dir_walk(FileSystemHandle fs, long directory_address, DirWalkFlags walk_flags, DirWalkDelegate callback, IntPtr a_ptr);
+        internal static extern byte tsk_fs_dir_walk(FileSystemHandle fs, ulong address_inode, DirWalkFlags walk_flags, DirWalkDelegate callback, IntPtr a_ptr);
 
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tsk_fs_dir_walk")]
-        internal static extern byte tsk_fs_dir_walk_ptr(FileSystemHandle fs, long directory_address, DirWalkFlags walk_flags, DirWalkPtrDelegate callback, IntPtr a_ptr);
+        internal static extern byte tsk_fs_dir_walk_ptr(FileSystemHandle fs, ulong directory_address, DirWalkFlags walk_flags, DirWalkPtrDelegate callback, IntPtr a_ptr);
 
         #endregion dir stuff
 
@@ -176,7 +176,7 @@ namespace SleuthKit
 
         //uint8_t tsk_fs_meta_walk(TSK_FS_INFO * a_fs, TSK_INUM_T a_start, TSK_INUM_T a_end, TSK_FS_META_FLAG_ENUM a_flags, TSK_FS_META_WALK_CB a_cb, void *a_ptr)
         [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern byte tsk_fs_meta_walk(FileSystemHandle fs, long start_address, long end_address, MetadataFlags walk_flags, MetaWalkDelegate callback, IntPtr a_ptr);
+        internal static extern byte tsk_fs_meta_walk(FileSystemHandle fs, ulong start_address, ulong end_address, MetadataFlags walk_flags, MetaWalkDelegate callback, IntPtr a_ptr);
 
         #endregion meta
 
@@ -235,18 +235,11 @@ namespace SleuthKit
         /// <summary>
         /// invalid if pointer is zero
         /// </summary>
-        public override bool IsInvalid
-        {
-            get
-            {
-                return base.handle == IntPtr.Zero;
-            }
-        }
+        public override bool IsInvalid => base.handle == IntPtr.Zero;
 
         /// <summary>
         /// closes handle
         /// </summary>
-        /// <returns></returns>
         protected override bool ReleaseHandle()
         {
             NativeMethods.tsk_img_close(this.handle);
@@ -257,7 +250,6 @@ namespace SleuthKit
         /// <summary>
         /// converts this pointer into an ImageInfo struct
         /// </summary>
-        /// <returns></returns>
         internal TSK_IMG_INFO GetStruct()
         {
             return ((TSK_IMG_INFO)Marshal.PtrToStructure(this.handle, typeof(TSK_IMG_INFO)));
@@ -268,7 +260,6 @@ namespace SleuthKit
         /// </summary>
         /// <param name="vstype"></param>
         /// <param name="offset"></param>
-        /// <returns></returns>
         internal VolumeSystemHandle OpenVolumeSystemHandle(VolumeSystemType vstype = VolumeSystemType.Autodetect, long offset = 0)
         {
             return NativeMethods.tsk_vs_open(this, offset, vstype);
@@ -279,8 +270,7 @@ namespace SleuthKit
         /// </summary>
         /// <param name="fstype"></param>
         /// <param name="offset"></param>
-        /// <returns></returns>
-        internal FileSystemHandle OpenFileSystemHandle(FileSystemType fstype = FileSystemType.Autodetect, ulong offset = 0)
+        internal FileSystemHandle OpenFileSystemHandle(FileSystemType fstype = FileSystemType.Autodetect, long offset = 0)
         {
             return NativeMethods.tsk_fs_open_img(this, offset, fstype);
         }
@@ -302,18 +292,12 @@ namespace SleuthKit
         /// <summary>
         /// invalid if pointer is zero
         /// </summary>
-        public override bool IsInvalid
-        {
-            get
-            {
-                return base.handle == IntPtr.Zero;
-            }
-        }
+        public override bool IsInvalid => base.handle == IntPtr.Zero;
 
         /// <summary>
         /// closes handle
         /// </summary>
-        /// <returns></returns>
+
         protected override bool ReleaseHandle()
         {
             NativeMethods.tsk_vs_close(this.handle);
@@ -324,7 +308,7 @@ namespace SleuthKit
         /// <summary>
         /// Converts this handle into a new VolumeSystemInfo.
         /// </summary>
-        /// <returns></returns>
+
         internal TSK_VS_INFO GetStruct()
         {
             if (this.IsInvalid)
@@ -343,29 +327,22 @@ namespace SleuthKit
             : base(IntPtr.Zero, true)
         {
         }
-        
+
         /// <summary>
         /// invalid if pointer is zero
         /// </summary>
-        public override bool IsInvalid
-        {
-            get
-            {
-                return base.handle == IntPtr.Zero;
-            }
-        }
-        
+        public override bool IsInvalid => base.handle == IntPtr.Zero;
+
         /// <summary>
         /// closes handle
         /// </summary>
-        /// <returns></returns>
+
         protected override bool ReleaseHandle()
         {
             NativeMethods.tsk_pool_close(this.handle);
             base.SetHandleAsInvalid();
             return true;
         }
-
 
         internal TSK_POOL_INFO GetStruct()
         {
@@ -396,18 +373,12 @@ namespace SleuthKit
         /// <summary>
         /// invalid if pointer is zero
         /// </summary>
-        public override bool IsInvalid
-        {
-            get
-            {
-                return base.handle == IntPtr.Zero;
-            }
-        }
+        public override bool IsInvalid => base.handle == IntPtr.Zero;
 
         /// <summary>
         /// closes handle
         /// </summary>
-        /// <returns></returns>
+
         protected override bool ReleaseHandle()
         {
             NativeMethods.tsk_fs_close(this.handle);
@@ -469,18 +440,12 @@ namespace SleuthKit
         /// <summary>
         /// invalid if pointer is zero
         /// </summary>
-        public override bool IsInvalid
-        {
-            get
-            {
-                return base.handle == IntPtr.Zero;
-            }
-        }
+        public override bool IsInvalid => base.handle == IntPtr.Zero;
 
         /// <summary>
         /// closes handle
         /// </summary>
-        /// <returns></returns>
+
         protected override bool ReleaseHandle()
         {
             NativeMethods.tsk_fs_block_free(this.handle);
@@ -513,18 +478,12 @@ namespace SleuthKit
         /// <summary>
         /// invalid if pointer is zero
         /// </summary>
-        public override bool IsInvalid
-        {
-            get
-            {
-                return base.handle == IntPtr.Zero;
-            }
-        }
+        public override bool IsInvalid => base.handle == IntPtr.Zero;
 
         /// <summary>
         /// closes handle
         /// </summary>
-        /// <returns></returns>
+
         protected override bool ReleaseHandle()
         {
             NativeMethods.tsk_fs_file_close(this.handle);
@@ -557,18 +516,12 @@ namespace SleuthKit
         /// <summary>
         /// invalid if pointer is zero
         /// </summary>
-        public override bool IsInvalid
-        {
-            get
-            {
-                return base.handle == IntPtr.Zero;
-            }
-        }
+        public override bool IsInvalid => base.handle == IntPtr.Zero;
 
         /// <summary>
         /// closes handle
         /// </summary>
-        /// <returns></returns>
+
         protected override bool ReleaseHandle()
         {
             base.SetHandleAsInvalid();
@@ -600,18 +553,12 @@ namespace SleuthKit
         /// <summary>
         /// invalid if pointer is zero
         /// </summary>
-        public override bool IsInvalid
-        {
-            get
-            {
-                return base.handle == IntPtr.Zero;
-            }
-        }
+        public override bool IsInvalid => base.handle == IntPtr.Zero;
 
         /// <summary>
         /// closes handle
         /// </summary>
-        /// <returns></returns>
+
         protected override bool ReleaseHandle()
         {
             NativeMethods.tsk_fs_dir_close(this.handle);

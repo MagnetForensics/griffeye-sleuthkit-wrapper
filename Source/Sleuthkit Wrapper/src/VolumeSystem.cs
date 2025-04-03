@@ -1,8 +1,6 @@
 ﻿using SleuthKit.Structs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SleuthKit
 {
@@ -34,7 +32,7 @@ namespace SleuthKit
         }
 
         #region Properties
-        
+
         /// <summary>
         /// The parent disk image
         /// </summary>
@@ -47,68 +45,43 @@ namespace SleuthKit
         /// <summary>
         /// Managed wrapper for TSK_VS_INFO.
         /// </summary>
-        public TSK_VS_INFO VolumeSystemInfo
-        {
-            get
-            {
-                return this._struct;
-            }
-        }
+        public TSK_VS_INFO VolumeSystemInfo => this._struct;
 
         /// <summary>
         /// The type of volume system used
         /// </summary>
-        public VolumeSystemType Type
-        {
-            get
-            {
-                return this._struct.Type;
-            }
-        }
+        public VolumeSystemType Type => this._struct.Type;
 
         /// <summary>
         /// The number of partitions on this volume system
         /// </summary>
-        public int PartitionCount
-        {
-            get
-            {
-                return this._struct.PartitionCount;
-            }
-        }
+        public long PartitionCount => this._struct.PartitionCount;
 
         /// <summary>
-        /// The number of partitions on this volume system that are allocated 
+        /// The number of partitions on this volume system that are allocated
         /// </summary>
         public int AllocatedPartitionCount
         {
             get
             {
-                int apc =0;
+                int apc = 0;
                 foreach (var fi in this._struct.VolumeInfos)
                 {
-                    if ((fi.Flags & VolumeFlags.Allocated)!=0)
+                    if ((fi.Flags & VolumeFlags.Allocated) != 0)
                     {
                         apc++;
                     }
                 }
                 return apc;
-
             }
         }
 
         /// <summary>
         /// Block size used by this volume system
         /// </summary>
-        public int BlockSize
-        {
-            get
-            {
-                return _struct.BlockSize;
-            }
-        }
+        public uint BlockSize => _struct.BlockSize;
 
-        #endregion
+        #endregion Properties
 
         /// <summary>
         /// Gets volumes

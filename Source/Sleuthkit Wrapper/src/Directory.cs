@@ -28,7 +28,7 @@ namespace SleuthKit
             this._handle = dh;
             this._struct = dh.GetStruct();
             this._parentDir = parent;
-            
+
             var fileStruct = (TSK_FS_FILE)Marshal.PtrToStructure(_struct.fs_dir, typeof(TSK_FS_FILE));
 
             if (fileStruct.Metadata.HasValue)
@@ -59,7 +59,7 @@ namespace SleuthKit
         }
 
         #region Properties
-        
+
         /// <summary>
         /// The full path
         /// </summary>
@@ -80,7 +80,7 @@ namespace SleuthKit
                     {
                         var pp = _parentDir.Path;
                         buf.Append(pp);
-                        buf.Append("/");
+                        buf.Append('/');
                     }
 
                     buf.Append(this.Name);
@@ -108,7 +108,7 @@ namespace SleuthKit
             }
         }
 
-        #endregion
+        #endregion Properties
 
         /// <summary>
         /// Releases resources
@@ -121,7 +121,7 @@ namespace SleuthKit
         /// <summary>
         /// open file
         /// </summary>
-        /// <returns></returns>
+
         public TSK_FS_FILE GetFileStruct()
         {
             var fs = (TSK_FS_FILE)Marshal.PtrToStructure(this._struct.fs_dir, typeof(TSK_FS_FILE));
@@ -137,9 +137,9 @@ namespace SleuthKit
         {
             get
             {
-                for (int a = 0; a < _struct.names_used; a++)
+                for (ulong a = 0; a < _struct.names_used; a++)
                 {
-                    yield return _struct.ptr_list_names.ElementAt<TSK_FS_NAME>(a);
+                    yield return _struct.ptr_list_names.ElementAt<TSK_FS_NAME>((int)a);
                 }
             }
         }
@@ -156,7 +156,7 @@ namespace SleuthKit
                     if (e.Metadata.HasValue && (e.Metadata.Value.MetadataType == MetadataType.Regular) && e.Name.HasValue)
                     {
                         var fn = e.Name.Value.GetName();
-                        var kidpath = string.Join("\\", new string[] { this.Path, fn }); ;
+                        var kidpath = string.Join("\\", this.Path, fn); ;
                         var f = this._fs.OpenFile(kidpath, this);
                         if (f != null)
                         {
@@ -203,13 +203,13 @@ namespace SleuthKit
             var kidpath = name;
             if (this.Path != "")
             {
-                kidpath = string.Join(@"/", new string[] { this.Path, name }); ;
+                kidpath = string.Join(@"/", this.Path, name); ;
             }
 
             return this.FileSystem.OpenDirectory(kidpath, this);
         }
 
-        internal Directory OpenSubdirectory(long address)
+        internal Directory OpenSubdirectory(ulong address)
         {
             return this.FileSystem.OpenDirectory(address, this);
         }
@@ -238,6 +238,6 @@ namespace SleuthKit
             }
         }
 
-        #endregion
+        #endregion enumerations
     }
 }

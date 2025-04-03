@@ -3,33 +3,21 @@ using System.Runtime.InteropServices;
 
 namespace SleuthKit.Structs
 {
-    [StructLayout(LayoutKind.Explicit, 
-        Size = 456
+    [StructLayout(LayoutKind.Explicit,
+        Size = 456 + 16
     )]
     public struct ISO_INFO
     {
         [FieldOffset(0)]
-        TSK_FS_INFO fs_info;
+        private TSK_FS_INFO fs_info;
 
         // Skipping som properties
-        
-        [FieldOffset(432)]
-        IntPtr pvd_ptr;
 
-        internal TSK_FS_INFO tsk_fs_info
-        {
-            get
-            {
-                return fs_info;
-            }
-        }
+        [FieldOffset(432 + 16)]
+        private IntPtr pvd_ptr;
 
-        public iso9660_pvd pvd
-        {
-            get
-            {
-                return ((iso9660_pvd)Marshal.PtrToStructure(pvd_ptr, typeof(iso9660_pvd)));                
-            }
-        }
+        internal TSK_FS_INFO tsk_fs_info => fs_info;
+
+        public iso9660_pvd pvd => ((iso9660_pvd)Marshal.PtrToStructure(pvd_ptr, typeof(iso9660_pvd)));
     }
 }
